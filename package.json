@@ -1,0 +1,19 @@
+{
+  "name": "starspawn",
+  "version": "1.0.0",
+  "description": "Ingest all the things",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/autotrons/starspawn.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/autotrons/starspawn/issues"
+  },
+  "homepage": "https://github.com/autotrons/starspawn#readme"
+}
