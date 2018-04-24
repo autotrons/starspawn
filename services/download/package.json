@@ -2,7 +2,7 @@
   "name": "download",
   "version": "1.0.0",
   "description": "",
-  "main": "download.js",
+  "main": "./src/download.js",
   "scripts": {
     "test": "mocha ./src/download.test.js"
   },
