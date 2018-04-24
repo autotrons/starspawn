@@ -7,4 +7,4 @@ steps:
   dir: 'functions/autodeploy'
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['beta', 'functions', 'deploy', 'download', '--trigger-http', '--source', './src/download.js']
-  dir: '.'
+  dir: './services/download'
