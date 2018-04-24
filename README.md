@@ -1,6 +1,9 @@
 # starspawn
 Ingest all the things
 
+# Builds
+* Downloads https://console.cloud.google.com/gcr/builds?project=starspawn-201921&query=tags%20%3D%20%22download%22
+
 # Job Feed
 * from Appcast https://appcast.io/
 * the feed https://exchangefeeds.s3.amazonaws.com/9d2dcb702d7d6b801f34227c04c8bb23/feed.xml.gz
