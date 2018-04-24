@@ -1,6 +1,11 @@
 # starspawn
 Ingest all the things
 
+# Job Feed
+  from Appcast
+  https://appcast.io/
+  https://exchangefeeds.s3.amazonaws.com/9d2dcb702d7d6b801f34227c04c8bb23/feed.xml.gz
+
 # Links to tech documentation
 GCP Nodejs
 https://cloud.google.com/nodejs/docs/reference/libraries
