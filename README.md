@@ -2,9 +2,8 @@
 Ingest all the things
 
 # Job Feed
-  from Appcast
-  https://appcast.io/
-  https://exchangefeeds.s3.amazonaws.com/9d2dcb702d7d6b801f34227c04c8bb23/feed.xml.gz
+* from Appcast https://appcast.io/
+* the feed https://exchangefeeds.s3.amazonaws.com/9d2dcb702d7d6b801f34227c04c8bb23/feed.xml.gz
 
 # Links to tech documentation
 GCP Nodejs
@@ -17,6 +16,7 @@ https://developers.google.com/search/docs/data-types/job-posting
 # Ideas:
 
 * Incorporate Accessibility cleanly
+* offer the job feed as a service (better than downloading a giant XML file)
 
 # Schemas
 ```
