@@ -16,7 +16,7 @@ https://developers.google.com/search/docs/data-types/job-posting
 # Ideas:
 
 * Incorporate Accessibility cleanly
-* offer the job feed as a service (better than downloading a giant XML file)
+* Offer the job feed as a service (better than downloading a giant XML file)
 
 # Schemas
 ```
