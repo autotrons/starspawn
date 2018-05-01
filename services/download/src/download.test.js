@@ -4,7 +4,6 @@ const rp = require("request-promise-native")
 const uuid = require(`uuid`)
 const { download } = require("./index")
 const exec = util.promisify(require("child_process").exec)
-var storage = require("@google-cloud/storage")()
 
 var myBucket = storage.bucket("starspawn_xmlfeeds")
 
