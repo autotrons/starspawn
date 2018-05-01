@@ -2,7 +2,7 @@
   "name": "download",
   "version": "1.0.0",
   "description": "",
-  "main": "./src/download.js",
+  "main": "./build/download.js",
   "scripts": {
     "test": "mocha ./build/download.test.js",
     "testwatch": "mocha --watch ./build/download.test.js",
@@ -20,6 +20,6 @@
   "dependencies": {
     "@google-cloud/storage": "^1.6.0",
     "simple-get": "^3.0.2",
-    "uuid": "^3.2.1"
+    "uuid": "3.2.1"
   }
 }

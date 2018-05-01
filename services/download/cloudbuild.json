@@ -2,6 +2,11 @@
   "steps": [
     {
       "name": "gcr.io/cloud-builders/npm",
+      "args": ["cache", "clear", "--force"],
+      "dir": "./services/download"
+    },
+    {
+      "name": "gcr.io/cloud-builders/npm",
       "args": ["install"],
       "dir": "./services/download"
     },

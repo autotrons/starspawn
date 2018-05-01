@@ -43,3 +43,6 @@ https://developers.google.com/search/docs/data-types/job-posting
   "cpc": 0.24
 }
 ```
+
+# Handy commands
+`gcloud beta functions deploy template --trigger-http --source ./build`
