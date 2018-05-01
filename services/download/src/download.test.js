@@ -12,15 +12,15 @@ describe("download.js", () => {
   before(() => {})
   it("should download a file", async () => {
     const name = uuid.v4()
-    // const req = {
-    //   body: {
-    //     url: "https://storage.googleapis.com/starspawn_tests/feed.xml.gz"
-    //   }
-    // }
-    // const res = {
-    //   send: () => {}
-    // }
-    // download(req, res)
+    const req = {
+      body: {
+        url: "https://storage.googleapis.com/starspawn_tests/feed.xml.gz"
+      }
+    }
+    const res = {
+      send: () => {}
+    }
+    download(req, res)
     const result = await rp("https://google.com")
   })
   after(() => {})
