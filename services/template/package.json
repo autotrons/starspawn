@@ -1,0 +1,21 @@
+{
+  "name": "template",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha ./build/index.test.js",
+    "testwatch": "mocha --watch ./build/index.test.js",
+    "build": "babel src --out-dir build"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "mocha": "^5.1.1"
+  },
+  "dependencies": {
+    "uuid": "3.2.1"
+  }
+}
