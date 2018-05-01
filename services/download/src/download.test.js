@@ -5,7 +5,7 @@ const uuid = require(`uuid`)
 const { download } = require("./index")
 const exec = util.promisify(require("child_process").exec)
 
-var myBucket = storage.bucket("starspawn_xmlfeeds")
+//var myBucket = storage.bucket("starspawn_xmlfeeds")
 
 describe("download.js", () => {
   before(() => {})
