@@ -1,7 +1,7 @@
 {
   "steps": [
     {
-      "name": "gcr.io/cloud-builders/yarn",
+      "name": "gcr.io/cloud-builders/npm",
       "args": ["install"],
       "dir": "./services/download"
     },
@@ -12,7 +12,7 @@
     },
     {
       "name": "gcr.io/cloud-builders/gcloud",
-      "args": ["beta", "functions", "deploy", "download", "--trigger-http", "--source", "./src"],
+      "args": ["beta", "functions", "deploy", "download", "--trigger-http", "--source", "./build"],
       "dir": "./services/download"
     }
   ],
