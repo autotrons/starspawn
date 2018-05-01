@@ -3,19 +3,19 @@
     {
       "name": "gcr.io/cloud-builders/npm",
       "args": ["install"],
-      "dir": "./services/download"
+      "dir": "./functions/${_FUNCTION_NAME}"
     },
     {
       "name": "gcr.io/cloud-builders/npm",
       "args": ["test"],
-      "dir": "./services/download"
+      "dir": "./functions/${_FUNCTION_NAME}"
     },
     {
       "name": "gcr.io/cloud-builders/gcloud",
-      "args": ["beta", "functions", "deploy", "download", "--trigger-http"],
-      "dir": "./services/download"
+      "args": ["beta", "functions", "deploy", "${_FUNCTION_NAME}", "--trigger-http"],
+      "dir": "./functions/${_FUNCTION_NAME}"
     }
   ],
-  "tags": ["service", "download"]
+  "tags": ["service", "${_FUNCTION_NAME}"]
 }
 
