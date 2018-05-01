@@ -4,11 +4,23 @@
   "description": "",
   "main": "./src/download.js",
   "scripts": {
-    "test": "mocha ./src/download.test.js"
+    "test": "mocha ./build/download.test.js",
+    "testwatch": "mocha --watch ./build/download.test.js",
+    "build": "babel src --out-dir build"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "mocha": "^5.1.1"
+    "@google-cloud/functions-emulator": "^1.0.0-beta.4",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "mocha": "^5.1.1",
+    "request": "^2.85.0",
+    "request-promise-native": "^1.0.5"
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^1.6.0",
+    "simple-get": "^3.0.2",
+    "uuid": "^3.2.1"
   }
 }
