@@ -2,11 +2,6 @@
   "steps": [
     {
       "name": "gcr.io/cloud-builders/npm",
-      "args": ["cache", "clear", "--force"],
-      "dir": "./services/download"
-    },
-    {
-      "name": "gcr.io/cloud-builders/npm",
       "args": ["install"],
       "dir": "./services/download"
     },
@@ -17,7 +12,7 @@
     },
     {
       "name": "gcr.io/cloud-builders/gcloud",
-      "args": ["beta", "functions", "deploy", "download", "--trigger-http", "--source", "./build"],
+      "args": ["beta", "functions", "deploy", "download", "--trigger-http"],
       "dir": "./services/download"
     }
   ],
