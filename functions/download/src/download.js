@@ -1,7 +1,8 @@
-const storage = require("@google-cloud/storage")
+const uuid = require("uuid")
 const download = async (req, res) => {
-  console.log("some log message")
-  res.send("Downloading this shit")
+  const id = uuid.v4()
+  console.log(`uuid ${id}`)
+  res.send(`v1 ${id}`)
 }
 
 module.exports = {

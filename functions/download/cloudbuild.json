@@ -1,7 +1,7 @@
 {
   "steps": [
     {
-      "name": "gcr.io/cloud-builders/npm",
+      "name": "gcr.io/cloud-builders/yarn",
       "args": ["install"],
       "dir": "./functions/${_FUNCTION_NAME}"
     },
