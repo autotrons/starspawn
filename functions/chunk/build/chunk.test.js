@@ -4,30 +4,14 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 const equal = require("assert").deepEqual;
 const util = require("util");
-const rp = require("request-promise-native");
 const uuid = require(`uuid`);
-const { download } = require("./download");
+const { chunk } = require("./chunk");
 const exec = util.promisify(require("child_process").exec);
 
 //var myBucket = storage.bucket("starspawn_xmlfeeds")
 
-describe("download.js", () => {
+describe("chunk.js", () => {
   before(() => {});
-  it("should download a file", _asyncToGenerator(function* () {
-    const name = uuid.v4();
-    const req = {
-      body: {
-        url: "https://storage.googleapis.com/starspawn_tests/feed.xml.gz"
-      }
-    };
-    const res = {
-      status: function () {
-        return { send: () => {} };
-      },
-      send: function () {}
-    };
-    download(req, res);
-    const result = yield rp("https://google.com");
-  }));
+  it("should chunk a file", _asyncToGenerator(function* () {}));
   after(() => {});
 });

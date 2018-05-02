@@ -1,6 +1,5 @@
 const equal = require("assert").deepEqual
 const util = require("util")
-const rp = require("request-promise-native")
 const uuid = require(`uuid`)
 const { chunk } = require("./chunk")
 const exec = util.promisify(require("child_process").exec)
