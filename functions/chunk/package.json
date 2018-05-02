@@ -1,0 +1,22 @@
+{
+  "name": "chunk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./build/chunk.js",
+  "scripts": {
+    "test": "mocha ./build/chunk.test.js",
+    "testwatch": "mocha --watch ./build/chunk.test.js",
+    "build": "babel src --out-dir build"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "mocha": "^5.1.1"
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^1.6.0",
+    "uuid": "3.2.1"
+  }
+}
