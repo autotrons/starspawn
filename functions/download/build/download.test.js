@@ -21,6 +21,9 @@ describe("download.js", () => {
       }
     };
     const res = {
+      status: function () {
+        return { send: () => {} };
+      },
       send: function () {}
     };
     download(req, res);

@@ -8,23 +8,24 @@ var myBucket = storage.bucket("datafeeds");
 const get = require("simple-get");
 
 const download = (() => {
-  var _ref = _asyncToGenerator(function* (req, res) {
+  var _ref = _asyncToGenerator(function* (req, downloadResponse) {
     const id = uuid.v4();
     console.log(`${id} starting`);
     const file = myBucket.file(`${id}.xml.gz`);
-    get("https://exchangefeeds.s3.amazonaws.com/9d2dcb702d7d6b801f34227c04c8bb23/feed.xml.gz", function (err, res) {
+    get("https://exchangefeeds.s3.amazonaws.com/9d2dcb702d7d6b801f34227c04c8bb23/feed.xml.gz", function (err, getResponse) {
       if (err) {
         console.error(`${id} ${err.toString()}`);
+        downloadResponse.status(500).send({ id, status: err.toString() });
       }
-      console.log(`${id} ${res.statusCode}`);
-      res.pipe(file.createWriteStream()).on("error", function (err) {
+      console.log(`${id} getResponse ${getResponse.statusCode}`);
+      getResponse.pipe(file.createWriteStream()).on("error", function (err) {
         console.error(`${id} ${err.toString()}`);
+        downloadResponse.status(500).send({ id, status: err.toString() });
       }).on("finish", function () {
         console.log(`${id} complete`);
-      }); // `res` is a stream
+        downloadResponse.status(200).send({ id, status: "complete" });
+      });
     });
-
-    res.send({ id, status: "downloading" });
   });
 
   return function download(_x, _x2) {

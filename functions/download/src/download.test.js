@@ -17,6 +17,9 @@ describe("download.js", () => {
       }
     }
     const res = {
+      status: function() {
+        return { send: () => {} }
+      },
       send: () => {}
     }
     download(req, res)
