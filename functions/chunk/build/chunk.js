@@ -6,18 +6,18 @@ const uuid = require("uuid");
 var storage = require("@google-cloud/storage")();
 var myBucket = storage.bucket("datafeeds");
 
-const download = (() => {
+const chunk = (() => {
   var _ref = _asyncToGenerator(function* (req, downloadResponse) {
     const id = uuid.v4();
     console.log(`${id} starting`);
     downloadResponse.status(200).send({ id, status: "complete" });
   });
 
-  return function download(_x, _x2) {
+  return function chunk(_x, _x2) {
     return _ref.apply(this, arguments);
   };
 })();
 
 module.exports = {
-  download
+  chunk
 };
