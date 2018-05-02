@@ -11,7 +11,7 @@ const download = (() => {
   var _ref = _asyncToGenerator(function* (req, downloadResponse) {
     const id = uuid.v4();
     console.log(`${id} starting`);
-    const file = myBucket.file(`${id}.xml.gz`);
+    const file = myBucket.file(`full_feed/${id}.xml.gz`);
     get("https://exchangefeeds.s3.amazonaws.com/9d2dcb702d7d6b801f34227c04c8bb23/feed.xml.gz", function (err, getResponse) {
       if (err) {
         console.error(`${id} ${err.toString()}`);

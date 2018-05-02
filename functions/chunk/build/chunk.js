@@ -7,13 +7,25 @@ var storage = require("@google-cloud/storage")();
 var myBucket = storage.bucket("datafeeds");
 
 const chunk = (() => {
-  var _ref = _asyncToGenerator(function* (req, downloadResponse) {
+  var _ref = _asyncToGenerator(function* (event) {
     const id = uuid.v4();
     console.log(`${id} starting`);
-    downloadResponse.status(200).send({ id, status: "complete" });
+    const file = event.data;
+    const context = event.context;
+    const fileHandle = myBucket.file(file.name);
+
+    console.log(`Event ${context.eventId}`);
+    console.log(`Event Type: ${context.eventType}`);
+    console.log(`Bucket: ${file.bucket}`);
+    console.log(`File: ${file.name}`);
+    console.log(`Metageneration: ${file.metageneration}`);
+    console.log(`Created: ${file.timeCreated}`);
+    console.log(`Updated: ${file.updated}`);
+    console.log(`ResourceState: ${file.resourceState}`);
+    return { id, status: "complete" };
   });
 
-  return function chunk(_x, _x2) {
+  return function chunk(_x) {
     return _ref.apply(this, arguments);
   };
 })();

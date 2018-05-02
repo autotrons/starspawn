@@ -12,6 +12,20 @@ const exec = util.promisify(require("child_process").exec);
 
 describe("chunk.js", () => {
   before(() => {});
-  it("should chunk a file", _asyncToGenerator(function* () {}));
+  it("should chunk a file", _asyncToGenerator(function* () {
+    const event = {
+      data: {
+        bucket: "datafeeds",
+        name: "full_feed/test_feed.xml.gz",
+        metageneration: 1,
+        timeCreated: Date.now()
+      },
+      context: {
+        eventType: "et"
+      }
+    };
+    const result = yield chunk(event);
+    equal(result.status, "complete");
+  }));
   after(() => {});
 });
