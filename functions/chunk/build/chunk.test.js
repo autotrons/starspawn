@@ -10,7 +10,8 @@ const exec = util.promisify(require("child_process").exec);
 
 //var myBucket = storage.bucket("starspawn_xmlfeeds")
 
-describe("chunk.js", () => {
+describe("chunk.js", function () {
+  this.timeout(30 * 1000);
   before(() => {});
   it("should chunk a file", _asyncToGenerator(function* () {
     const event = {

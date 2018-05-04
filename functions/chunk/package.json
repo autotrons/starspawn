@@ -17,6 +17,8 @@
   },
   "dependencies": {
     "@google-cloud/storage": "^1.6.0",
-    "uuid": "3.2.1"
+    "event-stream": "^3.3.4",
+    "uuid": "3.2.1",
+    "xmlsplit": "^1.2.8"
   }
 }
