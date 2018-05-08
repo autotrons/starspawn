@@ -50,13 +50,13 @@ describe("unzip.js", function () {
       source_filename: "full_feed/feed_100.xml.gz",
       target_bucket: "datafeeds",
       target_filename: `unziped/${uuid.v4()}.xml`
-    };
-    const { req, res } = make_req_res(req_data);
+      // const { req, res } = make_req_res(req_data)
 
-    const result = yield unzip(req, res);
-    if (isFailure(result)) console.log(result);
-    assertSuccess(result);
-    const r2 = yield exists(req_data.target_bucket, req_data.target_filename);
-    assertSuccess(r2, true);
+      // const result = await unzip(req, res)
+      // if (isFailure(result)) console.log(result)
+      // assertSuccess(result)
+      // const r2 = await exists(req_data.target_bucket, req_data.target_filename)
+      // assertSuccess(r2, true)
+    };
   }));
 });
