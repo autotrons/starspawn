@@ -4,10 +4,12 @@ let unzip = (() => {
   var _ref = _asyncToGenerator(function* (req, res) {
     const id = uuid.v4();
     try {
-      res.status(200);
-      res.send(success({
-        id
-      }));
+      // res.status(200)
+      // res.send(
+      //   success({
+      //     id
+      //   })
+      // )
       return success({
         id,
         function_name
