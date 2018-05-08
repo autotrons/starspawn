@@ -40,7 +40,7 @@ describe("unzip.js", function() {
   it("should unzip a file", async () => {
     const req_data = {
       source_bucket: "datafeeds",
-      source_filename: "feed_100.xml.gz",
+      source_filename: "full_feed/feed_100.xml.gz",
       target_bucket: "datafeeds",
       target_filename: `unziped/${uuid.v4()}.xml`
     }
@@ -49,7 +49,7 @@ describe("unzip.js", function() {
     const result = await unzip(req, res)
     if (isFailure(result)) console.log(result)
     assertSuccess(result)
-    // const r2 = await exists(req_data.target_bucket, req_data.target_filename)
-    // assertSuccess(r2, true)
+    const r2 = await exists(req_data.target_bucket, req_data.target_filename)
+    assertSuccess(r2, true)
   })
 })

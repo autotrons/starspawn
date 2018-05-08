@@ -9,26 +9,24 @@ const function_name = "unzip"
 async function unzip(req, res) {
   const id = uuid.v4()
   try {
-    // res.status(200)
-    // res.send(
-    //   success({
-    //     id
-    //   })
-    // )
+    const result = await do_file_things(req)
+    res_ok(res, { id, function_name })
     return success({
       id,
       function_name
     })
   } catch (e) {
-    res.status(500)
-    res.send(
-      failure({
-        id
-      })
-    )
-
+    res_err(res, { id, function_name, error: e.toString() })
     return failure(e.toString())
   }
+}
+
+function res_ok(res, payload) {
+  res.status(200).send(success(payload))
+}
+
+function res_err(res, payload) {
+  res.status(500).send(failure(payload))
 }
 
 function do_file_things(req) {
@@ -39,27 +37,21 @@ function do_file_things(req) {
     target_filename
   } = req.body.attributes
   const s_bucket = storage.bucket(source_bucket)
-  const readStream = s_bucket.file(source_filename).createReadStream({})
+  const s_file = s_bucket.file(source_filename)
   const t_bucket = storage.bucket(target_bucket)
-  const writeStream = t_bucket.file(target_filename).createWriteStream({})
+  const t_file = t_bucket.file(target_filename)
   return new Promise((res, rej) => {
-    readStream
+    console.log(source_bucket)
+    console.log(target_filename)
+    s_file
+      .createReadStream()
       .pipe(gzip)
-      .pipe(writeStream)
-      .on("end", () => {
-        console.info(`${id} ${functionName} complete`)
-        resolve({
-          id,
-          status: "complete"
-        })
+      .pipe(t_file.createWriteStream())
+      .on("finish", () => {
+        res()
       })
       .on("error", err => {
-        console.error(`${id} ${err.toString()}`)
-        reject({
-          id,
-          status: "error",
-          error: err.toString()
-        })
+        rej(err.toString())
       })
   })
 }
