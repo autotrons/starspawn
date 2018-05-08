@@ -17,11 +17,13 @@ async function unzip(req, res) {
 }
 
 function res_ok(res, payload) {
+  console.info(payload)
   res.status(200).send(success(payload))
   return success(payload)
 }
 
 function res_err(res, payload) {
+  console.error(payload)
   res.status(500).send(failure(payload))
   return failure(payload)
 }
