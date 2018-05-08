@@ -45,4 +45,8 @@ https://developers.google.com/search/docs/data-types/job-posting
 ```
 
 # Handy commands
-`gcloud beta functions deploy template --trigger-http --source ./build`
+```bash
+gcloud beta functions deploy template --trigger-http --source ./build
+rename 's/chunk/unzip/' **/*(D.)
+sed -i '' 's/chunk/unzip/g' **/*(D.)
+```

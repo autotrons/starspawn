@@ -1,11 +1,11 @@
 {
-  "name": "chunk",
+  "name": "unzip",
   "version": "1.0.0",
   "description": "",
-  "main": "./build/chunk.js",
+  "main": "./build/unzip.js",
   "scripts": {
-    "test": "mocha ./build/chunk.test.js",
-    "testwatch": "mocha --watch ./build/chunk.test.js",
+    "test": "mocha ./build/unzip.test.js",
+    "testwatch": "mocha --watch ./build/unzip.test.js",
     "build": "babel src --out-dir build",
     "lint": "prettier  --write \"./src/**/*.js\"",
     "lint-watch": "onchange './src/**/*.js' -- prettier --write {{changed}}"
@@ -21,9 +21,8 @@
   },
   "dependencies": {
     "@google-cloud/storage": "^1.6.0",
-    "event-stream": "^3.3.4",
-    "uuid": "3.2.1",
-    "xmlsplit": "^1.2.8"
+    "@pheasantplucker/failables-node6": "^2.0.3",
+    "uuid": "3.2.1"
   },
   "prettier": {
     "semi": false,

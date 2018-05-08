@@ -7,7 +7,7 @@ const exec = util.promisify(require("child_process").exec)
 //var myBucket = storage.bucket("starspawn_xmlfeeds")
 
 describe("chunk.js", function() {
-  this.timeout(30 * 1000)
+  this.timeout(540 * 1000)
   before(() => {})
   it("should chunk a file", async () => {
     const event = {
@@ -21,8 +21,12 @@ describe("chunk.js", function() {
         eventType: "et"
       }
     }
-    const result = await chunk(event)
-    equal(result.status, "complete")
+    try {
+      const result = await chunk(event)
+      equal(result.status, "complete")
+    } catch (e) {
+      console.log(e.toString())
+    }
   })
   after(() => {})
 })
