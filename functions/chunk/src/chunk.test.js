@@ -13,7 +13,7 @@ describe("chunk.js", function() {
     const event = {
       data: {
         bucket: "datafeeds",
-        name: "full_feed/test_feed.xml.gz",
+        name: "full_feed/feed_100.xml.gz",
         metageneration: 1,
         timeCreated: Date.now()
       },
