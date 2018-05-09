@@ -12,15 +12,10 @@
     },
     {
       "name": "gcr.io/cloud-builders/gcloud",
-      "args": [
-        "beta",
-        "functions",
-        "deploy",
-        "${_FUNCTION_NAME}",
-        "--trigger-http"
-      ],
+      "args": ["beta", "functions", "deploy", "${_FUNCTION_NAME}", "--trigger-resource", "datafeeds", "--trigger-event", "google.storage.object.finalize"],
       "dir": "./functions/${_FUNCTION_NAME}"
     }
   ],
   "tags": ["service", "${_FUNCTION_NAME}"]
 }
+

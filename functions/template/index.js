@@ -1,5 +1,7 @@
-const { template } = require("./build/template");
+const {
+  template
+} = require("./build/template.js")
 
 module.exports = {
   template
-};
+}

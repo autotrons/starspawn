@@ -1,8 +1,8 @@
 const { assertSuccess } = require("@pheasantplucker/failables-node6")
-const { chunk } = require("./chunk")
+const { template } = require("./template")
 const MEGABYTE = Math.pow(2, 20)
 
-describe("chunk.js", function() {
+describe("template.js", function() {
   this.timeout(540 * 1000)
   it("should pull a batch of tags between two points in the file", async () => {
     const input = {
@@ -12,7 +12,7 @@ describe("chunk.js", function() {
       end_text: "</job>"
     }
     const { req, res } = make_req_res(input)
-    const result = await chunk(req, res)
+    const result = await template(req, res)
     assertSuccess(result)
   })
 })

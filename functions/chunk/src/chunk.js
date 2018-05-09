@@ -1,68 +1,39 @@
 const uuid = require("uuid")
-const zlib = require("zlib")
+const { failure, success } = require("@pheasantplucker/failables-node6")
+
 const storage = require("@google-cloud/storage")()
-const xmlsplit = require("xmlsplit")
-const es = require("event-stream")
-const fs = require("fs")
-const Writable = require("stream").Writable
-
-const gzip = zlib.createUnzip()
 const myBucket = storage.bucket("datafeeds")
-const spliter = new xmlsplit(10, "job")
 
-const chunk = async event => {
+async function chunk(req, res) {
   const id = uuid.v4()
   console.log(`${id} starting`)
-  const file = event.data
-  const context = event.context
-  const readFileHandle = myBucket.file(file.name)
-  const writeFileHandle = myBucket.file(file.name)
+
+  //const readFileHandle = myBucket.file(file.name)
+  //const writeFileHandle = myBucket.file(file.name)
   let counter = 0
-  console.log(__dirname)
-  const ws = Writable()
-  ws._write = function(chunk, enc, next) {
-    counter += 1
-    const c = counter
-    const filename = `chunks/${id}/${counter}.xml`
-    const f = myBucket.file(filename)
-    f.save(
-      chunk,
-      {
-        validation: false
-      },
-      err => {
-        if (err) {
-          console.error("saveError: " + err.toString())
-          next()
-        } else {
-          console.info(`wrote ${filename}`)
-          next()
-        }
-      }
-    )
-  }
-  return new Promise((resolve, reject) => {
-    readFileHandle
-      .createReadStream()
-      .pipe(gzip)
-      .pipe(spliter)
-      .pipe(ws)
-      .on("end", () => {
-        console.info(`map complete`)
-        resolve({
-          id,
-          status: "complete"
-        })
-      })
-      .on("error", err => {
-        console.error(`${id} ${err.toString()}`)
-        reject({
-          id,
-          status: "error",
-          error: err.toString()
-        })
-      })
+  return res_ok(res, { id })
+}
+
+function readSomeData() {
+  const readable = getReadableStreamSomehow()
+  readable.on("readable", () => {
+    let chunk
+    while (null !== (chunk = readable.read())) {
+      console.log(`Received ${chunk.length} bytes of data.`)
+    }
   })
+}
+
+function res_ok(res, payload) {
+  console.info(payload)
+  res.status(200).send(success(payload))
+  return success(payload)
+}
+
+function res_err(res, payload) {
+  console.error(payload)
+  res.status(500).send(failure(payload))
+  return failure(payload)
 }
 
 module.exports = {
