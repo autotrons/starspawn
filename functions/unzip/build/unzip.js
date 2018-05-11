@@ -27,6 +27,7 @@ const gzip = zlib.createUnzip();
 const function_name = "unzip";
 
 function res_ok(res, payload) {
+  console.log(Date.now());
   console.info(payload);
   res.status(200).send(success(payload));
   return success(payload);
