@@ -23,6 +23,7 @@
     "@google-cloud/storage": "^1.6.0",
     "@pheasantplucker/failables-node6": "^2.0.3",
     "event-stream": "^3.3.4",
+    "mississippi": "^3.0.0",
     "uuid": "3.2.1",
     "xmlsplit": "^1.2.8"
   },
