@@ -4,8 +4,8 @@ let render = (() => {
   var _ref = _asyncToGenerator(function* (req, res) {
     const id = uuid.v4();
     console.log(`${id} starting`);
-    console.log(req.params);
-    console.log(req.url);
+    console.log("this is the req.params :" + req.params);
+    console.log("this is the req.url :" + req.url);
     console.log("werxing");
     console.log("got to here");
     //const readFileHandle = myBucket.file(file.name)
