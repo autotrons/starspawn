@@ -18,6 +18,7 @@ async function unzip(req, res) {
 
 function res_ok(res, payload) {
   console.info(payload)
+  console.info('test')
   res.status(200).send(success(payload))
   return success(payload)
 }
