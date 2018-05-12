@@ -7,7 +7,7 @@ const myBucket = storage.bucket("datafeeds")
 async function render(req, res) {
   const id = uuid.v4()
   console.log(`${id} starting`)
-  console.log("this is the req.params :" + req.params)
+  console.log("this is the req.originalUrl :" + req.originalUrl)
   console.log("this is the req.url :" + req.url)
   console.log("werxing")
   console.log("got to here")
