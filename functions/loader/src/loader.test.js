@@ -34,8 +34,8 @@ describe('loader.js', function() {
     const result = await loader(req, res)
     assertSuccess(result)
     const writtenJobs = payload(result)
-    job1Key = writtenJobs.jobEntities[0].key
-    job1UniqueId = job1Key.name
+    const job1Key = writtenJobs.jobEntities[0].key
+    const job1UniqueId = job1Key.name
     const readCheckResult = await readEntities([job1Key])
     assertSuccess(readCheckResult)
 
