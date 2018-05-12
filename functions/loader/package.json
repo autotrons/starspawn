@@ -1,0 +1,33 @@
+{
+  "name": "loader",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./build/loader.js",
+  "scripts": {
+    "test": "mocha ./build/loader.test.js",
+    "testwatch": "mocha --watch ./build/loader.test.js",
+    "build": "babel src --out-dir build",
+    "lint": "prettier  --write \"./src/**/*.js\"",
+    "lint-watch": "onchange './src/**/*.js' -- prettier --write {{changed}}"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "mocha": "^5.1.1",
+    "onchange": "^4.0.0",
+    "prettier": "1.12.1"
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^1.6.0",
+    "@pheasantplucker/failables-node6": "^2.0.3",
+    "event-stream": "^3.3.4",
+    "uuid": "3.2.1",
+    "xmlsplit": "^1.2.8"
+  },
+  "prettier": {
+    "semi": false,
+    "bracketSpacing": true
+  }
+}
