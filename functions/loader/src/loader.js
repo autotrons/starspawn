@@ -1,41 +1,92 @@
-const uuid = require("uuid")
-const { failure, success } = require("@pheasantplucker/failables-node6")
+const uuid = require('uuid')
+const {
+  success,
+  failure,
+  isFailure,
+  payload,
+} = require('@pheasantplucker/failables-node6')
+const {
+  createDatastoreClient,
+  // makeDatastoreKey,
+  makeEntityByName,
+  writeEntity,
+  // deleteEntity,
+  readEntities,
+  // formatResponse,
+  // createQueryObj,
+  // runQuery,
+  // runQueryKeysOnly,
+  // deleteByKey,
+  // getRawEntitiesByKeys,
+  // formatKeyResponse,
+  // getDatastoreKeySymbol,
+} = require('@pheasantplucker/gc-datastore')
 
-const storage = require("@google-cloud/storage")()
-const myBucket = storage.bucket("datafeeds")
-
-async function loader(req, res) {
+const loader = async (req, res) => {
   const id = uuid.v4()
-  console.log(`${id} starting`)
 
-  //const readFileHandle = myBucket.file(file.name)
-  //const writeFileHandle = myBucket.file(file.name)
-  let counter = 0
-  return res_ok(res, { id })
+  const jobsResult = getAttributes(req)
+  if (isFailure(jobsResult)) return jobsResult
+  const jobs = payload(jobsResult)
+
+  const datastore = createDatastoreClient()
+  // all jobs need extra field IS_TEST = true/false
+
+  const jobEntitiesResult = await jobsToEntities(jobs)
+  if (isFailure(jobEntitiesResult)) return jobEntitiesResult
+
+  const jobEntities = payload(jobEntitiesResult)
+
+  const writeResult = await writeEntity(jobEntities)
+  if (isFailure(writeResult)) return writeResult
+  const writePayload = payload(writeResult)
+
+  return res_ok(res, { jobEntities, writePayload })
 }
 
-function readSomeData() {
-  const readable = getReadableStreamSomehow()
-  readable.on("readable", () => {
-    let loader
-    while (null !== (loader = readable.read())) {
-      console.log(`Received ${loader.length} bytes of data.`)
+const getAttributes = req => {
+  try {
+    if (req.body.attributes) {
+      return success(req.body.attributes)
+    } else {
+      return failure(req, { error: 'couldnt access req.body.attributes' })
     }
-  })
+  } catch (e) {
+    return failure(e.toString(), {
+      error: 'couldnt access req.body.attributes',
+      req: req,
+    })
+  }
 }
 
 function res_ok(res, payload) {
-  console.info(payload)
   res.status(200).send(success(payload))
   return success(payload)
 }
 
-function res_err(res, payload) {
-  console.error(payload)
-  res.status(500).send(failure(payload))
-  return failure(payload)
+const jobsToEntities = jobs => {
+  const kind = 'jobs' //hmm, testing data?
+  try {
+    const entities = jobs.map(job => {
+      const thisEntity = makeEntityByName(kind, job.job_reference, job)
+      return payload(thisEntity)
+    })
+    return success(entities)
+  } catch (e) {
+    return failure(e.toString(), {
+      jobs: jobs,
+    })
+  }
 }
 
+// function res_err(res, payload) {
+//   console.error(payload)
+//   res.status(500).send(failure(payload))
+//   return failure(payload)
+// }
+
 module.exports = {
-  loader
+  loader,
+  getAttributes,
+  jobsToEntities,
 }

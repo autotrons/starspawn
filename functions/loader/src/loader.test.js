@@ -1,38 +1,89 @@
-const { assertSuccess } = require("@pheasantplucker/failables-node6")
-const { loader } = require("./loader")
-const MEGABYTE = Math.pow(2, 20)
+const {
+  assertSuccess,
+  assertFailure,
+  payload,
+} = require('@pheasantplucker/failables-node6')
+const {
+  createDatastoreClient,
+  // makeDatastoreKey,
+  // makeEntityByName,
+  // writeEntity,
+  // deleteEntity,
+  readEntities,
+  // formatResponse,
+  // createQueryObj,
+  // runQuery,
+  // runQueryKeysOnly,
+  // deleteByKey,
+  // getRawEntitiesByKeys,
+  // formatKeyResponse,
+  getDatastoreKeySymbol,
+} = require('@pheasantplucker/gc-datastore')
 
-describe("loader.js", function() {
+const { loader, getAttributes, jobsToEntities } = require('./loader')
+const equal = require('assert').deepEqual
+
+const fakeJobArray = require('../../../samples/fakejobsarray.json')
+const datastore = createDatastoreClient()
+const dsKey = getDatastoreKeySymbol()
+
+describe('loader.js', function() {
   this.timeout(540 * 1000)
-  it("should load a list of jobs into Datastore", async () => {
-    const input = {
-      start: 1 * MEGABYTE,
-      end: 2 * MEGABYTE,
-      start_text: "<job>",
-      end_text: "</job>"
-    }
-    const { req, res } = make_req_res(input)
+  it('should load a list of jobs into Datastore', async () => {
+    const { req, res } = make_req_res(fakeJobArray)
     const result = await loader(req, res)
+    assertSuccess(result)
+    const writtenJobs = payload(result)
+    job1Key = writtenJobs.jobEntities[0].key
+    job1UniqueId = job1Key.name
+    const readCheckResult = await readEntities([job1Key])
+    assertSuccess(readCheckResult)
+
+    const readData = payload(readCheckResult)
+    equal(readData[job1UniqueId].title, fakeJobArray[0].title)
+  })
+
+  it(`should fail if not given body.attributes`, async () => {
+    const badReq = {}
+    const result = await loader(badReq, {})
+    assertFailure(result)
+  })
+})
+
+describe(`jobstoEntities()`, () => {
+  it(`should take an array of jobs and return an array of entities`, () => {
+    const result = jobsToEntities(fakeJobArray)
     assertSuccess(result)
   })
 })
 
-function make_req_res(attributes) {
+describe(`getAttributes`, () => {
+  it(`should return the payload of the request`, () => {
+    const dataPayload = { data: 123 }
+    const request = make_req_res(dataPayload)
+    const { req } = request
+    const result = getAttributes(req)
+    const reqPayload = payload(result)
+    equal(reqPayload, dataPayload)
+  })
+})
+
+const make_req_res = attributes => {
   const req = {
     body: {
-      attributes
-    }
+      attributes,
+    },
   }
   const res = {
-    status: function() {
+    status: () => {
       return {
-        send: () => {}
+        send: () => {},
       }
     },
-    send: () => {}
+    send: () => {},
   }
   return {
     req,
-    res
+    res,
   }
 }
