@@ -77,3 +77,6 @@ Once your function is running you can execute:
 `functions-emulator logs read`
 OR
 `functions-emulator status`, collect the `.log` filename and `tail -f` (i.e. `~/.nvm/versions/node/v7.7.1/lib/node_modules/@google-cloud/functions-emulator/logs/cloud-functions-emulator.log`
+# Cloud Function Links
+Issue Tracker
+https://issuetracker.google.com/issues?q=componentid:187195%20status:open
