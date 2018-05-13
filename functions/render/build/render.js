@@ -29,8 +29,8 @@ let render = (() => {
 
 let getDataFromDatastore = (() => {
   var _ref2 = _asyncToGenerator(function* (keyName) {
-    const datastore = createDatastoreClient("starspawn-201921");
-    const entityKeyResult = makeDatastoreKey("jobs", keyName);
+    const datastore = createDatastoreClient(projectFullName);
+    const entityKeyResult = makeDatastoreKey(entityKeyKind, keyName);
     if (isFailure(entityKeyResult)) return entityKeyResult;
     const entityKey = payload(entityKeyResult);
     const entity = yield readEntities([entityKey]);
@@ -47,7 +47,6 @@ let getDataFromDatastore = (() => {
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 const uuid = require("uuid");
-const datastore = require("@google-cloud/datastore");
 const cons = require("consolidate");
 const path = require("path");
 const {
@@ -59,19 +58,11 @@ const {
 const {
   createDatastoreClient,
   makeDatastoreKey,
-  makeEntityByName,
-  writeEntity,
-  // deleteEntity,
   readEntities
-  // formatResponse,
-  // createQueryObj,
-  // runQuery,
-  // runQueryKeysOnly,
-  // deleteByKey,
-  // getRawEntitiesByKeys,
-  // formatKeyResponse,
-  // getDatastoreKeySymbol,
 } = require("@pheasantplucker/gc-datastore");
+
+const projectFullName = "starspawn-201921";
+const entityKeyKind = "jobs";
 
 const getJobId = req => {
   try {

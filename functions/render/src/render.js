@@ -1,5 +1,4 @@
 const uuid = require("uuid")
-const datastore = require("@google-cloud/datastore")
 const cons = require("consolidate")
 const path = require("path")
 const {
@@ -11,19 +10,11 @@ const {
 const {
   createDatastoreClient,
   makeDatastoreKey,
-  makeEntityByName,
-  writeEntity,
-  // deleteEntity,
   readEntities
-  // formatResponse,
-  // createQueryObj,
-  // runQuery,
-  // runQueryKeysOnly,
-  // deleteByKey,
-  // getRawEntitiesByKeys,
-  // formatKeyResponse,
-  // getDatastoreKeySymbol,
 } = require("@pheasantplucker/gc-datastore")
+
+const projectFullName = "starspawn-201921"
+const entityKeyKind = "jobs"
 
 async function render(req, res) {
   const id = uuid.v4()
@@ -47,8 +38,8 @@ async function render(req, res) {
 }
 
 async function getDataFromDatastore(keyName) {
-  const datastore = createDatastoreClient("starspawn-201921")
-  const entityKeyResult = makeDatastoreKey("jobs", keyName)
+  const datastore = createDatastoreClient(projectFullName)
+  const entityKeyResult = makeDatastoreKey(entityKeyKind, keyName)
   if (isFailure(entityKeyResult)) return entityKeyResult
   const entityKey = payload(entityKeyResult)
   const entity = await readEntities([entityKey])

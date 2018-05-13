@@ -4,18 +4,7 @@ const { parse } = require("himalaya")
 const { render, getDataFromDatastore } = require("./render")
 const {
   createDatastoreClient,
-  // makeDatastoreKey,
-  // makeEntityByName,
-  // writeEntity,
-  // deleteEntity,
   readEntities,
-  // formatResponse,
-  // createQueryObj,
-  // runQuery,
-  // runQueryKeysOnly,
-  // deleteByKey,
-  // getRawEntitiesByKeys,
-  // formatKeyResponse,
   getDatastoreKeySymbol
 } = require("@pheasantplucker/gc-datastore")
 
@@ -31,15 +20,15 @@ describe("render.js ", () => {
     })
   })
 
-  describe("renderer()", function() {
-    it("render an AMP page from a payload", async () => {
+  describe("render()", () => {
+    it("Should render an AMP page from a query string", async () => {
       const { req, res } = make_req_res()
       const result = await render(req, res)
       assertSuccess(result)
       const renderedAmp = payload(result)
       const parsed = parse(renderedAmp)
       assert(typeof renderedAmp === "string")
-      assert(parsed[0].tagName == "!doctype")
+      assert(parsed[0].tagName === "!doctype")
       assert(parsed[2].tagName === "html")
     })
   })
