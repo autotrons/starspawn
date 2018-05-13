@@ -33,9 +33,7 @@ describe("render.js ", () => {
 
   describe("renderer()", function() {
     it("render an AMP page from a payload", async () => {
-      const input = "63_Apr43245"
-
-      const { req, res } = make_req_res(input)
+      const { req, res } = make_req_res()
       const result = await render(req, res)
       assertSuccess(result)
       const renderedAmp = payload(result)
@@ -47,10 +45,10 @@ describe("render.js ", () => {
   })
 })
 
-function make_req_res(attributes) {
+function make_req_res() {
   const req = {
-    body: {
-      attributes
+    query: {
+      jobId: "63_Apr43245"
     }
   }
   const res = {

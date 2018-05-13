@@ -27,7 +27,7 @@ const {
 
 async function render(req, res) {
   const id = uuid.v4()
-  const jobIdResult = getAttributes(req)
+  const jobIdResult = getJobId(req)
   if (isFailure(jobIdResult)) return jobIdResult
   const jobId = payload(jobIdResult)
   const jobDataResult = await getDataFromDatastore(jobId)
@@ -57,29 +57,29 @@ async function getDataFromDatastore(keyName) {
   return success(jobData)
 }
 
-const getAttributes = req => {
+const getJobId = req => {
   try {
-    if (req.body.attributes) {
-      return success(req.body.attributes)
+    if (req.query.jobId) {
+      return success(req.query.jobId)
     } else {
-      return failure(req, { error: "couldnt access req.body.attributes" })
+      return failure(req, { error: "couldnt access req.query" })
     }
   } catch (e) {
     return failure(e.toString(), {
-      error: "couldnt access req.body.attributes",
+      error: "couldnt access req.query",
       req: req
     })
   }
 }
 
 function res_ok(res, payload) {
-  res.status(200).send(success(payload))
+  res.status(200).send(payload)
   return success(payload)
 }
 
 function res_err(res, payload) {
   console.error(payload)
-  res.status(500).send(failure(payload))
+  res.status(500).send(payload)
   return failure(payload)
 }
 
