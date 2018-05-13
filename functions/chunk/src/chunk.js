@@ -16,13 +16,12 @@ async function chunk(req, res) {
   const { bucketpart, filepart } = split_filename(filename)
   const myBucket = storage.bucket(bucketpart)
   const readFileHandle = myBucket.file(filepart)
-  const rStream = readFileHandle.createReadStream()
-  const pairs = await find_file_offsets(
-    rStream,
-    start_text,
-    end_text,
-    start_byte_offset
-  )
+  const rStream = readFileHandle.createReadStream({
+    start: start_byte_offset,
+    end: end_byte_offset
+  })
+
+  pipeline(rStream, start_text, end_text, start_byte_offset)
   return res_ok(res, { id })
 }
 
@@ -30,7 +29,7 @@ function split_at(text, index) {
   return [text.substring(0, index), text.substring(index)]
 }
 
-function find_file_offsets(rs, start_text, end_text, cursor = 0) {
+function pipeline(rs, start_text, end_text, cursor = 0) {
   return new Promise((res, rej) => {
     let pair_idxs = []
     let blocks = []
@@ -76,6 +75,20 @@ function find_file_offsets(rs, start_text, end_text, cursor = 0) {
   })
 }
 
+async function write_blocks(id, filename, blocks) {
+  try {
+    const preblob = `<?xml version="1.0" encoding="UTF-8"?>\n<root>\n`
+    const postblob = `\n</root>`
+    const file = getFileHandle(filename)
+    const blob = blocks.join("\n")
+    const result = await file.save(preblob + blob + postblob)
+    return success(result)
+  } catch (e) {
+    console.log(e.toString())
+    return failure(e.toString())
+  }
+}
+
 function chop(str, idx) {
   return str.slice(idx)
 }
@@ -98,8 +111,16 @@ function split_filename(n) {
   return { bucketpart, filepart }
 }
 
+function getFileHandle(filepath) {
+  const { bucketpart, filepart } = split_filename(filepath)
+  const bucket = storage.bucket(bucketpart)
+  const file = bucket.file(filepart)
+  return file
+}
+
 module.exports = {
   split_at,
   chunk,
-  find_file_offsets
+  pipeline,
+  write_blocks
 }
