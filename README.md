@@ -50,3 +50,30 @@ gcloud beta functions deploy template --trigger-http --source ./build
 rename 's/chunk/unzip/' **/*(D.)
 sed -i '' 's/chunk/unzip/g' **/*(D.)
 ```
+
+# Cloud Functions Emulator
+
+Google offers a Cloud Functions emulator to test your cloud functions locally before pushing them up to GCE
+_https://cloud.google.com/functions/docs/emulator_
+
+To install cloud functions emulator:
+`npm install -g @google-cloud/functions-emulator`
+
+to start cloud functions emulator:
+`functions-emulator start`
+
+to deploy a function:
+navigate to your target directory:
+`cd /Volumes/DiskName/code/starspawn/functions/render`
+
+then run:
+
+ `functions-emulator deploy render --trigger-http --local-path=/Volumes/DiskName/code/starspawn/functions/render`
+
+It will return a table with an endpoint like:
+`http://localhost:8010/starspawn/us-central1/render`
+
+Once your function is running you can execute:
+`functions-emulator logs read`
+OR
+`functions-emulator status`, collect the `.log` filename and `tail -f` (i.e. `~/.nvm/versions/node/v7.7.1/lib/node_modules/@google-cloud/functions-emulator/logs/cloud-functions-emulator.log`
