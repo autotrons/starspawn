@@ -5,6 +5,7 @@
   "main": "./build/render.js",
   "scripts": {
     "test": "mocha ./build/render.test.js",
+    "fasttest": "mocha ./src/render.test.js",
     "testwatch": "mocha --watch ./build/render.test.js",
     "build": "babel src --out-dir build",
     "lint": "prettier  --write \"./src/**/*.js\"",
@@ -20,8 +21,10 @@
     "prettier": "1.12.1"
   },
   "dependencies": {
+    "@google-cloud/datastore": "^1.4.0",
     "@google-cloud/storage": "^1.6.0",
     "@pheasantplucker/failables-node6": "^2.0.3",
+    "@pheasantplucker/gc-datastore": "^0.5.3",
     "event-stream": "^3.3.4",
     "uuid": "3.2.1",
     "xmlsplit": "^1.2.8"
