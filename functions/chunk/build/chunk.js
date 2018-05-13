@@ -4,44 +4,18 @@ let chunk = (() => {
   var _ref = _asyncToGenerator(function* (req, res) {
     const id = uuid.v4();
     console.log(`${id} starting`);
-    const { filename, start_text, end_text } = req.body.attributes;
+    const {
+      filename,
+      start_text,
+      end_text,
+      start_byte_offset,
+      end_byte_offset
+    } = req.body.attributes;
     const { bucketpart, filepart } = split_filename(filename);
     const myBucket = storage.bucket(bucketpart);
-    console.log(bucketpart, filepart);
     const readFileHandle = myBucket.file(filepart);
-    //console.log(data[0])
     const rStream = readFileHandle.createReadStream();
-    rStream.pause();
-    const waitHere = yield new Promise(function (res, rej) {
-      let cursor = 0;
-      let locations = [];
-      let oldchunk = "";
-      let newchunk = "";
-      rStream.on("readable", function () {
-        while (null !== (newchunk = rStream.read())) {
-          newchunk = newchunk.toString();
-          const temp = oldchunk + newchunk;
-          const new_locations = indexes(temp, start_text);
-          const offset = new_locations.map(function (l) {
-            return l + cursor;
-          });
-          locations.push(...offset);
-          cursor += oldchunk.length - (start_text.length - 1);
-          oldchunk = newchunk.slice();
-        }
-      });
-      rStream.on("end", function () {
-        locations.sort(function (a, b) {
-          return a - b;
-        });
-        console.log(locations);
-        console.log(`loc length ${locations.length}`);
-        res();
-      });
-    });
-    // console.log(rStream.isPaused())
-    //const writeFileHandle = myBucket.file(file.name)
-    let counter = 0;
+    const pairs = yield find_file_offsets(rStream, start_text, end_text, start_byte_offset);
     return res_ok(res, { id });
   });
 
@@ -61,35 +35,36 @@ function split_at(text, index) {
   return [text.substring(0, index), text.substring(index)];
 }
 
-function find_file_offsets(rs, start_text, end_text, batchsize) {
+function find_file_offsets(rs, start_text, end_text, cursor = 0) {
   return new Promise((res, rej) => {
-    let cursor = 0;
+    let pair_idxs = [];
+    let blocks = [];
+    let found = 0;
     let buffer = "";
-    let locs = [];
-    let is_start = true;
-    let curr_text = start_text;
-    let start_location = -1;
-    let stop_location = -1;
-    const toggle_text = () => {
-      if (is_start) curr_text = end_text;
-      is_start = !is_start;
-    };
-    function dochunk(chunk, next) {
-      buffer += chunk;
-      //console.log(chunk.toString())
-      const len = buffer.length;
-      if (len < curr_text.length) {
-        next();
-        return;
+    let start_idx = -1;
+    let end_idx = -1;
+    function dochunk(chunk, more) {
+      // look for next tags
+      buffer += chunk.toString();
+      while (buffer.length > 0) {
+        start_idx = buffer.indexOf(start_text);
+        end_idx = buffer.indexOf(end_text);
+        // one of the tags is missing so we need more data
+        if (end_idx < 0 || start_idx < 0) break;
+        // move to the end of the text
+        end_idx += end_text.length;
+        // the tags are both in the buffer and in the right order
+        if (start_idx < end_idx) {
+          pair_idxs.push([cursor + start_idx, cursor + end_idx]);
+          const b = buffer.slice(start_idx, end_idx);
+          blocks.push(b);
+        }
+        // chop the buffer to the next end_idx so we can look for
+        // the next pair
+        cursor += end_idx;
+        buffer = chop(buffer, end_idx);
       }
-      const [head, tail] = split_at(buffer, len - curr_text.length);
-      const new_locs = indexes(head, curr_text);
-      const offsets = new_locs.map(l => l + cursor);
-      locs.push(...new_locs);
-      if (new_locs.length > 0) toggle_text();
-      cursor += head.length;
-      buffer = tail;
-      next();
+      more();
     }
 
     function done(err) {
@@ -97,32 +72,17 @@ function find_file_offsets(rs, start_text, end_text, batchsize) {
         console.error(err.toString());
         res(failure(err.toString()));
       } else {
-        console.log(locs.slice(0, 5));
-        res(success(locs.length));
+        // this is really only returning for testing reasons
+        //console.log(blocks)
+        res(success(pair_idxs));
       }
     }
     miss.each(rs, dochunk, done);
   });
 }
-function indexes(str, find) {
-  var result = [];
-  var index = -1;
-  while (index < str.length) {
-    index = str.indexOf(find, index + 1);
-    if (index == -1) break;
-    result.push(index);
-  }
-  return result;
-}
 
-function readSomeData() {
-  const readable = getReadableStreamSomehow();
-  readable.on("readable", () => {
-    let chunk;
-    while (null !== (chunk = readable.read())) {
-      console.log(`Received ${chunk.length} bytes of data.`);
-    }
-  });
+function chop(str, idx) {
+  return str.slice(idx);
 }
 
 function res_ok(res, payload) {

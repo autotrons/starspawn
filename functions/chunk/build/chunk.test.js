@@ -15,17 +15,21 @@ describe("chunk.js", function () {
     const result = split_at(text, 5);
     equal(result, ["<job>", "</job>"]);
   }));
-  it("should pull a batch of tags between two points in the file", _asyncToGenerator(function* () {
+  it("should process a batch of tags between two points in the file", _asyncToGenerator(function* () {
     const start_text = "<job>";
     const end_text = "</job>";
-    const readstream = fs.createReadStream(__dirname + "/test.xml");
-    const batchsize = 2;
-    const result = yield find_file_offsets(readstream, start_text, end_text, batchsize);
-    assertSuccess(result, 1000);
+    const readstream = fs.createReadStream(__dirname + "/feed_100.xml", {
+      start: 0,
+      end: 6000
+    });
+    const result = yield find_file_offsets(readstream, start_text, end_text, 2);
+    assertSuccess(result, [[63, 1964], [1969, 3868], [3873, 5773]]);
   }));
   it.skip("should pull a batch of tags between two points in the file", _asyncToGenerator(function* () {
     const input = {
       filename: "datafeeds/full_feed/feed_100.xml",
+      start_byte_offset: 0,
+      end_byte_offset: 200,
       start_text: "<job>",
       end_text: "</job>"
     };
