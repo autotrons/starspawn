@@ -16,18 +16,17 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
+    "himalaya": "^1.1.0",
     "mocha": "^5.1.1",
     "onchange": "^4.0.0",
     "prettier": "1.12.1"
   },
   "dependencies": {
-    "@google-cloud/datastore": "^1.4.0",
-    "@google-cloud/storage": "^1.6.0",
     "@pheasantplucker/failables-node6": "^2.0.3",
     "@pheasantplucker/gc-datastore": "^0.5.3",
-    "event-stream": "^3.3.4",
-    "uuid": "3.2.1",
-    "xmlsplit": "^1.2.8"
+    "consolidate": "^0.15.1",
+    "ejs": "^2.6.1",
+    "uuid": "3.2.1"
   },
   "prettier": {
     "semi": false,

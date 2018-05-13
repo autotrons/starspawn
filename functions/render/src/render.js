@@ -1,6 +1,7 @@
 const uuid = require("uuid")
 const datastore = require("@google-cloud/datastore")
 const cons = require("consolidate")
+const path = require("path")
 const {
   success,
   failure,
@@ -26,12 +27,23 @@ const {
 
 async function render(req, res) {
   const id = uuid.v4()
-  console.log(`Starting: ${id}`)
-  const jobId = getAttributes(req)
+  const jobIdResult = getAttributes(req)
+  if (isFailure(jobIdResult)) return jobIdResult
+  const jobId = payload(jobIdResult)
+  const jobDataResult = await getDataFromDatastore(jobId)
+  if (isFailure(jobDataResult)) return jobDataResult
+  const jobData = payload(jobDataResult)[jobId]
 
-  if (isFailure(jobId)) return jobId
+  try {
+    const filePath = path.join(__dirname, "../template/index.ejs")
+    const html = await cons.ejs(filePath, jobData)
+    return res_ok(res, html)
+  } catch (e) {
+    console.log(e.toString())
+    return res_err(res, e.toString())
+  }
 
-  return success()
+  return res_err(res, e.toString())
 }
 
 async function getDataFromDatastore(keyName) {
@@ -61,7 +73,6 @@ const getAttributes = req => {
 }
 
 function res_ok(res, payload) {
-  console.info(payload)
   res.status(200).send(success(payload))
   return success(payload)
 }

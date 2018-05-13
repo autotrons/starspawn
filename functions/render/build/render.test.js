@@ -4,6 +4,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 const { assertSuccess, payload } = require("@pheasantplucker/failables-node6");
 const assert = require("assert");
+const { parse } = require("himalaya");
 const { render, getDataFromDatastore } = require("./render");
 const {
   createDatastoreClient,
@@ -28,7 +29,6 @@ describe("render.js ", () => {
     it("Should get data from GCE Datastore", _asyncToGenerator(function* () {
       const keyName = "63_Apr43245";
       const result = yield getDataFromDatastore(keyName);
-
       assertSuccess(result);
       const data = payload(result);
       assert(typeof data === "object");
@@ -38,10 +38,15 @@ describe("render.js ", () => {
   describe("renderer()", function () {
     it("render an AMP page from a payload", _asyncToGenerator(function* () {
       const input = "63_Apr43245";
+
       const { req, res } = make_req_res(input);
       const result = yield render(req, res);
       assertSuccess(result);
       const renderedAmp = payload(result);
+      const parsed = parse(renderedAmp);
+      assert(typeof renderedAmp === "string");
+      assert(parsed[0].tagName == "!doctype");
+      assert(parsed[2].tagName === "html");
     }));
   });
 });
