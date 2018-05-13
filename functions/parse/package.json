@@ -1,11 +1,11 @@
 {
-  "name": "template",
+  "name": "parse",
   "version": "1.0.0",
   "description": "",
-  "main": "./build/template.js",
+  "main": "./build/parse.js",
   "scripts": {
-    "test": "mocha ./build/template.test.js",
-    "testwatch": "mocha --watch ./build/template.test.js",
+    "test": "mocha ./build/parse.test.js",
+    "testwatch": "mocha --watch ./build/parse.test.js",
     "build": "babel src --out-dir build",
     "lint": "prettier  --write \"./src/**/*.js\"",
     "lint-watch": "onchange './src/**/*.js' -- prettier --write {{changed}}"
@@ -20,8 +20,9 @@
     "prettier": "1.12.1"
   },
   "dependencies": {
+    "@google-cloud/storage": "^1.6.0",
     "@pheasantplucker/failables-node6": "^2.0.3",
-    "uuid": "3.2.1",
+    "uuid": "3.2.1"
   },
   "prettier": {
     "semi": false,

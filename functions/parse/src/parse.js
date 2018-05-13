@@ -2,10 +2,9 @@ const uuid = require("uuid")
 const { failure, success } = require("@pheasantplucker/failables-node6")
 const storage = require("@google-cloud/storage")()
 
-async function template(req, res) {
+async function parse(req, res) {
   const id = uuid.v4()
   console.log(`${id} starting`)
-  let counter = 0
   return res_ok(res, { id })
 }
 
@@ -22,5 +21,5 @@ function res_err(res, payload) {
 }
 
 module.exports = {
-  template
+  parse
 }

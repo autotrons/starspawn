@@ -1,17 +1,13 @@
 "use strict";
 
-let template = (() => {
+let parse = (() => {
   var _ref = _asyncToGenerator(function* (req, res) {
     const id = uuid.v4();
     console.log(`${id} starting`);
-
-    //const readFileHandle = myBucket.file(file.name)
-    //const writeFileHandle = myBucket.file(file.name)
-    let counter = 0;
     return res_ok(res, { id });
   });
 
-  return function template(_x, _x2) {
+  return function parse(_x, _x2) {
     return _ref.apply(this, arguments);
   };
 })();
@@ -20,19 +16,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 const uuid = require("uuid");
 const { failure, success } = require("@pheasantplucker/failables-node6");
-
 const storage = require("@google-cloud/storage")();
-const myBucket = storage.bucket("datafeeds");
-
-function readSomeData() {
-  const readable = getReadableStreamSomehow();
-  readable.on("readable", () => {
-    let template;
-    while (null !== (template = readable.read())) {
-      console.log(`Received ${template.length} bytes of data.`);
-    }
-  });
-}
 
 function res_ok(res, payload) {
   console.info(payload);
@@ -47,5 +31,5 @@ function res_err(res, payload) {
 }
 
 module.exports = {
-  template
+  parse
 };

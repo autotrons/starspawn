@@ -3,20 +3,14 @@
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 const { assertSuccess } = require("@pheasantplucker/failables-node6");
-const { template } = require("./template");
-const MEGABYTE = Math.pow(2, 20);
+const { parse } = require("./parse");
 
-describe("template.js", function () {
+describe("parse.js", function () {
   this.timeout(540 * 1000);
   it("should pull a batch of tags between two points in the file", _asyncToGenerator(function* () {
-    const input = {
-      start: 1 * MEGABYTE,
-      end: 2 * MEGABYTE,
-      start_text: "<job>",
-      end_text: "</job>"
-    };
+    const input = {};
     const { req, res } = make_req_res(input);
-    const result = yield template(req, res);
+    const result = yield parse(req, res);
     assertSuccess(result);
   }));
 });

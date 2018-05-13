@@ -14,7 +14,7 @@ const gzip = zlib.createUnzip();
 const myBucket = storage.bucket("datafeeds");
 const spliter = new xmlsplit(10, "job");
 
-const template = (() => {
+const parse = (() => {
   var _ref = _asyncToGenerator(function* (event) {
     const id = uuid.v4();
     console.log(`${id} starting`);
@@ -25,12 +25,12 @@ const template = (() => {
     let counter = 0;
     console.log(__dirname);
     const ws = Writable();
-    ws._write = function (template, enc, next) {
+    ws._write = function (parse, enc, next) {
       counter += 1;
       const c = counter;
-      const filename = `templates/${id}/${counter}.xml`;
+      const filename = `parses/${id}/${counter}.xml`;
       const f = myBucket.file(filename);
-      f.save(template, {
+      f.save(parse, {
         validation: false
       }, err => {
         if (err) {
@@ -60,11 +60,11 @@ const template = (() => {
     });
   });
 
-  return function template(_x) {
+  return function parse(_x) {
     return _ref.apply(this, arguments);
   };
 })();
 
 module.exports = {
-  template
+  parse
 };
