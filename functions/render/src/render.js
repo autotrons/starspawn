@@ -1,6 +1,7 @@
 const uuid = require("uuid")
 const cons = require("consolidate")
 const path = require("path")
+const he = require('he');
 const {
   success,
   failure,
@@ -25,9 +26,16 @@ async function render(req, res) {
   if (isFailure(jobDataResult)) return jobDataResult
   const jobData = payload(jobDataResult)[jobId]
 
+  const r1 = unsanitizeDescriptionHtml(jobData.body)
+  if (isFailure(r1)) return r1
+  const cleanBody = payload(r1)
+
+  const cleanBodyObj = {body: cleanBody}
+  const cleanJobData = Object.assign({}, jobData, cleanBodyObj)
+
   try {
     const filePath = path.join(__dirname, "../template/index.ejs")
-    const html = await cons.ejs(filePath, jobData)
+    const html = await cons.ejs(filePath, cleanJobData)
     return res_ok(res, html)
   } catch (e) {
     console.log(e.toString())
@@ -46,6 +54,15 @@ async function getDataFromDatastore(keyName) {
   if (isFailure(entity)) return entity
   const jobData = payload(entity)
   return success(jobData)
+}
+
+const unsanitizeDescriptionHtml = (sanHtml) => {
+  try {
+      const decodedHtml = he.unescape(sanHtml)
+      return success(decodedHtml)
+  } catch (e) {
+      return failure(e.toString())
+  }
 }
 
 const getJobId = req => {
@@ -76,5 +93,6 @@ function res_err(res, payload) {
 
 module.exports = {
   render,
-  getDataFromDatastore
+  getDataFromDatastore,
+  unsanitizeDescriptionHtml,
 }

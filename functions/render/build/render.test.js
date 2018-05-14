@@ -4,15 +4,16 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 const { assertSuccess, payload } = require("@pheasantplucker/failables-node6");
 const assert = require("assert");
+const equal = assert.deepEqual;
 const { parse } = require("himalaya");
-const { render, getDataFromDatastore } = require("./render");
+const { render, getDataFromDatastore, unsanitizeDescriptionHtml } = require("./render");
 const {
   createDatastoreClient,
   readEntities,
   getDatastoreKeySymbol
 } = require("@pheasantplucker/gc-datastore");
 
-describe.skip("render.js ", () => {
+describe("render.js ", () => {
   describe("getDataFromDatastore()", function () {
     this.timeout(540 * 1000);
     it("Should get data from GCE Datastore", _asyncToGenerator(function* () {
@@ -22,6 +23,17 @@ describe.skip("render.js ", () => {
       const data = payload(result);
       assert(typeof data === "object");
     }));
+  });
+
+  describe('unsanitizeDescriptionHtml()', () => {
+    it(`should take a piece of sanitized html and make it renderable`, () => {
+      const sanHtml = '&lt;li&gt;Minimum';
+      const html = '<li>Minimum';
+      const r1 = unsanitizeDescriptionHtml(sanHtml);
+      assertSuccess(r1);
+      const ret = payload(r1);
+      equal(ret, html);
+    });
   });
 
   describe("render()", () => {

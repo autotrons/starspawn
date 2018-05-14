@@ -10,9 +10,16 @@ let render = (() => {
     if (isFailure(jobDataResult)) return jobDataResult;
     const jobData = payload(jobDataResult)[jobId];
 
+    const r1 = unsanitizeDescriptionHtml(jobData.body);
+    if (isFailure(r1)) return r1;
+    const cleanBody = payload(r1);
+
+    const cleanBodyObj = { body: cleanBody };
+    const cleanJobData = Object.assign({}, jobData, cleanBodyObj);
+
     try {
       const filePath = path.join(__dirname, "../template/index.ejs");
-      const html = yield cons.ejs(filePath, jobData);
+      const html = yield cons.ejs(filePath, cleanJobData);
       return res_ok(res, html);
     } catch (e) {
       console.log(e.toString());
@@ -49,6 +56,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 const uuid = require("uuid");
 const cons = require("consolidate");
 const path = require("path");
+const he = require('he');
 const {
   success,
   failure,
@@ -63,6 +71,15 @@ const {
 
 const projectFullName = "starspawn-201921";
 const entityKeyKind = "jobs";
+
+const unsanitizeDescriptionHtml = sanHtml => {
+  try {
+    const decodedHtml = he.unescape(sanHtml);
+    return success(decodedHtml);
+  } catch (e) {
+    return failure(e.toString());
+  }
+};
 
 const getJobId = req => {
   try {
@@ -92,5 +109,6 @@ function res_err(res, payload) {
 
 module.exports = {
   render,
-  getDataFromDatastore
+  getDataFromDatastore,
+  unsanitizeDescriptionHtml
 };
