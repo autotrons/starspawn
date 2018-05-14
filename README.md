@@ -80,3 +80,61 @@ OR
 # Cloud Function Links
 Issue Tracker
 https://issuetracker.google.com/issues?q=componentid:187195%20status:open
+
+# Structured Data
+[DOCS] https://developers.google.com/search/docs/data-types/job-posting
+
+Google uses structured data on your page to generate an appealing box populated with the data you're looking for
+(Think articles, recipes, etc...) They do this via a set of standardized JSON-LD schemas (available at http://schema.org/)
+A sample of a JobPosting schema follows, and renders successfuly in Google's Structured Data Testing Tool:
+https://search.google.com/structured-data/testing-tool
+
+If we omit values in some of the fields below (i.e. salary, street address) we _will_ get warnings in the formatting, 
+but not errors. Unclear if warnings affect SEO/scoring.
+
+```
+<script type="application/ld+json"> {
+  "@context" : "http://schema.org/",
+  "@type" : "JobPosting",
+  "title" : "Fitter and Turner",
+  "description" : "<p>Widget assembly role for pressing wheel assemblies.</p>
+    <p><strong>Educational Requirements:</strong> Completed level 2 ISTA
+    Machinist Apprenticeship.</p>
+    <p><strong>Required Experience:</strong> At
+    least 3 years in a machinist role.</p>",
+  "identifier": {
+    "@type": "PropertyValue",
+    "name": "MagsRUs Wheel Company",
+    "value": "1234567"
+  },
+  "datePosted" : "2017-01-18",
+  "validThrough" : "2017-03-18T00:00",
+  "employmentType" : "CONTRACTOR",
+  "hiringOrganization" : {
+    "@type" : "Organization",
+    "name" : "MagsRUs Wheel Company",
+    "sameAs" : "http://www.magsruswheelcompany.com",
+    "logo" : "http://www.example.com/images/logo.png"
+  },
+  "jobLocation" : {
+    "@type" : "Place",
+    "address" : {
+      "@type" : "PostalAddress",
+      "streetAddress" : "555 Clancy St",
+      "addressLocality" : "Detroit",
+      "addressRegion" : "MI",
+      "postalCode" : "48201",
+      "addressCountry": "US"
+    }
+  },
+  "baseSalary": {
+    "@type": "MonetaryAmount",
+    "currency": "USD",
+    "value": {
+      "@type": "QuantitativeValue",
+      "value": 40.00,
+      "unitText": "HOUR"
+    }
+  }
+}
+</script>```
