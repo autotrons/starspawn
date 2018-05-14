@@ -7,7 +7,7 @@
     },
     {
       "name": "gcr.io/cloud-builders/gcloud",
-      "args": ["config", "get-value", "container", "use_application_default_credentials" ],
+      "args": ["config", "get-value", "container/use_application_default_credentials" ],
       "dir": "./functions/${_FUNCTION_NAME}"
     },
     {
