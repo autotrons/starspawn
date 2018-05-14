@@ -33,7 +33,6 @@ describe("render.js ", () => {
       const parsed = parse(renderedAmp);
       assert(typeof renderedAmp === "string");
       assert(parsed[0].tagName === "!doctype");
-      assert(parsed[2].tagName === "html");
     }));
   });
 });

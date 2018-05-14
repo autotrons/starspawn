@@ -1,37 +1,81 @@
 <!doctype html>
-<html amp lang="en">
+<!--
+      This sample AMP HTML file aims to be a minimalist document that
+      follows best practices and guidances for publishers to mark up
+      content for inclusion in various platforms.
+-->
+<html AMP lang="en">
+  <!-- you can use "amp" or "AMP" or "⚡" -->
   <head>
     <meta charset="utf-8">
-    <script async src="https://cdn.ampproject.org/v0.js"></script>
-    <title>AMP Job Feed</title>
+    <title>Starspawn Jobfeed</title>
+    <!-- "canonical AMP doc for jobPosting may not exist - research" -->
+    <link rel="canonical" href="http://example.ampproject.org/article-metadata.html">
+    <!--
+        The canonical document for this article should be linked, as above.
+        The canonical document should also have a corresponding <link> tag
+        within pointing at this AMP HTML file:
+          <link rel="amphtml" href="http://example.ampproject.org/article-json-ld.amp.html">
+        It is possible that this AMP HTML document is the canonical document
+        for this article, in which case, the canonical URL should point to this
+        document, and no "amphtml" link is required.
+    -->
     <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
-    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <!-- only one style tag is allowed, and it must have an "amp-custom" attribute -->
+    <style amp-custom>
+      body {
+        background-color: white;
+      }
+    </style>
 
+    <script type="application/ld+json"> {
+      "@context" : "http://schema.org/",
+      "@type" : "JobPosting",
+      "title" : "Fitter and Turner",
+      "description" : <%- JSON.stringify(body) %>,
+      "identifier": {
+        "@type": "PropertyValue",
+        "name": "MagsRUs Wheel Company",
+        "value": "1234567"
+      },
+      "datePosted" : "2017-01-18",
+      "validThrough" : "2017-03-18T00:00",
+      "employmentType" : "CONTRACTOR",
+      "hiringOrganization" : {
+        "@type" : "Organization",
+        "name" : "MagsRUs Wheel Company",
+        "sameAs" : "http://www.magsruswheelcompany.com",
+        "logo" : "http://www.example.com/images/logo.png"
+      },
+      "jobLocation" : {
+        "@type" : "Place",
+        "address" : {
+          "@type" : "PostalAddress",
+          "streetAddress" : "555 Clancy St",
+          "addressLocality" : "Detroit",
+          "addressRegion" : "MI",
+          "postalCode" : "48201",
+          "addressCountry": "US"
+        }
+      },
+      "baseSalary": {
+        "@type": "MonetaryAmount",
+        "currency": "USD",
+        "value": {
+          "@type": "QuantitativeValue",
+          "value": 40.00,
+          "unitText": "HOUR"
+        }
+      }
+    }
+    </script>
+    
+    <!-- this style tag is required -->
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
   </head>
   <body>
-      <style amp-custom>
-          body {
-            font-family: 'Roboto', sans-serif;
-            background: #EDEDED;
-          }
-          .header {
-            color: #fff;
-            padding: 20px  20px;
-            top: 0px;
-            width: 100%;
-            background: #E53935;
-            text-align:left;
-          }
-
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <h1>AMP Job Feed</h1>
-        </div>
-
+    <h1>Starspawn Jobfeed</h1>
     Job Description: <%= body%>;
-
   </body>
 </html>
