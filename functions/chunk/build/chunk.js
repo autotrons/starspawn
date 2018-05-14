@@ -19,7 +19,7 @@ let chunk = (() => {
       end: end_byte_offset
     });
 
-    pipeline(rStream, start_text, end_text, start_byte_offset);
+    pipeline(id, CHUNK_CREATED_TOPIC, rStream, start_text, end_text, start_byte_offset);
     return res_ok(res, { id });
   });
 
@@ -29,38 +29,69 @@ let chunk = (() => {
 })();
 
 let write_blocks = (() => {
-  var _ref2 = _asyncToGenerator(function* (id, filename, blocks) {
+  var _ref3 = _asyncToGenerator(function* (id, filename, blocks, topic) {
     try {
       const preblob = `<?xml version="1.0" encoding="UTF-8"?>\n<root>\n`;
       const postblob = `\n</root>`;
       const file = getFileHandle(filename);
       const blob = blocks.join("\n");
-      const result = yield file.save(preblob + blob + postblob);
-      return success(result);
+      const r1 = yield file.save(preblob + blob + postblob);
+      if (isFailure(r1)) return r1;
+      const message = {
+        data: { id, filename },
+        attributes: { id, filename }
+      };
+      return publish(topic, message);
     } catch (e) {
       console.log(e.toString());
       return failure(e.toString());
     }
   });
 
-  return function write_blocks(_x3, _x4, _x5) {
-    return _ref2.apply(this, arguments);
+  return function write_blocks(_x4, _x5, _x6, _x7) {
+    return _ref3.apply(this, arguments);
   };
 })();
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 const uuid = require("uuid");
-const { failure, success } = require("@pheasantplucker/failables-node6");
+const {
+  failure,
+  success,
+  isFailure
+} = require("@pheasantplucker/failables-node6");
 const miss = require("mississippi");
 const storage = require("@google-cloud/storage")();
+const { publish } = require("./pubsub");
+const CHUNK_CREATED_TOPIC = `chunk-created`;
+const COMPLETE = "complete";
 
 function split_at(text, index) {
   return [text.substring(0, index), text.substring(index)];
 }
 
-function pipeline(rs, start_text, end_text, cursor = 0) {
+function pipeline(id, topic, rs, start_text, end_text, cursor = 0) {
   return new Promise((res, rej) => {
+    let done = (() => {
+      var _ref2 = _asyncToGenerator(function* (err) {
+        if (err && err !== COMPLETE) {
+          console.error(err.toString());
+          res(failure(err.toString()));
+          return;
+        }
+        const filename = `datafeeds/chunks/${id}/${uuid.v4()}.xml`;
+        const result = yield write_blocks(id, filename, blocks, topic);
+        // this is really only returning for testing reasons
+        res(result);
+      });
+
+      return function done(_x3) {
+        return _ref2.apply(this, arguments);
+      };
+    })();
+
+    const starttime = Date.now();
     let pair_idxs = [];
     let blocks = [];
     let found = 0;
@@ -79,6 +110,7 @@ function pipeline(rs, start_text, end_text, cursor = 0) {
         end_idx += end_text.length;
         // the tags are both in the buffer and in the right order
         if (start_idx < end_idx) {
+          found += 1;
           pair_idxs.push([cursor + start_idx, cursor + end_idx]);
           const b = buffer.slice(start_idx, end_idx);
           blocks.push(b);
@@ -87,20 +119,15 @@ function pipeline(rs, start_text, end_text, cursor = 0) {
         // the next pair
         cursor += end_idx;
         buffer = chop(buffer, end_idx);
+        const now = Date.now();
+        // should we bail out now
+        if (found > 1000 || now - starttime > 500 * 1000) {
+          more(COMPLETE);
+        }
       }
       more();
     }
 
-    function done(err) {
-      if (err) {
-        console.error(err.toString());
-        res(failure(err.toString()));
-      } else {
-        // this is really only returning for testing reasons
-        //console.log(blocks)
-        res(success(pair_idxs));
-      }
-    }
     miss.each(rs, dochunk, done);
   });
 }
@@ -135,7 +162,6 @@ function getFileHandle(filepath) {
 }
 
 module.exports = {
-  split_at,
   chunk,
   pipeline,
   write_blocks

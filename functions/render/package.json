@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@pheasantplucker/failables-node6": "^2.0.3",
-    "@pheasantplucker/gc-datastore": "^0.5.3",
+    "@pheasantplucker/gc-datastore": "^1.0.0",
     "consolidate": "^0.15.1",
     "ejs": "^2.6.1",
     "uuid": "3.2.1"
