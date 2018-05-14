@@ -36,6 +36,7 @@ describe('loader.js', function () {
   it('should load a list of jobs into Datastore', _asyncToGenerator(function* () {
     const { req, res } = make_req_res(fakeJobArray);
     const result = yield loader(req, res);
+    console.log(`result:`, result);
     assertSuccess(result);
     const writtenJobs = payload(result);
     const job1Key = writtenJobs.jobEntities[0].key;
