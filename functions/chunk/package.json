@@ -20,13 +20,11 @@
     "prettier": "1.12.1"
   },
   "dependencies": {
+    "@google-cloud/pubsub": "^0.18.0",
     "@google-cloud/storage": "^1.6.0",
     "@pheasantplucker/failables-node6": "^2.0.3",
-    "@pheasantplucker/gc-pubsub-node6": "^1.0.4",
-    "event-stream": "^3.3.4",
     "mississippi": "^3.0.0",
-    "uuid": "3.2.1",
-    "xmlsplit": "^1.2.8"
+    "uuid": "3.2.1"
   },
   "prettier": {
     "semi": false,

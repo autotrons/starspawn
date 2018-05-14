@@ -29,21 +29,25 @@ let chunk = (() => {
 })();
 
 let write_blocks = (() => {
-  var _ref2 = _asyncToGenerator(function* (id, filename, blocks) {
+  var _ref2 = _asyncToGenerator(function* (id, filename, blocks, topic) {
     try {
       const preblob = `<?xml version="1.0" encoding="UTF-8"?>\n<root>\n`;
       const postblob = `\n</root>`;
       const file = getFileHandle(filename);
       const blob = blocks.join("\n");
-      const result = yield file.save(preblob + blob + postblob);
-      return success(result);
+      const r1 = yield file.save(preblob + blob + postblob);
+      const message = {
+        data: { id, filename },
+        attributes: { id, filename }
+      };
+      return publish(topic, message);
     } catch (e) {
       console.log(e.toString());
       return failure(e.toString());
     }
   });
 
-  return function write_blocks(_x3, _x4, _x5) {
+  return function write_blocks(_x3, _x4, _x5, _x6) {
     return _ref2.apply(this, arguments);
   };
 })();
@@ -54,6 +58,8 @@ const uuid = require("uuid");
 const { failure, success } = require("@pheasantplucker/failables-node6");
 const miss = require("mississippi");
 const storage = require("@google-cloud/storage")();
+const { publish } = require("./pubsub");
+const CHUNK_CREATED_TOPIC = `chunk-created`;
 
 function split_at(text, index) {
   return [text.substring(0, index), text.substring(index)];
@@ -135,7 +141,6 @@ function getFileHandle(filepath) {
 }
 
 module.exports = {
-  split_at,
   chunk,
   pipeline,
   write_blocks

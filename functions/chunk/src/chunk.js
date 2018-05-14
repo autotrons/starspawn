@@ -2,6 +2,8 @@ const uuid = require("uuid")
 const { failure, success } = require("@pheasantplucker/failables-node6")
 const miss = require("mississippi")
 const storage = require("@google-cloud/storage")()
+const { publish } = require("./pubsub")
+const CHUNK_CREATED_TOPIC = `chunk-created`
 
 async function chunk(req, res) {
   const id = uuid.v4()
@@ -75,20 +77,23 @@ function pipeline(rs, start_text, end_text, cursor = 0) {
   })
 }
 
-async function write_blocks(id, filename, blocks) {
+async function write_blocks(id, filename, blocks, topic) {
   try {
     const preblob = `<?xml version="1.0" encoding="UTF-8"?>\n<root>\n`
     const postblob = `\n</root>`
     const file = getFileHandle(filename)
     const blob = blocks.join("\n")
-    const result = await file.save(preblob + blob + postblob)
-    return success(result)
+    const r1 = await file.save(preblob + blob + postblob)
+    const message = {
+      data: { id, filename },
+      attributes: { id, filename }
+    }
+    return publish(topic, message)
   } catch (e) {
     console.log(e.toString())
     return failure(e.toString())
   }
 }
-
 function chop(str, idx) {
   return str.slice(idx)
 }
@@ -119,7 +124,6 @@ function getFileHandle(filepath) {
 }
 
 module.exports = {
-  split_at,
   chunk,
   pipeline,
   write_blocks

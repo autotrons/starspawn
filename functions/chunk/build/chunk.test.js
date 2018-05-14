@@ -1,13 +1,13 @@
 "use strict";
 
 let exists = (() => {
-  var _ref7 = _asyncToGenerator(function* (bucket, filename) {
+  var _ref8 = _asyncToGenerator(function* (bucket, filename) {
     const result = yield storage.bucket(bucket).file(filename).exists();
     return success(result[0]);
   });
 
   return function exists(_x, _x2) {
-    return _ref7.apply(this, arguments);
+    return _ref8.apply(this, arguments);
   };
 })();
 
@@ -15,30 +15,60 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 const equal = require("assert").deepEqual;
 const uuid = require(`uuid`);
-const { assertSuccess, success } = require("@pheasantplucker/failables-node6");
-const { pull } = require("@pheasantplucker/gc-pubsub-node6");
+const {
+  assertSuccess,
+  success,
+  payload
+} = require("@pheasantplucker/failables-node6");
 const { chunk, pipeline, write_blocks } = require("./chunk");
+const {
+  pull,
+  ack,
+  createSubscription,
+  createTopic,
+  deleteSubscription,
+  deleteTopic
+} = require("./pubsub");
 const fs = require("fs");
 const storage = require("@google-cloud/storage")();
 const MEGABYTE = Math.pow(2, 20);
 
+const TOPIC = `test-${uuid.v4()}`;
+const SUBSCRIPTION = `test-${uuid.v4()}`;
+
 describe("chunk.js", function () {
   this.timeout(540 * 1000);
-  describe("write_block", _asyncToGenerator(function* () {
+  describe("write_block", () => {
+    it("should set shit up", _asyncToGenerator(function* () {
+      const r1 = yield createTopic(TOPIC);
+      assertSuccess(r1);
+      const r2 = yield createSubscription(TOPIC, SUBSCRIPTION);
+      assertSuccess(r2);
+    }));
     it("write blocks to a file", _asyncToGenerator(function* () {
       const blocks = ["<job><id>1</id></job>", "<job><id>2</id></job>"];
       const id = "test_" + uuid.v4();
-      const result = yield write_blocks(id, `datafeeds/chunks/${id}/1.xml`, blocks);
-      assertSuccess(result);
+      const filename = `datafeeds/chunks/${id}/1.xml`;
+      const r1 = yield write_blocks(id, filename, blocks, TOPIC);
+      assertSuccess(r1);
       const r2 = yield exists("datafeeds", `chunks/${id}/1.xml`);
       assertSuccess(r2, true);
-      const maxMessages = 1;
-      const subscriptionName = "chunk_created";
-      const r3 = yield pull(subscriptionName, maxMessages);
-      console.log(r3);
+      const r3 = yield pull(SUBSCRIPTION, 1, false);
       assertSuccess(r3);
+      const msg1 = payload(r3)[0].receivedMessages[0];
+      equal(msg1.message.attributes.filename, filename);
+      console.log(msg1);
+      const ackId = msg1.ackId;
+      const r4 = yield ack(SUBSCRIPTION, [ackId]);
+      assertSuccess(r4);
     }));
-  }));
+    it("clean up the topic and subscription", _asyncToGenerator(function* () {
+      const r1 = yield deleteTopic(TOPIC);
+      assertSuccess(r1);
+      const r2 = yield deleteSubscription(TOPIC, SUBSCRIPTION);
+      assertSuccess(r2);
+    }));
+  });
   describe("pipeline", _asyncToGenerator(function* () {
     it("chop the file into blocks of tag pairs", _asyncToGenerator(function* () {
       const start_text = "<job>";
