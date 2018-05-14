@@ -29,7 +29,7 @@ const dsKey = getDatastoreKeySymbol()
 
 describe('loader.js', function() {
   this.timeout(540 * 1000)
-  it.skip('should load a list of jobs into Datastore', async () => {
+  it('should load a list of jobs into Datastore', async () => {
     const { req, res } = make_req_res(fakeJobArray)
     const result = await loader(req, res)
     assertSuccess(result)
