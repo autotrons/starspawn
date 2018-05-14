@@ -35,7 +35,7 @@ const xml = `<?xml version="1.0" encoding="UTF-8"?>
 
 const json = {
   job: {
-    location: ['Fort Lauderdale, FL, United States'],
+    location: 'Fort Lauderdale, FL, United States',
   },
 }
 

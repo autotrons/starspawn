@@ -7,6 +7,7 @@ const {
 } = require('@pheasantplucker/failables-node6')
 const storage = require('@google-cloud/storage')()
 const xml2js = require('xml2js')
+const rp = require('request-promise')
 const parser = new xml2js.Parser({ explicitArray: false, trim: true })
 const {
   createBucket,
@@ -41,24 +42,16 @@ async function parse(req, res) {
 
   var options = {
     method: 'POST',
-    uri: 'http://api.posttestserver.com/post',
-    body: {
-      some: 'payload',
-    },
+    uri: 'https://us-central1-starspawn-201921.cloudfunctions.net/loader',
+    body: { attributes: jsonJobs.root.job },
     json: true, // Automatically stringifies the body to JSON
   }
 
-  rp(options)
-    .then(function(parsedBody) {
-      // POST succeeded...
-    })
-    .catch(function(err) {
-      // POST failed...
-    })
+  const postToLoader = await rp(options)
 
-  console.log(`jsonJobs:`, jsonJobs.root.job[0])
+  // console.log(`postToLoader:`, postToLoader)
 
-  // return res_ok(res, { id })
+  return res_ok(res, { id })
 }
 
 function parseXmlToJson(xml) {
