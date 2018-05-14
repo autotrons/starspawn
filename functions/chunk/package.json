@@ -7,8 +7,9 @@
     "test": "mocha ./build/chunk.test.js",
     "testwatch": "mocha --watch ./build/chunk.test.js",
     "build": "babel src --out-dir build",
+    "buildwatch": "babel src --out-dir build --watch",
     "lint": "prettier  --write \"./src/**/*.js\"",
-    "lint-watch": "onchange './src/**/*.js' -- prettier --write {{changed}}"
+    "lintwatch": "onchange './src/**/*.js' -- prettier --write {{changed}}"
   },
   "author": "",
   "license": "ISC",
