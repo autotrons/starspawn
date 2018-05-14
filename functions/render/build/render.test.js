@@ -13,7 +13,7 @@ const {
 } = require("@pheasantplucker/gc-datastore");
 
 describe("render.js ", () => {
-  describe("getDataFromDatastore()", function () {
+  describe.skip("getDataFromDatastore()", function () {
     this.timeout(540 * 1000);
     it("Should get data from GCE Datastore", _asyncToGenerator(function* () {
       const keyName = "63_Apr43245";
