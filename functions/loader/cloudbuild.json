@@ -12,7 +12,7 @@
     },
     {
       "name": "gcr.io/cloud-builders/gcloud",
-      "args": ["auth", "login"],
+      "args": ["config", "set", "account", "${_ACCOUNT_NAME}"],
       "dir": "./functions/${_FUNCTION_NAME}"
     },
     {
