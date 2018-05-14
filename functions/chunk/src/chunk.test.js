@@ -23,13 +23,13 @@ const SUBSCRIPTION = `test-${uuid.v4()}`
 
 describe("chunk.js", function() {
   this.timeout(540 * 1000)
-  describe("write_block", () => {
-    it("should set shit up", async () => {
-      const r1 = await createTopic(TOPIC)
-      assertSuccess(r1)
-      const r2 = await createSubscription(TOPIC, SUBSCRIPTION)
-      assertSuccess(r2)
-    })
+  before("should set shit up", async () => {
+    const r1 = await createTopic(TOPIC)
+    assertSuccess(r1)
+    const r2 = await createSubscription(TOPIC, SUBSCRIPTION)
+    assertSuccess(r2)
+  })
+  describe.skip("write_block", () => {
     it("write blocks to a file", async () => {
       const blocks = ["<job><id>1</id></job>", "<job><id>2</id></job>"]
       const id = "test_" + uuid.v4()
@@ -47,23 +47,20 @@ describe("chunk.js", function() {
       const r4 = await ack(SUBSCRIPTION, [ackId])
       assertSuccess(r4)
     })
-    it("clean up the topic and subscription", async () => {
-      const r1 = await deleteTopic(TOPIC)
-      assertSuccess(r1)
-      const r2 = await deleteSubscription(TOPIC, SUBSCRIPTION)
-      assertSuccess(r2)
-    })
   })
   describe("pipeline", async () => {
     it("chop the file into blocks of tag pairs", async () => {
+      const id = uuid.v4()
+      console.log(`ID: ${id}`)
       const start_text = "<job>"
       const end_text = "</job>"
       const readstream = fs.createReadStream(__dirname + "/feed_100.xml", {
         start: 0,
         end: 6000
       })
-      const result = await pipeline(readstream, start_text, end_text)
-      assertSuccess(result, [[61, 1962], [1967, 3866], [3871, 5771]])
+      const result = await pipeline(id, TOPIC, readstream, start_text, end_text)
+      assertSuccess(result)
+      equal(payload(result).messageIds.length > 0, true)
     })
   })
   describe("chunk", async () => {
@@ -79,6 +76,12 @@ describe("chunk.js", function() {
       const result = await chunk(req, res)
       assertSuccess(result)
     })
+  })
+  after("clean up the topic and subscription", async () => {
+    const r1 = await deleteTopic(TOPIC)
+    assertSuccess(r1)
+    const r2 = await deleteSubscription(TOPIC, SUBSCRIPTION)
+    assertSuccess(r2)
   })
 })
 

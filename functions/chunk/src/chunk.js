@@ -1,9 +1,14 @@
 const uuid = require("uuid")
-const { failure, success } = require("@pheasantplucker/failables-node6")
+const {
+  failure,
+  success,
+  isFailure
+} = require("@pheasantplucker/failables-node6")
 const miss = require("mississippi")
 const storage = require("@google-cloud/storage")()
 const { publish } = require("./pubsub")
 const CHUNK_CREATED_TOPIC = `chunk-created`
+const COMPLETE = "complete"
 
 async function chunk(req, res) {
   const id = uuid.v4()
@@ -23,7 +28,14 @@ async function chunk(req, res) {
     end: end_byte_offset
   })
 
-  pipeline(rStream, start_text, end_text, start_byte_offset)
+  pipeline(
+    id,
+    CHUNK_CREATED_TOPIC,
+    rStream,
+    start_text,
+    end_text,
+    start_byte_offset
+  )
   return res_ok(res, { id })
 }
 
@@ -31,8 +43,9 @@ function split_at(text, index) {
   return [text.substring(0, index), text.substring(index)]
 }
 
-function pipeline(rs, start_text, end_text, cursor = 0) {
+function pipeline(id, topic, rs, start_text, end_text, cursor = 0) {
   return new Promise((res, rej) => {
+    const starttime = Date.now()
     let pair_idxs = []
     let blocks = []
     let found = 0
@@ -51,6 +64,7 @@ function pipeline(rs, start_text, end_text, cursor = 0) {
         end_idx += end_text.length
         // the tags are both in the buffer and in the right order
         if (start_idx < end_idx) {
+          found += 1
           pair_idxs.push([cursor + start_idx, cursor + end_idx])
           const b = buffer.slice(start_idx, end_idx)
           blocks.push(b)
@@ -59,20 +73,27 @@ function pipeline(rs, start_text, end_text, cursor = 0) {
         // the next pair
         cursor += end_idx
         buffer = chop(buffer, end_idx)
+        const now = Date.now()
+        // should we bail out now
+        if (found > 1000 || now - starttime > 500 * 1000) {
+          more(COMPLETE)
+        }
       }
       more()
     }
 
-    function done(err) {
-      if (err) {
+    async function done(err) {
+      if (err && err !== COMPLETE) {
         console.error(err.toString())
         res(failure(err.toString()))
-      } else {
-        // this is really only returning for testing reasons
-        //console.log(blocks)
-        res(success(pair_idxs))
+        return
       }
+      const filename = `datafeeds/chunks/${id}/${uuid.v4()}.xml`
+      const result = await write_blocks(id, filename, blocks, topic)
+      // this is really only returning for testing reasons
+      res(result)
     }
+
     miss.each(rs, dochunk, done)
   })
 }
@@ -84,6 +105,7 @@ async function write_blocks(id, filename, blocks, topic) {
     const file = getFileHandle(filename)
     const blob = blocks.join("\n")
     const r1 = await file.save(preblob + blob + postblob)
+    if (isFailure(r1)) return r1
     const message = {
       data: { id, filename },
       attributes: { id, filename }
