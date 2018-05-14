@@ -11,11 +11,6 @@
       "dir": "./functions/${_FUNCTION_NAME}"
     },
     {
-      "name": "gcr.io/cloud-builders/gcloud",
-      "args": ["config", "set", "account", "${_ACCOUNT_NAME}"],
-      "dir": "./functions/${_FUNCTION_NAME}"
-    },
-    {
       "name": "gcr.io/cloud-builders/npm",
       "args": ["install"],
       "dir": "./functions/${_FUNCTION_NAME}"

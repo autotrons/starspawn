@@ -30,6 +30,7 @@ const dsKey = getDatastoreKeySymbol()
 describe('loader.js', function() {
   this.timeout(540 * 1000)
   it('should load a list of jobs into Datastore', async () => {
+    console.log(`process.env:`, process.env)
     const { req, res } = make_req_res(fakeJobArray)
     const result = await loader(req, res)
     console.log(`result:`, result)
