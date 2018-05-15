@@ -89,7 +89,7 @@ Google uses structured data on your page to generate an appealing box populated 
 A sample of a JobPosting schema follows, and renders successfuly in Google's Structured Data Testing Tool:
 https://search.google.com/structured-data/testing-tool
 
-If we omit values in some of the fields below (i.e. salary, street address) we _will_ get warnings in the formatting, 
+If we omit values in some of the fields below (i.e. salary, street address) we _will_ get warnings in the formatting,
 but not errors. Unclear if warnings affect SEO/scoring.
 
 ```
@@ -137,4 +137,45 @@ but not errors. Unclear if warnings affect SEO/scoring.
     }
   }
 }
-</script>```
+</script>
+```
+
+# Sitemap Research
+
+## Resources:
+
+1) [Google's Explanation of Sitemaps](https://support.google.com/webmasters/answer/156184?hl=en)
+
+2) [Google: Build and Submit](https://support.google.com/webmasters/answer/183668?hl=en&ref_topic=4581190)
+
+  ### Formats:
+    * Max sitemap size: 50mb uncompressed and 50,000 urls.
+      * Can break into multiple site maps if those limits are exceeded. We can also create what is effectively a sitemap manifest [here](https://support.google.com/webmasters/answer/75712)
+    * It looks like XML is the weapon of choice. This is the [XML sitemap protocol](https://www.sitemaps.org/protocol.html)
+      * There aren't many things to reference really. Your sitemap would include entries for each URL and some metadata about them. ~~If each leaf page has references to related searches (visible or otherwise?), then the sitemap would allow us to indicate a `priority` among the urls. That priority could follow some ranking, or be arbitrary, or just be theJobPostYouAreOn > theJobsInMetaData.~~The docs make this seem less useful for us actually. Priority is relative to the other urls on your site. For us, this would only really apply if we were building a homepage at something like `starspawn.blowjobs.com/jobs` that had a big list of jobs + links.
+      * At the very least, having a sitemap would allow us to clearly indicate to google/crawlers the last-modified date and change-frequency. This could be useful for our system because it will be updating relatively often, at least compared to most other systems it seems.
+      * `changeFreq` seems like the truly relevant field in sitemaps for our present needs. It is basically giving a suggestion to crawlers for how often they should crawl your site. That seems like something we would want if we are going to be pushing updates to jobs, at least if the URL to it remains constant (doesn't seem likely). If new updates to job postings create new URLs, then this is useless, really.
+
+  ### Current Questions:
+    * If we have a site that is basically just _a job_, in that it has some information bout it plus links to the employer and job posting itself, what benefit does a sitemap provide? I suppose we may want the company's URL made more available via the sitemap as I think it would help us when someone is searching jobs for a specific company.
+    * Well, turns out we probably do want to build a sitemap for our job pages either way. It is telling Google to pretty plz index our page, and should be super straight forward to make for any given job post.
+
+  Example sitemap for ours:
+  ```
+  <?xml version="1.0" encoding="UTF-8"?>
+  <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+     <url>
+        <loc>https://us-central1-starspawn-201921.cloudfunctions.net/render?jobId=63_Apr47792/</loc>
+        <lastmod>2018-05-13</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+     </url>
+  </urlset>
+  ```
+  #### TL;DR:
+  Yeah, lets make them, super easy to make and don't seem to have downsides aside from the work to implement.
+## How to submit:
+  * Option 1: Add `robots.txt` file and specify the location of your sitemap (URL to it such as `Sitemap: http://starspawn.com/my_site_map_mk.xml`)
+  * Option 2: Submit to Google's [Search Console Sitemaps Tool](https://www.google.com/webmasters/tools/sitemap-list?pli=1)
+
+It looks we will want the `robots.txt` to be generated for us. It turns out we can [submit these to Google](https://support.google.com/webmasters/answer/6078399?hl=en). I think submitting is kind of our only way because the `robots.txt` file needs to be at the root of the directory if it is to be used automatically by Google, which some difficulty if we are delivering via our render function and a query string.
