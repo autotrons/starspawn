@@ -1,11 +1,11 @@
 {
-  "name": "template",
+  "name": "echo",
   "version": "1.0.0",
   "description": "",
-  "main": "./build/template.js",
+  "main": "./build/echo.js",
   "scripts": {
-    "test": "mocha ./build/template.test.js",
-    "testwatch": "mocha --watch ./build/template.test.js",
+    "test": "mocha ./build/echo.test.js",
+    "testwatch": "mocha --watch ./build/echo.test.js",
     "build": "babel src --out-dir build",
     "lint": "prettier  --write \"./src/**/*.js\"",
     "lint-watch": "onchange './src/**/*.js' -- prettier --write {{changed}}"
