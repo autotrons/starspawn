@@ -21,7 +21,7 @@ const MEGABYTE = Math.pow(2, 20)
 const TOPIC = `test-${uuid.v4()}`
 const SUBSCRIPTION = `test-${uuid.v4()}`
 
-describe("chunk.js", function() {
+describe.skip("chunk.js", function() {
   this.timeout(540 * 1000)
   before("should set shit up", async () => {
     const r1 = await createTopic(TOPIC)
