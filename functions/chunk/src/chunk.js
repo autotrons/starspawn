@@ -11,7 +11,16 @@ const { publish } = require("./pubsub")
 
 const COMPLETE = "complete"
 
+function parse_req_data(r) {
+  try {
+    return JSON.parse(r.body.data)
+  } catch (e) {
+    return r.body.data
+  }
+}
+
 async function chunk(req, res) {
+  const data = parse_req_data(req)
   const {
     filename,
     start_text,
@@ -20,9 +29,9 @@ async function chunk(req, res) {
     end_byte_offset,
     parse_topic,
     continue_topic
-  } = req.body.attributes
+  } = data
   let id
-  if (req.body.attributes.id) id = req.body.attributes.id
+  if (data.id) id = data.id
   else id = uuid.v4()
   console.log(`${id} chunk starting`)
   const { bucketpart, filepart } = split_filename(filename)
@@ -139,7 +148,7 @@ async function write_blocks(id, filename, blocks, topic) {
     const blob = blocks.join("\n")
     const r1 = await file.save(preblob + blob + postblob)
     if (isFailure(r1)) return r1
-    console.info(`${id} wrote ${filename}`)
+    console.info(`${id} wrote ${blocks.length} blocks at ${filename}`)
     const message = {
       data: Buffer.from(JSON.stringify({ id, filename })),
       attributes: { id, filename }

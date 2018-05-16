@@ -37,6 +37,7 @@ let chunk = (() => {
       };
     })();
 
+    const data = parse_req_data(req);
     const {
       filename,
       start_text,
@@ -45,9 +46,9 @@ let chunk = (() => {
       end_byte_offset,
       parse_topic,
       continue_topic
-    } = req.body.attributes;
+    } = data;
     let id;
-    if (req.body.attributes.id) id = req.body.attributes.id;else id = uuid.v4();
+    if (data.id) id = data.id;else id = uuid.v4();
     console.log(`${id} chunk starting`);
     const { bucketpart, filepart } = split_filename(filename);
     const myBucket = storage.bucket(bucketpart);
@@ -75,7 +76,7 @@ let write_blocks = (() => {
       const blob = blocks.join("\n");
       const r1 = yield file.save(preblob + blob + postblob);
       if (isFailure(r1)) return r1;
-      console.info(`${id} wrote ${filename}`);
+      console.info(`${id} wrote ${blocks.length} blocks at ${filename}`);
       const message = {
         data: Buffer.from(JSON.stringify({ id, filename })),
         attributes: { id, filename }
@@ -106,6 +107,14 @@ const storage = require("@google-cloud/storage")();
 const { publish } = require("./pubsub");
 
 const COMPLETE = "complete";
+
+function parse_req_data(r) {
+  try {
+    return JSON.parse(r.body.data);
+  } catch (e) {
+    return r.body.data;
+  }
+}
 
 function find_blocks(rs, start_text, end_text, cursor = 0) {
   return new Promise((res, rej) => {
