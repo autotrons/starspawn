@@ -1,11 +1,13 @@
 {
-  "attributes": {
-    "filename": "datafeeds/full_feed/feed_500k.xml",
-    "start_byte_offset": 0,
-    "end_byte_offset": 1000000,
-    "start_text": "<job>",
-    "end_text": "</job>",
-    "parse_topic": "chunk_created",
-    "continue_topic": "chunk_work"
+  "message": {
+    "data": {
+      "filename": "datafeeds/full_feed/feed_500k.xml",
+      "start_byte_offset": 0,
+      "end_byte_offset": 1000000,
+      "start_text": "<job>",
+      "end_text": "</job>",
+      "parse_topic": "chunk_created",
+      "continue_topic": "chunk_work"
+    }
   }
 }

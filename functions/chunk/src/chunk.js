@@ -13,9 +13,9 @@ const COMPLETE = "complete"
 
 function parse_req_data(r) {
   try {
-    return JSON.parse(r.body.data)
+    return JSON.parse(r.body.message.data)
   } catch (e) {
-    return r.body.data
+    return r.body.message.data
   }
 }
 
