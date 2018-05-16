@@ -1,6 +1,5 @@
 const { assertSuccess } = require("@pheasantplucker/failables-node6")
 const { echo } = require("./echo")
-const MEGABYTE = Math.pow(2, 20)
 
 describe("echo.js", function() {
   this.timeout(540 * 1000)
