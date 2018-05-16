@@ -14,7 +14,7 @@ const {
 } = require("@pheasantplucker/gc-datastore");
 
 describe("render.js ", () => {
-  describe("getDataFromDatastore()", function () {
+  describe.skip("getDataFromDatastore()", function () {
     this.timeout(540 * 1000);
     it("Should get data from GCE Datastore", _asyncToGenerator(function* () {
       const keyName = "63_Apr43245";
@@ -37,7 +37,7 @@ describe("render.js ", () => {
   });
 
   describe("render()", () => {
-    it("Should render an AMP page from a query string", _asyncToGenerator(function* () {
+    it.skip("Should render an AMP page from a query string", _asyncToGenerator(function* () {
       const { req, res } = make_req_res();
       const result = yield render(req, res);
       assertSuccess(result);
