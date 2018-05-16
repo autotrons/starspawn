@@ -2,24 +2,29 @@ const uuid = require("uuid")
 const {
   failure,
   success,
-  isFailure
+  isFailure,
+  payload
 } = require("@pheasantplucker/failables-node6")
 const miss = require("mississippi")
 const storage = require("@google-cloud/storage")()
 const { publish } = require("./pubsub")
-const CHUNK_CREATED_TOPIC = `chunk-created`
+
 const COMPLETE = "complete"
 
 async function chunk(req, res) {
-  const id = uuid.v4()
-  console.log(`${id} starting`)
   const {
     filename,
     start_text,
     end_text,
     start_byte_offset,
-    end_byte_offset
+    end_byte_offset,
+    parse_topic,
+    continue_topic
   } = req.body.attributes
+  let id
+  if (req.body.attributes.id) id = req.body.attributes.id
+  else id = uuid.v4()
+  console.log(`${id} chunk starting`)
   const { bucketpart, filepart } = split_filename(filename)
   const myBucket = storage.bucket(bucketpart)
   const readFileHandle = myBucket.file(filepart)
@@ -28,27 +33,61 @@ async function chunk(req, res) {
     end: end_byte_offset
   })
 
-  pipeline(
-    id,
-    CHUNK_CREATED_TOPIC,
-    rStream,
-    start_text,
-    end_text,
-    start_byte_offset
-  )
+  async function pipeline() {
+    try {
+      const r1 = await find_blocks(
+        rStream,
+        start_text,
+        end_text,
+        start_byte_offset
+      )
+      if (isFailure(r1)) {
+        console.error(`${id} find_blocks ${payload(r1)}`)
+        return
+      }
+      const blocks = payload(r1).blocks
+      const cursor = payload(r1).cursor
+      const r2 = await write_blocks(
+        id,
+        `datafeeds/chunks/${id}/${uuid.v4()}.xml`,
+        blocks,
+        parse_topic
+      )
+      if (isFailure(r2)) {
+        console.error(`${id} write_blocks ${payload(r2)}`)
+        return
+      }
+      const r3 = continue_work(
+        id,
+        filename,
+        cursor,
+        end_byte_offset,
+        start_text,
+        end_text,
+        parse_topic,
+        continue_topic
+      )
+      if (r3 === false) {
+        console.info(`${id} continue_work complete`)
+        return
+      }
+      console.log(r3)
+      const r4 = await publish(continue_topic, r3)
+      if (isFailure(r4)) {
+        console.error(`${id} publish ${payload(r4)}`)
+      }
+    } catch (err) {
+      console.log(`${id} pipeline ${err.toString()}`)
+    }
+  }
+  pipeline()
   return res_ok(res, { id })
 }
 
-function split_at(text, index) {
-  return [text.substring(0, index), text.substring(index)]
-}
-
-function pipeline(id, topic, rs, start_text, end_text, cursor = 0) {
+function find_blocks(rs, start_text, end_text, cursor = 0) {
   return new Promise((res, rej) => {
     const starttime = Date.now()
-    let pair_idxs = []
     let blocks = []
-    let found = 0
     let buffer = ""
     let start_idx = -1
     let end_idx = -1
@@ -64,18 +103,14 @@ function pipeline(id, topic, rs, start_text, end_text, cursor = 0) {
         end_idx += end_text.length
         // the tags are both in the buffer and in the right order
         if (start_idx < end_idx) {
-          found += 1
-          pair_idxs.push([cursor + start_idx, cursor + end_idx])
           const b = buffer.slice(start_idx, end_idx)
           blocks.push(b)
         }
-        // chop the buffer to the next end_idx so we can look for
-        // the next pair
+        // chop the buffer to the next end_idx so we can look for the next pair
         cursor += end_idx
         buffer = chop(buffer, end_idx)
-        const now = Date.now()
         // should we bail out now
-        if (found > 1000 || now - starttime > 500 * 1000) {
+        if (blocks.length >= 1000 || Date.now() - starttime > 500 * 1000) {
           more(COMPLETE)
         }
       }
@@ -88,10 +123,8 @@ function pipeline(id, topic, rs, start_text, end_text, cursor = 0) {
         res(failure(err.toString()))
         return
       }
-      const filename = `datafeeds/chunks/${id}/${uuid.v4()}.xml`
-      const result = await write_blocks(id, filename, blocks, topic)
-      // this is really only returning for testing reasons
-      res(result)
+
+      res(success({ blocks, cursor }))
     }
 
     miss.each(rs, dochunk, done)
@@ -106,8 +139,9 @@ async function write_blocks(id, filename, blocks, topic) {
     const blob = blocks.join("\n")
     const r1 = await file.save(preblob + blob + postblob)
     if (isFailure(r1)) return r1
+    console.info(`${id} wrote ${filename}`)
     const message = {
-      data: { id, filename },
+      data: Buffer.from(JSON.stringify({ id, filename })),
       attributes: { id, filename }
     }
     return publish(topic, message)
@@ -116,6 +150,36 @@ async function write_blocks(id, filename, blocks, topic) {
     return failure(e.toString())
   }
 }
+
+function continue_work(
+  id,
+  filename,
+  cursor,
+  end_byte_offset,
+  start_text,
+  end_text,
+  parse_topic,
+  continue_topic
+) {
+  if (cursor >= end_byte_offset) return false
+  const args = {
+    id,
+    filename,
+    start_byte_offset: cursor,
+    end_byte_offset: end_byte_offset,
+    start_text,
+    end_text,
+    parse_topic,
+    continue_topic
+  }
+  // not sure if we will be using data or attributes
+  const message = {
+    data: Buffer.from(JSON.stringify(args)),
+    attributes: args
+  }
+  return message
+}
+
 function chop(str, idx) {
   return str.slice(idx)
 }
@@ -147,6 +211,7 @@ function getFileHandle(filepath) {
 
 module.exports = {
   chunk,
-  pipeline,
-  write_blocks
+  find_blocks,
+  write_blocks,
+  continue_work
 }
