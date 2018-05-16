@@ -71,6 +71,7 @@ function publish(topic, messagesElement) {
       return success(response)
     })
     .catch(err => {
+      console.log(err)
       return failure(err.toString())
     })
 }

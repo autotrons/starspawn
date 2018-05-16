@@ -22,7 +22,7 @@ let chunk = (() => {
             console.info(`${id} continue_work complete`);
             return;
           }
-          console.log(r3);
+
           const r4 = yield publish(continue_topic, r3);
           if (isFailure(r4)) {
             console.error(`${id} publish ${payload(r4)}`);
@@ -172,9 +172,9 @@ function continue_work(id, filename, cursor, end_byte_offset, start_text, end_te
     parse_topic,
     continue_topic
     // not sure if we will be using data or attributes
-  };const message = {
-    data: Buffer.from(JSON.stringify(args)),
-    attributes: args
+  };const data = Buffer.from(JSON.stringify(args));
+  const message = {
+    data
   };
   return message;
 }

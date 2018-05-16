@@ -71,7 +71,7 @@ async function chunk(req, res) {
         console.info(`${id} continue_work complete`)
         return
       }
-      console.log(r3)
+
       const r4 = await publish(continue_topic, r3)
       if (isFailure(r4)) {
         console.error(`${id} publish ${payload(r4)}`)
@@ -173,9 +173,9 @@ function continue_work(
     continue_topic
   }
   // not sure if we will be using data or attributes
+  const data = Buffer.from(JSON.stringify(args))
   const message = {
-    data: Buffer.from(JSON.stringify(args)),
-    attributes: args
+    data
   }
   return message
 }

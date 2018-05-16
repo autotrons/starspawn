@@ -58,6 +58,7 @@ function publish(topic, messagesElement) {
     const response = responses[0];
     return success(response);
   }).catch(err => {
+    console.log(err);
     return failure(err.toString());
   });
 }
