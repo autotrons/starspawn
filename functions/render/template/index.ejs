@@ -69,7 +69,15 @@
     <script async src="https://cdn.ampproject.org/v0.js"></script>
   </head>
   <body>
-    <h1>Starspawn Jobfeed</h1>
-    Job Description: <%- body%>;
+    <h1><%- title %></h1>
+    <h2><a href="<%- url %>">Apply</a></h2>
+    Job Description: <%- body %>;<br />
+    Location: <%- location %><br />
+    <%- city %>, <%- state %><br />
+    <%- zip %> <%- country %><br />
+
+    "job_type" <%- job_type %> //",<br />
+    "posted_at" <%- posted_at %> //2018-04-21",<br />
+    "company" <%- company %> //HealthTrust Workforce Solutions",
   </body>
 </html>

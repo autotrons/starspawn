@@ -33,7 +33,7 @@ describe("render.js ", () => {
   })
 
   describe("render()", () => {
-    it.skip("Should render an AMP page from a query string", async () => {
+    it("Should render an AMP page from a query string", async () => {
       const { req, res } = make_req_res()
       const result = await render(req, res)
       assertSuccess(result)
@@ -48,7 +48,7 @@ describe("render.js ", () => {
 function make_req_res() {
   const req = {
     query: {
-      jobId: "63_Apr43245"
+      jobId: "63_Apr47260"
     }
   }
   const res = {
