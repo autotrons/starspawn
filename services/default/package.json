@@ -4,12 +4,16 @@
   "description": "",
   "main": "./src/helloworld.js",
   "scripts": {
+    "start": "node ./src/helloworld.js",
     "test": "mocha ./src/*.spec.js",
     "testwatch": "mocha --watch ./src/*.spec.js",
     "lint": "prettier  --write \"./src/**/*.js\"",
     "lintwatch": "onchange './src/**/*.js' -- prettier --write {{changed}}",
     "eslint": "esw .eslintrc.js src/ lib/ tests/ -w --fix --ignore-pattern !.eslintrc.js",
     "deploy": "gcloud app deploy"
+  },
+  "engines": {
+    "node": "8.x"
   },
   "author": "",
   "license": "ISC",
