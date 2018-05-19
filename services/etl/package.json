@@ -4,6 +4,7 @@
   "description": "",
   "main": "./src/etl.js",
   "scripts": {
+    "start": "node ./src/etl.js",
     "test": "mocha ./src/*.spec.js",
     "testwatch": "mocha --watch ./src/*.spec.js",
     "lint": "prettier  --write \"./src/**/*.js\"",
