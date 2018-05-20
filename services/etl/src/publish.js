@@ -11,12 +11,14 @@ const {
 } = require("@pheasantplucker/gc-pubsub")
 
 const PROJECT_ID = "starspawn-201921"
-async function publish(id, data) {
+async function publish(id, topic, msg) {
   const { topic, msg } = data
   const res1 = createPublisher(PROJECT_ID)
   const topicResult = await createTopic(topic)
   if (isFailure(topicResult)) return topicResult
-  return publishJson(topic, msg)
+  const publishResult = await publishJson(topic, msg)
+  if (isFailure(publishResult)) return publishResult
+  return success(data)
 }
 
 module.exports = {
