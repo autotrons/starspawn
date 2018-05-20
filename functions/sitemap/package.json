@@ -1,0 +1,32 @@
+{
+  "name": "sitemap",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./build/sitemap.js",
+  "scripts": {
+    "test": "mocha ./src/sitemap.test.js",
+    "testbuild": "mocha ./build/sitemap.test.js",
+    "testwatch": "mocha --watch ./build/sitemap.test.js",
+    "build": "babel src --out-dir build",
+    "lint": "prettier  --write \"./src/**/*.js\"",
+    "lint-watch": "onchange './src/**/*.js' -- prettier --write {{changed}}"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "mocha": "^5.1.1",
+    "onchange": "^4.0.0",
+    "prettier": "1.12.1"
+  },
+  "dependencies": {
+    "@pheasantplucker/failables-node6": "^2.0.3",
+    "ramda": "^0.25.0",
+    "uuid": "3.2.1"
+  },
+  "prettier": {
+    "semi": false,
+    "bracketSpacing": true
+  }
+}
