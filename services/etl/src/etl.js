@@ -9,8 +9,7 @@ const {
   payload,
   meta
 } = require("@pheasantplucker/failables")
-const get = require("simple-get")
-const { createWriteStream } = require("@pheasantplucker/gc-cloudstorage")
+const { download } = require("./download")
 
 // ==========================================================
 //
@@ -36,6 +35,7 @@ app.get("/", (req, res) => {
 })
 
 app.post("/:function", async function(req, res) {
+  // Pull out task data
   let fun, data, id, reply, source
   const start_time = Date.now()
   try {
@@ -47,11 +47,17 @@ app.post("/:function", async function(req, res) {
     return res_err(res, id, fun, e.toString())
   }
 
+  // Call The function
   try {
     if (fun === "download") {
       reply = await download(id, data)
     }
 
+    if (fun === "publish") {
+      reply = await publish(id, data)
+    }
+
+    // deal with function failure
     if (isFailure(reply)) {
       return res_err(res, id, fun, payload(reply))
     }
@@ -60,39 +66,6 @@ app.post("/:function", async function(req, res) {
     return res_err(res, id, fun, e.toString())
   }
 })
-
-async function download(id, data) {
-  try {
-    let { source_url, target_file } = data
-    return stream_to_storage(source_url, target_file)
-  } catch (e) {
-    return failure(e.toString())
-  }
-}
-
-async function stream_to_storage(source_url, target_file) {
-  const r1 = await createWriteStream(target_file)
-  if (isFailure(r1)) return r1
-  const write_stream = payload(r1)
-  return new Promise(resolve => {
-    get(source_url, function(err, getResponse) {
-      if (err) {
-        resolve(failure(err.toString()))
-        return
-      }
-
-      console.log()
-      getResponse
-        .pipe(write_stream)
-        .on("error", function(err) {
-          resolve(failure(err.toString()))
-        })
-        .on("finish", function() {
-          resolve(success())
-        })
-    })
-  })
-}
 
 // ==========================================================
 //
