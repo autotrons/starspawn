@@ -1,8 +1,24 @@
-const { failure, success, payload } = require("@pheasantplucker/failables")
-const { publishJson } = require("@pheasantplucker/gc-pubsub")
+const {
+  isFailure,
+  failure,
+  success,
+  payload
+} = require("@pheasantplucker/failables")
+const {
+  publishJson,
+  createPublisher,
+  createTopic
+} = require("@pheasantplucker/gc-pubsub")
 
-async function publish() {
-  // create the dipshit clients
-  // create topic if not exist?
-  // publish to provided topic
+const PROJECT_ID = "starspawn-201921"
+async function publish(id, data) {
+  const { topic, msg } = data
+  const res1 = createPublisher(PROJECT_ID)
+  const topicResult = await createTopic(topic)
+  if (isFailure(topicResult)) return topicResult
+  return publishJson(topic, msg)
+}
+
+module.exports = {
+  publish
 }

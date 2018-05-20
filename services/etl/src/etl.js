@@ -12,6 +12,7 @@ const {
 const { download } = require("./download")
 const { unzip } = require("./unzip")
 const { chunk } = require("./chunk")
+const { publish } = require("./publish")
 
 // ==========================================================
 //
