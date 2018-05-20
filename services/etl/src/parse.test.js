@@ -2,7 +2,7 @@ const {
   assertSuccess,
   payload,
   isFailure,
-} = require('@pheasantplucker/failables-node6')
+} = require('@pheasantplucker/failables')
 const { parse, parseXmlToJson } = require('./parse')
 const equal = require('assert').deepEqual
 const path = require('path')
@@ -11,16 +11,10 @@ const fs = require('fs')
 const {
   createBucket,
   bucketExists,
-  //   noUpperCase,
   uploadFile,
-  //   getBucket,
-  //   newFile,
   exists,
   save,
   getFile,
-  //   deleteFile,
-  // createWriteStream,
-  //   deleteBucket
 } = require('@pheasantplucker/gc-cloudstorage')
 
 const bucket = 'starspawn_tests'
@@ -60,7 +54,7 @@ describe('parse.js', function() {
     _testsetup()
   })
 
-  it('should pull a batch of tags between two points in the file', async () => {
+  it('should convert the XML from the file into JSON and send it to load', async () => {
     const input = { fileName: testFileCloud }
     const { req, res } = make_req_res(input)
     const result = await parse(req, res)
@@ -77,10 +71,12 @@ describe('parse.js', function() {
   })
 })
 
-function make_req_res(attributes) {
+function make_req_res(data) {
   const req = {
     body: {
-      attributes,
+      message: {
+        data
+      }
     },
   }
   const res = {

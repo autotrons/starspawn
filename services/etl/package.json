@@ -33,7 +33,8 @@
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
     "simple-get": "^3.0.2",
-    "uuid": "^3.2.1"
+    "uuid": "^3.2.1",
+    "xml2js": "^0.4.19"
   },
   "prettier": {
     "semi": false,

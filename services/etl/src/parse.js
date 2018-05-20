@@ -4,7 +4,7 @@ const {
   success,
   isFailure,
   payload,
-} = require('@pheasantplucker/failables-node6')
+} = require('@pheasantplucker/failables')
 const storage = require('@google-cloud/storage')()
 const xml2js = require('xml2js')
 const rp = require('request-promise')
@@ -12,21 +12,15 @@ const parser = new xml2js.Parser({ explicitArray: false, trim: true })
 const {
   createBucket,
   bucketExists,
-  //   noUpperCase,
   uploadFile,
-  //   getBucket,
-  //   newFile,
   exists,
   save,
   getFile,
-  //   deleteFile,
-  // createWriteStream,
-  //   deleteBucket
 } = require('@pheasantplucker/gc-cloudstorage')
 
 async function parse(req, res) {
   const id = uuid.v4()
-  console.log(`${id} starting`)
+  // console.log(`${id} starting`)
   const r1 = getAttributes(req)
   if (isFailure(r1)) return r1
   const attrs = payload(r1)
@@ -51,7 +45,7 @@ async function parse(req, res) {
 
   // console.log(`postToLoader:`, postToLoader)
 
-  return res_ok(res, { id })
+  return res_ok(res, { id, postToLoader })
 }
 
 function parseXmlToJson(xml) {
@@ -65,37 +59,27 @@ function parseXmlToJson(xml) {
     return failure(e.toString())
   }
 }
-//
-// async function sourceAtoJSON(d, authorization, replyEmail) {
-//   const r1 = await parseXmlToJson(d)
-//   const results = r1.jobs.job.map(a =>
-//     typeAToJSON(a, authorization, replyEmail)
-//   )
-//   return results
-// }
 
 function res_ok(res, payload) {
-  // console.info(payload)
   res.status(200).send(success(payload))
   return success(payload)
 }
 
 function res_err(res, payload) {
-  console.error(payload)
   res.status(500).send(failure(payload))
   return failure(payload)
 }
 
 const getAttributes = req => {
   try {
-    if (req.body.attributes) {
-      return success(req.body.attributes)
+    if (req.body.message.data) {
+      return success(req.body.message.data)
     } else {
-      return failure(req, { error: 'couldnt access req.body.attributes' })
+      return failure(req, { error: 'couldnt access req.body.message.data' })
     }
   } catch (e) {
     return failure(e.toString(), {
-      error: 'couldnt access req.body.attributes',
+      error: 'couldnt access req.body.message.data',
       req: req,
     })
   }
