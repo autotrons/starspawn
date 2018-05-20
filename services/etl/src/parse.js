@@ -1,13 +1,13 @@
-const uuid = require('uuid')
+const uuid = require("uuid")
 const {
   failure,
   success,
   isFailure,
-  payload,
-} = require('@pheasantplucker/failables')
-const storage = require('@google-cloud/storage')()
-const xml2js = require('xml2js')
-const rp = require('request-promise')
+  payload
+} = require("@pheasantplucker/failables")
+const storage = require("@google-cloud/storage")()
+const xml2js = require("xml2js")
+const rp = require("request-promise")
 const parser = new xml2js.Parser({ explicitArray: false, trim: true })
 const {
   createBucket,
@@ -15,8 +15,8 @@ const {
   uploadFile,
   exists,
   save,
-  getFile,
-} = require('@pheasantplucker/gc-cloudstorage')
+  getFile
+} = require("@pheasantplucker/gc-cloudstorage")
 
 async function parse(req, res) {
   const id = uuid.v4()
@@ -35,10 +35,10 @@ async function parse(req, res) {
   const jsonJobs = payload(r3)
 
   var options = {
-    method: 'POST',
-    uri: 'https://us-central1-starspawn-201921.cloudfunctions.net/loader',
+    method: "POST",
+    uri: "https://us-central1-starspawn-201921.cloudfunctions.net/loader",
     body: { attributes: jsonJobs.root.job },
-    json: true, // Automatically stringifies the body to JSON
+    json: true // Automatically stringifies the body to JSON
   }
 
   const postToLoader = await rp(options)
@@ -75,17 +75,17 @@ const getAttributes = req => {
     if (req.body.message.data) {
       return success(req.body.message.data)
     } else {
-      return failure(req, { error: 'couldnt access req.body.message.data' })
+      return failure(req, { error: "couldnt access req.body.message.data" })
     }
   } catch (e) {
     return failure(e.toString(), {
-      error: 'couldnt access req.body.message.data',
-      req: req,
+      error: "couldnt access req.body.message.data",
+      req: req
     })
   }
 }
 
 module.exports = {
   parse,
-  parseXmlToJson,
+  parseXmlToJson
 }

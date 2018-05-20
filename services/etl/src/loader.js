@@ -1,16 +1,16 @@
-const uuid = require('uuid')
+const uuid = require("uuid")
 const {
   success,
   failure,
   isFailure,
-  payload,
-} = require('@pheasantplucker/failables-node6')
+  payload
+} = require("@pheasantplucker/failables-node6")
 const {
   createDatastoreClient,
   makeEntityByName,
   writeEntity,
-  readEntities,
-} = require('@pheasantplucker/gc-datastore')
+  readEntities
+} = require("@pheasantplucker/gc-datastore")
 
 const loader = async (req, res) => {
   const id = uuid.v4()
@@ -39,12 +39,12 @@ const getAttributes = req => {
     if (req.body.message.data) {
       return success(req.body.message.data)
     } else {
-      return failure(req, { error: 'couldnt access req.body.message.data' })
+      return failure(req, { error: "couldnt access req.body.message.data" })
     }
   } catch (e) {
     return failure(e.toString(), {
-      error: 'couldnt access req.body.message.data',
-      req: req,
+      error: "couldnt access req.body.message.data",
+      req: req
     })
   }
 }
@@ -55,7 +55,7 @@ function res_ok(res, payload) {
 }
 
 const jobsToEntities = jobs => {
-  const kind = 'jobs' //hmm, testing data?
+  const kind = "jobs" //hmm, testing data?
   try {
     const entities = jobs.map(job => {
       const thisEntity = makeEntityByName(kind, job.job_reference, job)
@@ -64,7 +64,7 @@ const jobsToEntities = jobs => {
     return success(entities)
   } catch (e) {
     return failure(e.toString(), {
-      jobs: jobs,
+      jobs: jobs
     })
   }
 }
@@ -78,5 +78,5 @@ const jobsToEntities = jobs => {
 module.exports = {
   loader,
   getAttributes,
-  jobsToEntities,
+  jobsToEntities
 }

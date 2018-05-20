@@ -11,7 +11,7 @@ const {
 } = require("@pheasantplucker/gc-pubsub")
 
 const PROJECT_ID = "starspawn-201921"
-async function publish(id, topic, msg) {
+async function publish(id, data) {
   const { topic, msg } = data
   const res1 = createPublisher(PROJECT_ID)
   const topicResult = await createTopic(topic)

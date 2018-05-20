@@ -7,6 +7,10 @@ describe("unzip.js", function() {
   this.timeout(540 * 1000)
   describe("unzip()", () => {
     it("split up a file", async () => {
+      const source_bucket = "datafeeds"
+      const target_bucket = "datafeeds"
+      const target_filename = `unziped/${uuid.v4()}.xml`
+
       const source_file =
         "https://storage.googleapis.com/datafeeds/feed_100.xml"
       const id = uuid.v4()

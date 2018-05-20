@@ -1,24 +1,24 @@
 const {
   assertSuccess,
   assertFailure,
-  payload,
-} = require('@pheasantplucker/failables-node6')
+  payload
+} = require("@pheasantplucker/failables-node6")
 const {
   createDatastoreClient,
   readEntities,
-  getDatastoreKeySymbol,
-} = require('@pheasantplucker/gc-datastore')
+  getDatastoreKeySymbol
+} = require("@pheasantplucker/gc-datastore")
 
-const { loader, getAttributes, jobsToEntities } = require('./loader')
-const equal = require('assert').deepEqual
+const { loader, getAttributes, jobsToEntities } = require("./loader")
+const equal = require("assert").deepEqual
 
-const fakeJobArray = require('../../../samples/fakejobsarray.json')
+const fakeJobArray = require("../../../samples/fakejobsarray.json")
 const datastore = createDatastoreClient()
 const dsKey = getDatastoreKeySymbol()
 
-describe('loader.js', function() {
+describe("loader.js", function() {
   this.timeout(540 * 1000)
-  it('should load a list of jobs into Datastore', async () => {
+  it("should load a list of jobs into Datastore", async () => {
     const { req, res } = make_req_res(fakeJobArray)
     const result = await loader(req, res)
     assertSuccess(result)
@@ -60,21 +60,21 @@ describe(`getAttributes`, () => {
 const make_req_res = data => {
   const req = {
     body: {
-      message:{
+      message: {
         data
-      },
-    },
+      }
+    }
   }
   const res = {
     status: () => {
       return {
-        send: () => {},
+        send: () => {}
       }
     },
-    send: () => {},
+    send: () => {}
   }
   return {
     req,
-    res,
+    res
   }
 }
