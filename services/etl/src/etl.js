@@ -2,7 +2,15 @@ const express = require("express")
 const app = express()
 const uuid = require("uuid")
 const bodyParser = require("body-parser")
-const { failure, success } = require("@pheasantplucker/failables")
+const {
+  isFailure,
+  failure,
+  success,
+  payload,
+  meta
+} = require("@pheasantplucker/failables")
+const get = require("simple-get")
+const { createWriteStream } = require("@pheasantplucker/gc-cloudstorage")
 
 // ==========================================================
 //
@@ -23,25 +31,68 @@ app.use(bodyParser.json())
 app.get("/", (req, res) => {
   res
     .status(200)
-    .send("hello etl")
+    .send("{}")
     .end()
 })
 
-app.post("/download", async (req, res) => {
-  let id
+app.post("/:function", async function(req, res) {
+  let fun, data, id, reply, source
+  const start_time = Date.now()
   try {
-    log(req.body)
-    const data = parse_req_data(req)
-    log(data)
-    let { source_url } = data
+    fun = req.params.function
+    data = parse_req_data(req)
     id = data.id
     if (!id) id = uuid.v4()
-    const payload = { foo: "bar" }
-    return res_ok(res, id, "download", ["test", "trace", "alpha"], payload)
   } catch (e) {
-    return res_err(res, id, "download", ["test", "trace", "alpha"], payload)
+    return res_err(res, id, fun, e.toString())
+  }
+
+  try {
+    if (fun === "download") {
+      reply = await download(id, data)
+    }
+
+    if (isFailure(reply)) {
+      return res_err(res, id, fun, payload(reply))
+    }
+    return res_ok(res, id, fun, payload(reply))
+  } catch (e) {
+    return res_err(res, id, fun, e.toString())
   }
 })
+
+async function download(id, data) {
+  try {
+    let { source_url, target_file } = data
+    return stream_to_storage(source_url, target_file)
+  } catch (e) {
+    return failure(e.toString())
+  }
+}
+
+async function stream_to_storage(source_url, target_file) {
+  const r1 = await createWriteStream(target_file)
+  if (isFailure(r1)) return r1
+  const write_stream = payload(r1)
+  return new Promise(resolve => {
+    get(source_url, function(err, getResponse) {
+      if (err) {
+        resolve(failure(err.toString()))
+        return
+      }
+
+      console.log()
+      getResponse
+        .pipe(write_stream)
+        .on("error", function(err) {
+          resolve(failure(err.toString()))
+        })
+        .on("finish", function() {
+          resolve(success())
+        })
+    })
+  })
+}
 
 // ==========================================================
 //
@@ -57,27 +108,17 @@ function parse_req_data(r) {
   }
 }
 
-function res_ok(res, id, source, tags, payload) {
-  const d = envelope(id, source, tags, payload)
-  res.status(200).send(success(d))
-  return success(d)
+function res_ok(res, id, source, data) {
+  const m = { id, wn: source }
+  res.status(200).send(success(data, m))
+  return success(data, m)
 }
 
-function res_err(res, id, source, tags, payload) {
-  const d = envelope(id, source, tags, payload)
-  console.error(d)
-  res.status(500).send(failure(d))
-  return failure(d)
-}
-
-function envelope(id, source, tags, payload) {
-  return {
-    id,
-    end_time: Date.now(),
-    source,
-    tags,
-    payload
-  }
+function res_err(res, id, source, data) {
+  const m = { id, wn: source }
+  console.error(data)
+  res.status(500).send(failure(data, m))
+  return failure(data, m)
 }
 
 // ==========================================================

@@ -26,10 +26,13 @@
     "request-promise": "^4.2.2"
   },
   "dependencies": {
+    "@google-cloud/storage": "^1.6.0",
     "@pheasantplucker/failables": "^2.0.4",
     "@pheasantplucker/failables-node6": "^2.0.3",
+    "@pheasantplucker/gc-cloudstorage": "0.0.2",
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
+    "simple-get": "^3.0.2",
     "uuid": "^3.2.1"
   },
   "prettier": {
