@@ -1,0 +1,80 @@
+{
+    "@context" : "http://schema.org/",
+    "@type" : "JobPosting",
+    "title" : "Fitter and Turner",
+    "description" : "<p>Widget assembly role for pressing wheel assemblies.</p>
+      <p><strong>Educational Requirements:</strong> Completed level 2 ISTA
+      Machinist Apprenticeship.</p>
+      <p><strong>Required Experience:</strong> At
+      least 3 years in a machinist role.</p>",
+    "identifier": {
+      "@type": "PropertyValue",
+      "name": "MagsRUs Wheel Company",
+      "value": "1234567"
+    },
+    "datePosted" : "2017-01-18",
+    "validThrough" : "2017-03-18T00:00",
+    "employmentType" : "CONTRACTOR",
+    "hiringOrganization" : {
+      "@type" : "Organization",
+      "name" : "MagsRUs Wheel Company",
+      "sameAs" : "http://www.magsruswheelcompany.com",
+      "logo" : "http://www.example.com/images/logo.png"
+    },
+    "jobLocation" : {
+      "@type" : "Place",
+      "address" : {
+        "@type" : "PostalAddress",
+        "streetAddress" : "555 Clancy St",
+        "addressLocality" : "Detroit",
+        "addressRegion" : "MI",
+        "postalCode" : "48201",
+        "addressCountry": "US"
+      }
+    },
+    "baseSalary": {
+      "@type": "MonetaryAmount",
+      "currency": "USD",
+      "value": {
+        "@type": "QuantitativeValue",
+        "value": 40.00,
+        "unitText": "HOUR"
+      }
+    }
+  }
+
+
+  tmpl = 
+  path: '.'
+  @context: "http://schema.org"
+  @type: "JobPosting"
+  title: 'title'
+  description: 'body'
+  identifier: 
+      @type: "PropertyValue"
+      name: 'company'
+      value: null
+  datePosted: "posted_at"
+  validThrough: null
+  employmentType: "category"
+  hiringOrganization:
+      @type: "Organization"
+      name: "company"
+      sameAs: null
+      logo: null
+  jobLocation:
+      @type: "Place"
+      addresss: 
+          @type: "PostalAddress"
+          streetAddress: null
+          addressLocality: "city"
+          addressRegion: "state"
+          postalCode: "zip"
+          addressCountry: "country"
+  baseSalary:
+      @type: "MonetaryAmount"
+      currency: "USD"
+      value:
+          @type: "QuantitativeValue",
+          value: null
+          unitText: "Hour"
