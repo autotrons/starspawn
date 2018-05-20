@@ -18,7 +18,7 @@ async function publish(id, topic, msg) {
     headers: {
       "User-Agent": "Request-Promise"
     },
-    body: { message: { data: { topic, msg } } },
+    body: { message: { data: { id, topic, msg } } },
     json: true // Automatically stringifies the body to JSON
   }
   const result = await rp(options)
