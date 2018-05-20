@@ -5,8 +5,8 @@
   "main": "./start.js",
   "scripts": {
     "start": "node start.js",
-    "test": "mocha ./src/*.spec.js",
-    "testwatch": "mocha --watch ./src/*.spec.js",
+    "test": "mocha ./src/*.test.js",
+    "testwatch": "mocha --watch ./src/*.test.js",
     "lint": "prettier  --write \"./src/**/*.js\"",
     "lintwatch": "onchange './src/**/*.js' -- prettier --write {{changed}}",
     "eslint": "esw .eslintrc.js src/ lib/ tests/ -w --fix --ignore-pattern !.eslintrc.js",
