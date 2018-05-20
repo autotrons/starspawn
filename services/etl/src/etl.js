@@ -10,6 +10,8 @@ const {
   meta
 } = require("@pheasantplucker/failables")
 const { download } = require("./download")
+const { unzip } = require("./unzip")
+const { chunk } = require("./chunk")
 
 // ==========================================================
 //
@@ -55,6 +57,14 @@ app.post("/:function", async function(req, res) {
 
     if (fun === "publish") {
       reply = await publish(id, data)
+    }
+
+    if (fun === "unzip") {
+      reply = await unzip(id, data)
+    }
+
+    if (fun === "chunk") {
+      reply = await chunk(id, data)
     }
 
     // deal with function failure
