@@ -47,7 +47,7 @@ describe("render.js ", () => {
 
 function make_req_res() {
   const req = {
-    query: {
+    params: {
       jobId: "63_Apr47260"
     }
   }

@@ -67,8 +67,8 @@ const unsanitizeDescriptionHtml = (sanHtml) => {
 
 const getJobId = req => {
   try {
-    if (req.query.jobId) {
-      return success(req.query.jobId)
+    if (req.params.jobId) {
+      return success(req.params.jobId)
     } else {
       return failure(req, { error: "couldnt access req.query" })
     }
