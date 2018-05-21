@@ -53,22 +53,15 @@ app.post("/:function", async function(req, res) {
   }
 
   // Call The function
+  const fns = {
+    download,
+    publish,
+    unzip,
+    chunk
+  }
+
   try {
-    if (fun === "download") {
-      reply = await download(id, data)
-    }
-
-    if (fun === "publish") {
-      reply = await publish(id, data)
-    }
-
-    if (fun === "unzip") {
-      reply = await unzip(id, data)
-    }
-
-    if (fun === "chunk") {
-      reply = await chunk(id, data)
-    }
+    reply = await fns[fun](id, data)
 
     if (fun === "loader") {
       reply = await loader(id, data)
