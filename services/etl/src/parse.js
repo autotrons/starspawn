@@ -7,7 +7,6 @@ const {
 } = require("@pheasantplucker/failables")
 const storage = require("@google-cloud/storage")()
 const xml2js = require("xml2js")
-const rp = require("request-promise")
 const parser = new xml2js.Parser({ explicitArray: false, trim: true })
 const {
   createBucket,
