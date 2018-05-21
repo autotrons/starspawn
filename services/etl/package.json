@@ -36,7 +36,8 @@
     "express": "^4.16.3",
     "simple-get": "^3.0.2",
     "uuid": "^3.2.1",
-    "xml2js": "^0.4.19"
+    "xml2js": "^0.4.19",
+    "zlib": "^1.0.5"
   },
   "prettier": {
     "semi": false,

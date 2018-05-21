@@ -25,7 +25,7 @@ async function publish(id, topic, msg) {
   return result
 }
 
-describe.only(`publish.js`, function() {
+describe(`publish.js`, function() {
   this.timeout(540 * 1000)
 
   before(async () => {
