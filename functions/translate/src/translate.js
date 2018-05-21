@@ -5,7 +5,7 @@ const {
   payload,
   success,
   isFailure
-} = require("@pheasantplucker/failables-node6")
+} = require("@pheasantplucker/failables")
 
 async function translate(req, res) {
   const id = uuid.v4()

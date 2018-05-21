@@ -1,6 +1,6 @@
 const {
   translate
-} = require("./build/translate.js")
+} = require("./src/translate.js")
 
 module.exports = {
   translate

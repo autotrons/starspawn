@@ -1,5 +1,5 @@
 const assert = require("assert")
-const { assertSuccess, payload } = require("@pheasantplucker/failables-node6")
+const { assertSuccess, payload } = require("@pheasantplucker/failables")
 const { translate, assemble, blend } = require("./translate")
 const { data, types, tmpl } = require("./mocks")
 

@@ -2,10 +2,10 @@
   "name": "translate",
   "version": "1.0.0",
   "description": "",
-  "main": "./build/translate.js",
+  "main": "./src/translate.js",
   "scripts": {
-    "test": "mocha ./build/translate.test.js",
-    "testwatch": "mocha --watch ./build/translate.test.js",
+    "test": "mocha ./src/translate.test.js",
+    "testwatch": "mocha --watch ./src/translate.test.js",
     "build": "babel src --out-dir build",
     "lint": "prettier  --write \"./src/**/*.js\"",
     "lint-watch": "onchange './src/**/*.js' -- prettier --write {{changed}}"
@@ -20,7 +20,7 @@
     "prettier": "1.12.1"
   },
   "dependencies": {
-    "@pheasantplucker/failables-node6": "^2.0.3",
+    "@pheasantplucker/failables": "^2.0.3",
     "coffeescript": "^2.3.0",
     "json2json": "^0.2.8",
     "matches-shape": "^2.0.1",
