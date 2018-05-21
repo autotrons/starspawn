@@ -9,35 +9,16 @@ const {
 
 async function translate(req, res) {
   const id = uuid.v4()
-  console.log(`${id} starting...`)
-  const bodyData = getBodyData(req)
-  if (isFailure(bodyData)) return bodyData
-  const dataResult = payload(bodyData)
-  const extended = extend(dataResult.data, dataResult.types)
-  if (isFailure(extended)) return extended
-  const extendedResult = payload(extended)
-  console.log(extendedResult)
-  const assembly = await assemble(dataResult.tmpl, extendedResult)
-  if (isFailure(assembly)) return assembly
-  const result = payload(assembly)
-  console.log(JSON.parse(result))
-  return res_ok(res, { result })
-}
-
-function extend(obj, src) {
-  try {
-    let result = Object.keys(src).forEach(function(key) {
-      obj[key] = src[key]
-      return obj
-    })
-    return success(result)
-  } catch (e) {
-    return failure(e.toString(), {
-      error: "Could not merge objects",
-      obj,
-      src
-    })
-  }
+  const body = getBodyData(req)
+  if (isFailure(body)) return body
+  const { data, types, tmpl } = payload(body)
+  const merged = await blend(data, types)
+  if (isFailure(merged)) return merged
+  const mergedResult = payload(merged)
+  const translator = await assemble(tmpl, mergedResult)
+  if (isFailure(translator)) return translator
+  const result = payload(translator)
+  return success(result)
 }
 
 const getBodyData = req => {
@@ -68,6 +49,21 @@ async function assemble(tmpl, data) {
   }
 }
 
+function blend(obj, src) {
+  try {
+    Object.keys(src).forEach(key => {
+      obj[key] = src[key]
+    })
+    return success(obj)
+  } catch (e) {
+    return failure(e.toString(), {
+      error: "Couldn't merge objects",
+      obj,
+      src
+    })
+  }
+}
+
 function res_ok(res, payload) {
   console.info(payload)
   res.status(200).send(success(payload))
@@ -83,5 +79,5 @@ function res_err(res, payload) {
 module.exports = {
   translate,
   assemble,
-  extend
+  blend
 }

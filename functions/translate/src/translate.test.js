@@ -1,11 +1,11 @@
 const assert = require("assert")
-const { assertSuccess } = require("@pheasantplucker/failables-node6")
-const { translate, assemble, extend } = require("./translate")
+const { assertSuccess, payload } = require("@pheasantplucker/failables-node6")
+const { translate, assemble, blend } = require("./translate")
 const { data, types, tmpl } = require("./mocks")
 
 describe("translate.js", function() {
   describe("translate()", function() {
-    it("Should return a success and an id", async function() {
+    it("Should return success and a result of rendered data", async function() {
       const input = { data, types, tmpl }
       const { req, res } = make_req_res(input)
       const result = await translate(req, res)
@@ -14,7 +14,7 @@ describe("translate.js", function() {
     })
   })
   describe("assemble()", function() {
-    it("should return an object and success", async function() {
+    it("should add template and data", async function() {
       const input = {}
       const { req, res } = make_req_res(input)
       const result = await assemble(req, res)
@@ -22,11 +22,12 @@ describe("translate.js", function() {
       assertSuccess(result)
     })
   })
-  describe("extend()", function() {
+  describe("blend()", function() {
     it("should combine two objects", () => {
-      //console.log(data, types)
-      const extended = extend(data, types)
-      assert(typeof extended === "object")
+      const result = blend(data, types)
+      const ext = payload(result)
+      assert(typeof ext === "object")
+      assertSuccess(result)
     })
   })
 })
