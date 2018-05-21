@@ -7,6 +7,7 @@ const { parse, parseXmlToJson } = require("./parse")
 const equal = require("assert").deepEqual
 const path = require("path")
 const fs = require("fs")
+const uuid = require("uuid")
 
 const {
   createBucket,
@@ -47,6 +48,8 @@ const _testsetup = async () => {
   }
 }
 
+const thisId = uuid.v4()
+
 describe("parse.js", function() {
   this.timeout(540 * 1000)
 
@@ -55,9 +58,7 @@ describe("parse.js", function() {
   })
 
   it("should convert the XML from the file into JSON and send it to load", async () => {
-    const input = { fileName: testFileCloud }
-    const { req, res } = make_req_res(input)
-    const result = await parse(req, res)
+    const result = await parse(thisId, testFileCloud)
     assertSuccess(result)
   })
 
@@ -70,25 +71,3 @@ describe("parse.js", function() {
     })
   })
 })
-
-function make_req_res(data) {
-  const req = {
-    body: {
-      message: {
-        data
-      }
-    }
-  }
-  const res = {
-    status: function() {
-      return {
-        send: () => {}
-      }
-    },
-    send: () => {}
-  }
-  return {
-    req,
-    res
-  }
-}

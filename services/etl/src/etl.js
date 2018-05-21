@@ -13,6 +13,8 @@ const { download } = require("./download")
 const { unzip } = require("./unzip")
 const { chunk } = require("./chunk")
 const { publish } = require("./publish")
+const { loader } = require("./loader")
+const { parse } = require("./parse")
 
 // ==========================================================
 //
@@ -66,6 +68,14 @@ app.post("/:function", async function(req, res) {
 
     if (fun === "chunk") {
       reply = await chunk(id, data)
+    }
+
+    if (fun === "loader") {
+      reply = await loader(id, data)
+    }
+
+    if (fun === "parse") {
+      reply = await parse(id, data)
     }
 
     // deal with function failure
