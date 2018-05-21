@@ -1,0 +1,9 @@
+{
+  "message": {
+    "data": {
+      "source_url":"https://storage.googleapis.com/starspawn_tests/feed.xml.gz",
+      "target_file": "datafeeds/full_feed/1234-5678.xml.gz",
+      "id":"1234-5678"
+    }
+  }
+}
