@@ -5,7 +5,7 @@ const uuid = require("uuid")
 const { unzip } = require("./unzip")
 describe("unzip.js", function() {
   this.timeout(540 * 1000)
-  describe.only("unzip()", () => {
+  describe("unzip()", () => {
     const source_file = "full_feed/feed_100.xml.gz"
     const source_bucket = "datafeeds"
     const target_bucket = "datafeeds"
