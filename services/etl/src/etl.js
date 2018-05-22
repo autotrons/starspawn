@@ -107,7 +107,7 @@ async function setupPubSub() {
 
 function parse_req_data(r) {
   try {
-    return JSON.parse(r.body.message.data)
+    return JSON.parse(r.body.message.data.toString())
   } catch (e) {
     return r.body.message.data
   }
