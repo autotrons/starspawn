@@ -1,3 +1,7 @@
+const assert = require("assert")
+const { assertSuccess, payload } = require("@pheasantplucker/failables")
+const { json2gsd, assemble, blend } = require("./json2gsd")
+
 const jobJson = {
   location: "Fort Lauderdale, FL, United States",
   title: "RN Per Diem Nurse",
@@ -18,14 +22,6 @@ const jobJson = {
     "HealthTrust Workforce Solutions offers Registered Nurses (RNs) job opportunities in leading healthcare facilities across the country. The specialties we staff include ICU, Critical Care, Med/Surg, Telemetry, ER, PACU, Labor &amp; Delivery, and more!&lt;p&gt; With regional and satellite recruitment offices nationwide, we work around the clock to provide the best support for our Per Diem Nurses. We offer flexible scheduling, meaning you get first preference on where and when to work, first call / last cancelled and one of the most competitive compensation packages in the market.&lt;p&gt; If you are a registered nurse (RN) and are interested in learning more about our careers, please fill out the form below and one of our skilled recruiters will contact you shortly.&lt;p&gt; &lt;strong&gt;Please note that certain requirements must be met in order to be eligible to work per diem with HealthTrust Workforce Solutions.&lt;/strong&gt; &lt;li&gt;Graduate from an accredited nursing school   &lt;li&gt;Minimum of one year acute care experience in a hospital setting   &lt;li&gt;Current State Nursing License   &lt;li&gt;All appropriate certifications for the position to which you are applying",
   cpa: 5.831,
   cpc: 0.24
-}
-
-const types = {
-  identifierType: "PropertyValue",
-  hiringOrganizationType: "Organization",
-  postalAddressType: "PostalAddress",
-  baseSalaryType: "MonetaryAmount",
-  valueType: "QuantitativeValue"
 }
 
 const tmpl = {
@@ -84,4 +80,53 @@ const tmpl = {
   }
 }
 
-module.exports = { jobJson, types, tmpl }
+describe("json2gsd.js", function() {
+  describe("json2gsd()", function() {
+    it("Should return success and a result of transformed data", async function() {
+      const input = { jobJson, tmpl }
+      const { req, res } = make_req_res(input)
+      const result = await json2gsd(req, res)
+      assert(typeof result === "object")
+      assertSuccess(result)
+    })
+  })
+  describe("assemble()", function() {
+    it("should add template and data", async function() {
+      const input = {}
+      const { req, res } = make_req_res(input)
+      const result = await assemble(req, res)
+      assert(typeof result === "object")
+      assertSuccess(result)
+    })
+  })
+  describe("blend()", function() {
+    it("should combine base request with type metadata", () => {
+      const result = blend(jobJson)
+      const ext = payload(result)
+      assert(typeof ext === "object")
+      assertSuccess(result)
+    })
+  })
+})
+
+function make_req_res(data) {
+  const req = {
+    body: {
+      message: {
+        data
+      }
+    }
+  }
+  const res = {
+    status: function() {
+      return {
+        send: () => {}
+      }
+    },
+    send: () => {}
+  }
+  return {
+    req,
+    res
+  }
+}
