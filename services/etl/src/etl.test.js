@@ -1,5 +1,5 @@
 const equal = require("assert").deepEqual
-const { setupPubSub, TOPICS } = require("./etl.js")
+const { setupPubSub, TOPICS, start, stop } = require("./etl.js")
 const { assertSuccess, payload, meta } = require("@pheasantplucker/failables")
 const { exists } = require("@pheasantplucker/gc-cloudstorage")
 const { topicExists } = require("@pheasantplucker/gc-pubsub")
@@ -22,6 +22,13 @@ async function health_check(id) {
 
 describe("etl.js", function() {
   this.timeout(540 * 1000)
+  before(async () => {
+    await start()
+  })
+
+  after(() => {
+    stop()
+  })
 
   describe(`setupPubSub()`, () => {
     it(`should setup topics`, async () => {
@@ -36,7 +43,7 @@ describe("etl.js", function() {
       })
     })
   })
-  
+
   describe("/health_check", () => {
     it("should return the id in a payload", async () => {
       const id = uuid.v4()
