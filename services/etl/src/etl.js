@@ -2,13 +2,17 @@ const express = require("express")
 const app = express()
 const uuid = require("uuid")
 const bodyParser = require("body-parser")
+const { map } = require("ramda")
 const {
+  anyFailed,
+  firstFailure,
   isFailure,
   failure,
   success,
   payload,
   meta
 } = require("@pheasantplucker/failables")
+const { setProject, createTopic } = require("@pheasantplucker/gc-pubsub")
 const { download } = require("./download")
 const { unzip } = require("./unzip")
 const { chunk } = require("./chunk")
@@ -24,6 +28,7 @@ const { health_check } = require("./health_check")
 // ==========================================================
 const log = console.log
 const PORT = process.env.PORT || 8080
+const PROJECT_ID = "starspawn-201921"
 let SERVER
 
 app.use(bodyParser.json())
@@ -89,6 +94,17 @@ app.post("/:function", async function(req, res) {
 //
 // ==========================================================
 
+const TOPICS = ["unzip_v1"]
+
+async function setupPubSub() {
+  setProject(PROJECT_ID)
+  const promises = map(t => createTopic(t), TOPICS)
+  const results = await Promise.all(promises)
+  if (anyFailed(results)) return firstFailure(results)
+
+  return success(PROJECT_ID)
+}
+
 function parse_req_data(r) {
   try {
     return JSON.parse(r.body.message.data)
@@ -115,7 +131,8 @@ function res_err(res, id, source, data) {
 //                         STARTUP
 //
 // ==========================================================
-function start() {
+
+async function start() {
   return new Promise(function(resolve, reject) {
     SERVER = app.listen(PORT, () => {
       console.log(`App listening on port ${PORT}`)
@@ -131,5 +148,7 @@ function stop() {
 
 module.exports = {
   start,
-  stop
+  stop,
+  setupPubSub,
+  TOPICS
 }
