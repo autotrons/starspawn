@@ -70,6 +70,8 @@ async function chunk(id, data) {
         return
       }
 
+      const for_logging = r3.data.toString()
+      console.info(`${id} needs more work ${for_logging}`)
       const r4 = await publish(continue_topic, r3)
       if (isFailure(r4)) {
         console.error(`${id} publish ${payload(r4)}`)
@@ -132,6 +134,7 @@ function find_blocks(rs, start_text, end_text, cursor = 0) {
 
 async function write_blocks(id, filename, blocks, topic) {
   try {
+    console.info(`${id} writing ${filename}`)
     const file = getFileHandle(filename)
     const preblob = `<?xml version="1.0" encoding="UTF-8"?>\n<root>\n`
     const postblob = `\n</root>`
@@ -145,7 +148,6 @@ async function write_blocks(id, filename, blocks, topic) {
     }
     return publish(topic, message)
   } catch (e) {
-    console.error("151")
     console.error(e.toString())
     return failure(e.toString())
   }

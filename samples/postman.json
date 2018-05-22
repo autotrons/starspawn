@@ -1,4 +1,4 @@
-{
+[{
   "message": {
     "data": {
       "source_url":"https://storage.googleapis.com/starspawn_tests/feed.xml.gz",
@@ -6,4 +6,19 @@
       "id":"1234-5678"
     }
   }
+},
+
+{
+  "message": {
+    "data": {
+      "filename": "datafeeds/full_feed/feed_500k.xml",
+      "start_byte_offset": 0,
+      "end_byte_offset": 8000000,
+      "start_text": "<job>",
+      "end_text": "</job>",
+      "parse_topic": "chunk_v1",
+      "continue_topic": "chunk_recursive_v1"
+    }
+  }
 }
+]
