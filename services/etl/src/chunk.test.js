@@ -119,8 +119,8 @@ describe("chunk.js", function() {
         end_byte_offset: 1 * Math.pow(2, 20),
         start_text: "<job>",
         end_text: "</job>",
-        parse_topic: "chunk_created",
-        continue_topic: "chunk_work"
+        parse_topic: "chunk_v1",
+        continue_topic: "chunk_recursive_v1"
       }
       const id = uuid.v4()
       const result = await chunk(id, data)

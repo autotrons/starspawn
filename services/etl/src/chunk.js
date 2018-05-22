@@ -39,15 +39,12 @@ async function chunk(id, data) {
         start_byte_offset
       )
       if (isFailure(r1)) {
-        console.error("42")
         console.error(`${id} find_blocks ${payload(r1)}`)
         return
       }
       const blocks = payload(r1).blocks
       const cursor = payload(r1).cursor
       const sub_id = uuid.v4()
-
-      console.log()
       const r2 = await write_blocks(
         id,
         `datafeeds/chunks/${id}/${sub_id}.xml`,
@@ -55,7 +52,6 @@ async function chunk(id, data) {
         parse_topic
       )
       if (isFailure(r2)) {
-        console.error("55")
         console.error(`${id} write_blocks ${payload(r2)}`)
         return
       }
@@ -70,17 +66,15 @@ async function chunk(id, data) {
         continue_topic
       )
       if (r3 === false) {
-        //console.info(`${id} continue_work complete`)
+        console.info(`${id} continue_work complete`)
         return
       }
 
       const r4 = await publish(continue_topic, r3)
       if (isFailure(r4)) {
-        console.error("76")
         console.error(`${id} publish ${payload(r4)}`)
       }
     } catch (err) {
-      console.error("80")
       console.error(`${id} pipeline ${err.toString()}`)
     }
   }
@@ -178,7 +172,7 @@ function continue_work(
     parse_topic,
     continue_topic
   }
-  // not sure if we will be using data or attributes
+
   const data = Buffer.from(JSON.stringify(args))
   const message = {
     data
