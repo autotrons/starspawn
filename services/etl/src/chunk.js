@@ -12,9 +12,6 @@ const { publish } = require("./pubsub")
 const COMPLETE = "complete"
 
 async function chunk(id, data) {
-  console.info(
-    `${id} chunk starting on ${filename} at ${start_byte_offset} to ${end_byte_offset}`
-  )
   const {
     filename,
     start_text,
@@ -24,6 +21,10 @@ async function chunk(id, data) {
     parse_topic,
     continue_topic
   } = data
+
+  console.info(
+    `${id} chunk starting on ${filename} at ${start_byte_offset} to ${end_byte_offset}`
+  )
 
   const { bucketpart, filepart } = split_filename(filename)
   const myBucket = storage.bucket(bucketpart)

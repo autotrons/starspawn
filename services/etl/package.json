@@ -10,7 +10,7 @@
     "lint": "prettier  --write \"./src/**/*.js\"",
     "lintwatch": "onchange './src/**/*.js' -- prettier --write {{changed}}",
     "eslint": "esw .eslintrc.js src/ lib/ tests/ -w --fix --ignore-pattern !.eslintrc.js",
-    "deploy": "gcloud app deploy"
+    "deploy": "gcloud beta app deploy"
   },
   "author": "",
   "license": "ISC",
