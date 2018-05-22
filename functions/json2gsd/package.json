@@ -1,11 +1,11 @@
 {
-  "name": "translate",
+  "name": "json2gsd",
   "version": "1.0.0",
   "description": "",
-  "main": "./src/translate.js",
+  "main": "./src/json2gsd.js",
   "scripts": {
-    "test": "mocha ./src/translate.test.js",
-    "testwatch": "mocha --watch ./src/translate.test.js",
+    "test": "mocha ./src/json2gsd.test.js",
+    "testwatch": "mocha --watch ./src/json2gsd.test.js",
     "build": "babel src --out-dir build",
     "lint": "prettier  --write \"./src/**/*.js\"",
     "lint-watch": "onchange './src/**/*.js' -- prettier --write {{changed}}"
@@ -15,15 +15,14 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
+    "matches-shape": "^2.0.1",
     "mocha": "^5.1.1",
     "onchange": "^4.0.0",
     "prettier": "1.12.1"
   },
   "dependencies": {
     "@pheasantplucker/failables": "^2.0.3",
-    "coffeescript": "^2.3.0",
     "json2json": "^0.2.8",
-    "matches-shape": "^2.0.1",
     "uuid": "3.2.1"
   },
   "prettier": {

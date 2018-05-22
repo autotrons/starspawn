@@ -7,15 +7,15 @@ const {
   isFailure
 } = require("@pheasantplucker/failables")
 
-async function translate(req, res) {
+async function json2gsd(req, res) {
   const id = uuid.v4()
   const body = getBodyData(req)
   if (isFailure(body)) return body
-  const { data, types, tmpl } = payload(body)
-  const merged = await blend(data, types)
+  const message = payload(body)
+  const merged = await blend(message.jobJson, message.types)
   if (isFailure(merged)) return merged
   const mergedResult = payload(merged)
-  const translator = await assemble(tmpl, mergedResult)
+  const translator = await assemble(message.tmpl, mergedResult)
   if (isFailure(translator)) return translator
   const result = payload(translator)
   return success(result)
@@ -23,8 +23,8 @@ async function translate(req, res) {
 
 const getBodyData = req => {
   try {
-    if (req.body.data) {
-      return success(req.body)
+    if (req.body.message.data) {
+      return success(req.body.message.data)
     } else {
       return failure(req, { error: "couldnt access req.data" })
     }
@@ -77,7 +77,7 @@ function res_err(res, payload) {
 }
 
 module.exports = {
-  translate,
+  json2gsd,
   assemble,
   blend
 }

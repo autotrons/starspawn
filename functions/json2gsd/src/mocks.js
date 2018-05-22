@@ -1,4 +1,4 @@
-const data = {
+const jobJson = {
   location: "Fort Lauderdale, FL, United States",
   title: "RN Per Diem Nurse",
   city: "Fort Lauderdale",
@@ -38,7 +38,7 @@ const tmpl = {
       ignoreEmpty: false,
       path: ".",
       as: {
-        "@type": "identifierType",
+        type: "identifierType",
         name: "company",
         value: null
       }
@@ -49,7 +49,7 @@ const tmpl = {
     hiringOrganization: {
       ignoreEmpty: false,
       as: {
-        "@type": "hiringOrganizationType",
+        type: "hiringOrganizationType",
         name: "company",
         sameAs: "url",
         logo: null
@@ -58,7 +58,7 @@ const tmpl = {
     jobLocation: {
       ignoreEmpty: false,
       as: {
-        "@type": "PostalAddressType",
+        type: "postalAddressType",
         streetAddress: null,
         addressLocality: "city",
         addressRegion: "state",
@@ -69,12 +69,12 @@ const tmpl = {
     baseSalary: {
       ignoreEmpty: false,
       as: {
-        "@type": "BaseSalaryType",
+        type: "baseSalaryType",
         currency: null,
         value: {
           ignoreEmpty: false,
           as: {
-            "@type": "ValueType",
+            type: "valueType",
             value: null,
             unitText: null
           }
@@ -84,4 +84,4 @@ const tmpl = {
   }
 }
 
-module.exports = { data, types, tmpl }
+module.exports = { jobJson, types, tmpl }

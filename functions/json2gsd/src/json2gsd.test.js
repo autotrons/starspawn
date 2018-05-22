@@ -1,14 +1,16 @@
 const assert = require("assert")
 const { assertSuccess, payload } = require("@pheasantplucker/failables")
-const { translate, assemble, blend } = require("./translate")
-const { data, types, tmpl } = require("./mocks")
+const { json2gsd, assemble, blend } = require("./json2gsd")
+const { jobJson, types, tmpl } = require("./mocks")
 
-describe("translate.js", function() {
-  describe("translate()", function() {
+describe("json2gsd.js", function() {
+  describe("json2gsd()", function() {
     it("Should return success and a result of rendered data", async function() {
-      const input = { data, types, tmpl }
+      const input = { jobJson, types, tmpl }
       const { req, res } = make_req_res(input)
-      const result = await translate(req, res)
+      const result = await json2gsd(req, res)
+      const re = payload(result)
+      console.log(re)
       assert(typeof result === "object")
       assertSuccess(result)
     })
@@ -24,7 +26,7 @@ describe("translate.js", function() {
   })
   describe("blend()", function() {
     it("should combine two objects", () => {
-      const result = blend(data, types)
+      const result = blend(jobJson, types)
       const ext = payload(result)
       assert(typeof ext === "object")
       assertSuccess(result)
@@ -32,9 +34,13 @@ describe("translate.js", function() {
   })
 })
 
-function make_req_res(body) {
+function make_req_res(data) {
   const req = {
-    body
+    body: {
+      message: {
+        data
+      }
+    }
   }
   const res = {
     status: function() {
