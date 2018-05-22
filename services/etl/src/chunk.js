@@ -12,6 +12,9 @@ const { publish } = require("./pubsub")
 const COMPLETE = "complete"
 
 async function chunk(id, data) {
+  console.info(
+    `${id} chunk starting on ${filename} at ${start_byte_offset} to ${end_byte_offset}`
+  )
   const {
     filename,
     start_text,
