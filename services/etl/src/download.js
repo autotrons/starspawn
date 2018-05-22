@@ -6,7 +6,7 @@ const {
 } = require("@pheasantplucker/failables")
 const get = require("simple-get")
 const { createWriteStream } = require("@pheasantplucker/gc-cloudstorage")
-const { } = require("@pheasantplucker/gc-pubsub")
+const {} = require("@pheasantplucker/gc-pubsub")
 
 async function download(id, data) {
   try {

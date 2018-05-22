@@ -18,7 +18,8 @@ async function download(id, source_url, target_file) {
   const result = await rp(options)
   return result
 }
-describe(`download.js`, () => {
+describe(`download.js`, function() {
+  this.timeout(10 * 1000)
   before(async () => {
     await start()
   })
@@ -30,7 +31,7 @@ describe(`download.js`, () => {
     it("download a file", async () => {
       const id = uuid.v4()
       const source_url =
-      "https://storage.googleapis.com/starspawn_tests/feed.xml.gz"
+        "https://storage.googleapis.com/starspawn_tests/feed.xml.gz"
       const target_file = `datafeeds/full_feed/${id}.xml.gz`
       const result = await download(id, source_url, target_file)
       assertSuccess(result)

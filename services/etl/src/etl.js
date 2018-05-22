@@ -107,7 +107,8 @@ async function setupPubSub() {
 
 function parse_req_data(r) {
   try {
-    return JSON.parse(r.body.message.data.toString())
+    const decoded = new Buffer(r.body.message.data, "base64").toString("ascii")
+    return JSON.parse(decoded)
   } catch (e) {
     return r.body.message.data
   }
