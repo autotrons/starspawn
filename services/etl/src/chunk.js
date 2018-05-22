@@ -48,6 +48,7 @@ async function chunk(id, data) {
       }
       const blocks = payload(r1).blocks
       const cursor = payload(r1).cursor
+      const streamed_to = payload(r1).streamed_to
       const sub_id = uuid.v4()
       const r2 = await write_blocks(
         id,
@@ -67,15 +68,14 @@ async function chunk(id, data) {
         start_text,
         end_text,
         parse_topic,
-        continue_topic
+        continue_topic,
+        streamed_to
       )
       if (r3 === false) {
-        console.info(`${id} continue_work complete`)
+        console.info(`${id} complete`)
         return
       }
 
-      const for_logging = r3.data.toString()
-      console.info(`${id} needs more work ${for_logging}`)
       const r4 = await publish(continue_topic, r3)
       if (isFailure(r4)) {
         console.error(`${id} publish ${payload(r4)}`)
@@ -95,14 +95,18 @@ function find_blocks(rs, start_text, end_text, cursor = 0) {
     let buffer = ""
     let start_idx = -1
     let end_idx = -1
+    let streamed_to = cursor
     function dochunk(chunk, more) {
       // look for next tags
+      streamed_to += chunk.length
       buffer += chunk.toString()
       while (buffer.length > 0) {
         start_idx = buffer.indexOf(start_text)
         end_idx = buffer.indexOf(end_text)
         // one of the tags is missing so we need more data
-        if (end_idx < 0 || start_idx < 0) break
+        if (end_idx < 0 || start_idx < 0) {
+          break
+        }
         // move to the end of the text
         end_idx += end_text.length
         // the tags are both in the buffer and in the right order
@@ -114,22 +118,23 @@ function find_blocks(rs, start_text, end_text, cursor = 0) {
         cursor += end_idx
         buffer = chop(buffer, end_idx)
         // should we bail out now
-        if (blocks.length >= 1000 || Date.now() - starttime > 500 * 1000) {
+        const times_up = Date.now() - starttime > 500 * 1000
+        const block_limit = blocks.length >= 1000
+        if (times_up || block_limit) {
           more(COMPLETE)
         }
       }
       more()
     }
 
-    async function done(err) {
+    function done(err) {
       if (err && err !== COMPLETE) {
-        console.error("123")
         console.error(err.toString())
         res(failure(err.toString()))
         return
       }
 
-      res(success({ blocks, cursor }))
+      res(success({ blocks, cursor, streamed_to }))
     }
 
     miss.each(rs, dochunk, done)
@@ -138,14 +143,16 @@ function find_blocks(rs, start_text, end_text, cursor = 0) {
 
 async function write_blocks(id, filename, blocks, topic) {
   try {
-    console.info(`${id} writing ${filename}`)
+    if (blocks.length <= 0) {
+      console.info(`${id} had 0 blocks`)
+      return success()
+    }
+    console.info(`${id} try to write ${blocks.length} blocks to ${filename}`)
     const file = getFileHandle(filename)
     const preblob = `<?xml version="1.0" encoding="UTF-8"?>\n<root>\n`
     const postblob = `\n</root>`
     const blob = blocks.join("\n")
     const r1 = await file.save(preblob + blob + postblob)
-    //if (isFailure(r1)) return r1
-    //console.info(`${id} wrote ${blocks.length} blocks at ${filename}`)
     const message = {
       data: Buffer.from(JSON.stringify({ id, filename })),
       attributes: { id, filename }
@@ -165,9 +172,13 @@ function continue_work(
   start_text,
   end_text,
   parse_topic,
-  continue_topic
+  continue_topic,
+  streamed_to
 ) {
-  if (cursor >= end_byte_offset) return false
+  if (streamed_to >= end_byte_offset) {
+    console.info(`${id} end of section reached`)
+    return false
+  }
   const args = {
     id,
     filename,

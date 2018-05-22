@@ -2,6 +2,7 @@ const equal = require("assert").deepEqual
 const uuid = require(`uuid`)
 const {
   assertSuccess,
+  assertEmpty,
   success,
   payload
 } = require("@pheasantplucker/failables")
@@ -46,6 +47,13 @@ describe("chunk.js", function() {
       const r4 = await ack(SUBSCRIPTION, [ackId])
       assertSuccess(r4)
     })
+    it("does nothing if no blocks", async () => {
+      const blocks = []
+      const id = "test_" + uuid.v4()
+      const filename = `datafeeds/chunks/${id}/1.xml`
+      const r1 = await write_blocks(id, filename, blocks, TOPIC)
+      assertEmpty(r1)
+    })
   })
   describe("find_blocks", async () => {
     it("chop the file into blocks of tag pairs", async () => {
@@ -65,17 +73,23 @@ describe("chunk.js", function() {
     it("if we do not need to do more work return false", async () => {
       const id = uuid.v4()
       const filename = "datafeeds/full_feed/feed_100.xml"
-      const cursor = Math.pow(2, 10)
+      const cursor = Math.pow(2, 10) - 256
       const end_byte_offset = Math.pow(2, 10)
       const start_text = "<job>"
       const end_text = "</job>"
+      const parse_topic = "chunk_created"
+      const continue_topic = "chunk_work"
+      const streamed_to = end_byte_offset
       const result = continue_work(
         id,
         filename,
         cursor,
         end_byte_offset,
         start_text,
-        end_text
+        end_text,
+        parse_topic,
+        continue_topic,
+        streamed_to
       )
       equal(result, false)
     })
@@ -88,6 +102,7 @@ describe("chunk.js", function() {
       const end_text = "</job>"
       const parse_topic = "chunk_created"
       const continue_topic = "chunk_work"
+      const streamed_to = end_byte_offset - 256
       const expected = {
         id,
         filename,
@@ -106,7 +121,8 @@ describe("chunk.js", function() {
         start_text,
         end_text,
         parse_topic,
-        continue_topic
+        continue_topic,
+        streamed_to
       )
       equal(JSON.parse(result.data), expected)
     })
