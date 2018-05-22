@@ -15,6 +15,7 @@ const { chunk } = require("./chunk")
 const { publish } = require("./publish")
 const { loader } = require("./loader")
 const { parse } = require("./parse")
+const { health_check } = require("./health_check")
 
 // ==========================================================
 //
@@ -57,7 +58,8 @@ app.post("/:function", async function(req, res) {
     download,
     publish,
     unzip,
-    chunk
+    chunk,
+    health_check
   }
 
   try {

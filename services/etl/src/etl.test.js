@@ -19,6 +19,20 @@ async function download(id, source_url, target_file) {
   return result
 }
 
+async function health_check(id) {
+  const options = {
+    uri: "http://localhost:8080/health_check",
+    method: "POST",
+    headers: {
+      "User-Agent": "Request-Promise"
+    },
+    body: { message: { data: { id } } },
+    json: true // Automatically stringifies the body to JSON
+  }
+  const result = await rp(options)
+  return result
+}
+
 describe("etl.js", function() {
   this.timeout(540 * 1000)
   before(async () => {
@@ -39,6 +53,13 @@ describe("etl.js", function() {
       equal(meta(result).wn, "download")
       const r2 = await exists(target_file)
       assertSuccess(r2, true)
+    })
+  })
+  describe("/health_check", () => {
+    it("should return the id in a payload", async () => {
+      const id = uuid.v4()
+      const result = await health_check(id)
+      assertSuccess(result)
     })
   })
 })
