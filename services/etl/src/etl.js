@@ -63,7 +63,6 @@ app.post("/:function", async function(req, res) {
     chunk,
     download,
     health_check,
-    json2gsd,
     publish,
     loader,
     parse,
