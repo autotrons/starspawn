@@ -7,12 +7,36 @@
     <!-- We need to change the href to point to the page!! -->
     <link rel="canonical" href="https://render-dot-starspawn-201921.appspot.com/">
 
-    <meta name="Description" content="Employer: <%- company %>, City: <%- city %>, State: <%- state %>, Zipcode: <%- zip %>, Country: <%- country %>">
+    <meta name="Description" content="Employer: <%- company %>, City: <%- city %>, State: <%- state %>">
     <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
     <!-- only one style tag is allowed, and it must have an "amp-custom" attribute -->
     <style amp-custom>
       body {
         background-color: white;
+        font-family: Helvetica, Arial, sans-serif;
+        margin: 10px 10px 10px 10px
+      }
+
+      .button {
+        border-radius: 4px;
+        moz-border-radius: 4px;
+        webkit-border-radius: 4px;
+        height: 40px;
+        width: 130px;
+        background-color: #10abe0;
+        -moz-box-shadow:    inset 0 0 -6px #000000;
+        -webkit-box-shadow: inset 0 0 -6px #000000;
+        box-shadow: 0px 2px 0px 0px  #0d89b3;
+        vertical-align: middle;
+        display: table-cell;
+        text-align: center;
+      }
+
+      a {
+        color: white;
+        text-decoration: none;
+        font-family: Helvetica, Arial, sans-serif;
+        font-weight: bold;
       }
     </style>
 
@@ -64,7 +88,7 @@
   </head>
   <body>
     <h1><%- title %></h1>
-    <h2><a href="<%- url %>">Apply</a></h2>
+    <div class="button" class="shadow" ><a href="<%- url %>" >Apply</a></div>
     Job Description: <%- body %>;<br />
     Location: <%- location %><br />
     <%- city %>, <%- state %><br />
