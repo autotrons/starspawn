@@ -60,23 +60,19 @@ app.post("/:function", async function(req, res) {
 
   // Call The function
   const fns = {
+    chunk,
     download,
+    health_check,
+    json2gsd,
+    publish,
+    loader,
+    parse,
     publish,
     unzip,
-    chunk,
-    health_check
   }
 
   try {
     reply = await fns[fun](id, data)
-
-    if (fun === "loader") {
-      reply = await loader(id, data)
-    }
-
-    if (fun === "parse") {
-      reply = await parse(id, data)
-    }
 
     // deal with function failure
     if (isFailure(reply)) {
