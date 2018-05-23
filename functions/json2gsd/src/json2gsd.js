@@ -1,4 +1,3 @@
-const uuid = require("uuid")
 const ObjectTemplate = require("json2json").ObjectTemplate
 const {
   failure,
@@ -7,33 +6,15 @@ const {
   isFailure
 } = require("@pheasantplucker/failables")
 
-async function json2gsd(req, res) {
-  const id = uuid.v4()
-  const body = getBodyData(req)
-  if (isFailure(body)) return body
-  const message = payload(body)
-  const merged = await blend(message.jobJson, message.types)
-  if (isFailure(merged)) return merged
-  const mergedResult = payload(merged)
-  const translator = await assemble(message.tmpl, mergedResult)
-  if (isFailure(translator)) return translator
-  const result = payload(translator)
-  return success(result)
-}
-
-const getBodyData = req => {
-  try {
-    if (req.body.message.data) {
-      return success(req.body.message.data)
-    } else {
-      return failure(req, { error: "couldnt access req.data" })
-    }
-  } catch (e) {
-    return failure(e.toString(), {
-      error: "couldnt access req.data",
-      req: req
-    })
-  }
+async function json2gsd(id, data) {
+  let { jobJson, tmpl } = data
+  const r1 = mergeMeta(jobJson)
+  if (isFailure(r1)) return r1
+  const r1Result = payload(r1)
+  const r2 = await assemble(tmpl, r1Result)
+  if (isFailure(r2)) return r2
+  const r2Result = payload(r2)
+  return success(r2Result)
 }
 
 async function assemble(tmpl, data) {
@@ -49,7 +30,7 @@ async function assemble(tmpl, data) {
   }
 }
 
-function blend(obj) {
+function mergeMeta(jobJson) {
   let types = {
     identifierType: "PropertyValue",
     hiringOrganizationType: "Organization",
@@ -59,32 +40,20 @@ function blend(obj) {
   }
   try {
     Object.keys(types).forEach(key => {
-      obj[key] = types[key]
+      jobJson[key] = types[key]
     })
-    return success(obj)
+    return success(jobJson)
   } catch (e) {
     return failure(e.toString(), {
       error: "Couldn't merge objects",
-      obj,
+      jobJson,
       types
     })
   }
 }
 
-function res_ok(res, payload) {
-  console.info(payload)
-  res.status(200).send(success(payload))
-  return success(payload)
-}
-
-function res_err(res, payload) {
-  console.error(payload)
-  res.status(500).send(failure(payload))
-  return failure(payload)
-}
-
 module.exports = {
   json2gsd,
   assemble,
-  blend
+  mergeMeta
 }

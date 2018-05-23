@@ -1,6 +1,8 @@
 const assert = require("assert")
-const { assertSuccess, payload } = require("@pheasantplucker/failables")
-const { json2gsd, assemble, blend } = require("./json2gsd")
+const { assertSuccess, payload, isFailure } = require("@pheasantplucker/failables")
+const { json2gsd, assemble, mergeMeta } = require("./json2gsd")
+const uuid = require('uuid')
+const id = uuid.v4()
 
 const jobJson = {
   location: "Fort Lauderdale, FL, United States",
@@ -83,50 +85,31 @@ const tmpl = {
 describe("json2gsd.js", function() {
   describe("json2gsd()", function() {
     it("Should return success and a result of transformed data", async function() {
-      const input = { jobJson, tmpl }
-      const { req, res } = make_req_res(input)
-      const result = await json2gsd(req, res)
-      assert(typeof result === "object")
-      assertSuccess(result)
+      const data = { jobJson, tmpl }
+      const r1 = await json2gsd(id, data)
+      if (isFailure(r1)) return r1
+      const r1Result = payload(r1)
+      assert(typeof r1Result === "object")
+      assertSuccess(r1)
     })
   })
   describe("assemble()", function() {
     it("should add template and data", async function() {
-      const input = {}
-      const { req, res } = make_req_res(input)
-      const result = await assemble(req, res)
+      const data = { jobJson, tmpl }
+      const r1 = mergeMeta(jobJson)
+      if (isFailure) return r1 
+      const r1Result = payload(r1)
+      const r2 = await assemble(r1, tmpl)
       assert(typeof result === "object")
-      assertSuccess(result)
+      assertSuccess(r2)
     })
   })
-  describe("blend()", function() {
+  describe("mergeMeta()", function() {
     it("should combine base request with type metadata", () => {
-      const result = blend(jobJson)
-      const ext = payload(result)
-      assert(typeof ext === "object")
-      assertSuccess(result)
+      const r1 = mergeMeta(jobJson)
+      const r1Result = payload(r1)
+      assert(typeof r1Result === "object")
+      assertSuccess(r1)
     })
   })
 })
-
-function make_req_res(data) {
-  const req = {
-    body: {
-      message: {
-        data
-      }
-    }
-  }
-  const res = {
-    status: function() {
-      return {
-        send: () => {}
-      }
-    },
-    send: () => {}
-  }
-  return {
-    req,
-    res
-  }
-}
