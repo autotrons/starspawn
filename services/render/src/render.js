@@ -1,24 +1,23 @@
-const uuid = require("uuid")
-const cons = require("consolidate")
-const path = require("path")
-const he = require('he');
+const cons = require('consolidate')
+const path = require('path')
+const he = require('he')
+const timeago = require('time-ago')
 const {
   success,
   failure,
   isFailure,
-  payload
-} = require("@pheasantplucker/failables")
+  payload,
+} = require('@pheasantplucker/failables')
 const {
   createDatastoreClient,
   makeDatastoreKey,
-  readEntities
-} = require("@pheasantplucker/gc-datastore")
+  readEntities,
+} = require('@pheasantplucker/gc-datastore')
 
-const projectFullName = "starspawn-201921"
-const entityKeyKind = "jobs"
+const projectFullName = 'starspawn-201921'
+const entityKeyKind = 'jobs'
 
 async function render(req, res) {
-  const id = uuid.v4()
   const jobIdResult = getJobId(req)
   if (isFailure(jobIdResult)) return jobIdResult
   const jobId = payload(jobIdResult)
@@ -29,12 +28,17 @@ async function render(req, res) {
   const r1 = unsanitizeDescriptionHtml(jobData.body)
   if (isFailure(r1)) return r1
   const cleanBody = payload(r1)
+  const cleanBodyObj = { body: cleanBody }
 
-  const cleanBodyObj = {body: cleanBody}
-  const cleanJobData = Object.assign({}, jobData, cleanBodyObj)
+  const r2 = timeAgo(jobData.posted_at)
+  if (isFailure(r2)) return r2
+  const cleanTimeAgo = payload(r2)
+  const cleanTimeAgoObj = { timeAgo: cleanTimeAgo }
+
+  const cleanJobData = Object.assign({}, jobData, cleanBodyObj, cleanTimeAgoObj)
 
   try {
-    const filePath = path.join(__dirname, "../template/index.ejs")
+    const filePath = path.join(__dirname, '../template/index.ejs')
     const html = await cons.ejs(filePath, cleanJobData)
     return res_ok(res, html)
   } catch (e) {
@@ -45,8 +49,17 @@ async function render(req, res) {
   return res_err(res, e.toString())
 }
 
+function timeAgo(datePosted) {
+  try {
+    const result = timeago.ago(Date.parse(datePosted))
+    return success(result)
+  } catch (e) {
+    return failure(e, { datePosted })
+  }
+}
+
 async function getDataFromDatastore(keyName) {
-  const datastore = createDatastoreClient(projectFullName)
+  createDatastoreClient(projectFullName)
   const entityKeyResult = makeDatastoreKey(entityKeyKind, keyName)
   if (isFailure(entityKeyResult)) return entityKeyResult
   const entityKey = payload(entityKeyResult)
@@ -56,12 +69,12 @@ async function getDataFromDatastore(keyName) {
   return success(jobData)
 }
 
-const unsanitizeDescriptionHtml = (sanHtml) => {
+const unsanitizeDescriptionHtml = sanHtml => {
   try {
-      const decodedHtml = he.unescape(sanHtml)
-      return success(decodedHtml)
+    const decodedHtml = he.unescape(sanHtml)
+    return success(decodedHtml)
   } catch (e) {
-      return failure(e.toString())
+    return failure(e.toString())
   }
 }
 
@@ -70,12 +83,12 @@ const getJobId = req => {
     if (req.params.jobId) {
       return success(req.params.jobId)
     } else {
-      return failure(req, { error: "couldnt access req.query" })
+      return failure(req, { error: 'couldnt access req.query' })
     }
   } catch (e) {
     return failure(e.toString(), {
-      error: "couldnt access req.query",
-      req: req
+      error: 'couldnt access req.query',
+      req: req,
     })
   }
 }
@@ -95,4 +108,5 @@ module.exports = {
   render,
   getDataFromDatastore,
   unsanitizeDescriptionHtml,
+  timeAgo,
 }

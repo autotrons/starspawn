@@ -1,23 +1,23 @@
-const { assertSuccess, payload } = require("@pheasantplucker/failables")
-const assert = require("assert")
+const { assertSuccess, payload } = require('@pheasantplucker/failables')
+const assert = require('assert')
 const equal = assert.deepEqual
-const { parse } = require("himalaya")
-const { render, getDataFromDatastore, unsanitizeDescriptionHtml } = require("./render")
+const { parse } = require('himalaya')
 const {
-  createDatastoreClient,
-  readEntities,
-  getDatastoreKeySymbol
-} = require("@pheasantplucker/gc-datastore")
+  render,
+  getDataFromDatastore,
+  unsanitizeDescriptionHtml,
+  timeAgo,
+} = require('./render')
 
-describe("render.js ", () => {
-  describe("getDataFromDatastore()", function() {
+describe('render.js ', () => {
+  describe('getDataFromDatastore()', function() {
     this.timeout(540 * 1000)
-    it("Should get data from GCE Datastore", async () => {
-      const keyName = "63_Apr43245"
+    it('Should get data from GCE Datastore', async () => {
+      const keyName = '63_Apr43245'
       const result = await getDataFromDatastore(keyName)
       assertSuccess(result)
       const data = payload(result)
-      assert(typeof data === "object")
+      assert(typeof data === 'object')
     })
   })
 
@@ -32,15 +32,25 @@ describe("render.js ", () => {
     })
   })
 
-  describe("render()", () => {
-    it("Should render an AMP page from a query string", async () => {
+  describe('render()', () => {
+    it('Should render an AMP page from a query string', async () => {
       const { req, res } = make_req_res()
       const result = await render(req, res)
       assertSuccess(result)
       const renderedAmp = payload(result)
       const parsed = parse(renderedAmp)
-      assert(typeof renderedAmp === "string")
-      assert(parsed[0].tagName === "!doctype")
+      assert(typeof renderedAmp === 'string')
+      assert(parsed[0].tagName === '!doctype')
+    })
+  })
+
+  describe(`timeAgo()`, () => {
+    it(`should return the english time ago equiv given a date`, () => {
+      const result = timeAgo(new Date() - 1000)
+      assertSuccess(result)
+      const val = payload(result)
+      const last3Letters = val.substring(val.length - 3)
+      equal(last3Letters, 'ago')
     })
   })
 })
@@ -48,19 +58,19 @@ describe("render.js ", () => {
 function make_req_res() {
   const req = {
     params: {
-      jobId: "63_Apr47260"
-    }
+      jobId: '63_Apr47260',
+    },
   }
   const res = {
     status: function() {
       return {
-        send: () => {}
+        send: () => {},
       }
     },
-    send: () => {}
+    send: () => {},
   }
   return {
     req,
-    res
+    res,
   }
 }

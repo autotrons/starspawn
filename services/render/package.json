@@ -34,9 +34,10 @@
     "@pheasantplucker/gc-datastore": "^1.0.0",
     "consolidate": "^0.15.1",
     "ejs": "^2.6.1",
+    "express": "^4.16.3",
     "he": "^1.1.1",
-    "uuid": "3.2.1",
-    "express": "^4.16.3"
+    "time-ago": "^0.2.1",
+    "uuid": "3.2.1"
   },
   "prettier": {
     "semi": false,
