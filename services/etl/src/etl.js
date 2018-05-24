@@ -67,7 +67,7 @@ app.post("/:function", async function(req, res) {
     loader,
     parse,
     publish,
-    unzip,
+    unzip
   }
 
   try {

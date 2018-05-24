@@ -1,5 +1,9 @@
 const assert = require("assert")
-const { assertSuccess, payload, isFailure } = require("@pheasantplucker/failables")
+const {
+  assertSuccess,
+  payload,
+  isFailure
+} = require("@pheasantplucker/failables")
 const { json2gsd, assemble, mergeMeta } = require("./json2gsd")
 const gsdTemplate = require("../../../samples/gsd.json")
 const uuid = require('uuid')
@@ -115,7 +119,7 @@ describe("json2gsd.js", function() {
     it("should add template and data", async function() {
       const data = { jobJson, tmpl }
       const r1 = mergeMeta(jobJson)
-      if (isFailure) return r1 
+      if (isFailure) return r1
       const r1Result = payload(r1)
       const r2 = await assemble(r1, tmpl)
       assert(typeof result === "object")
