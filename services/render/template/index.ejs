@@ -11,105 +11,111 @@
     <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
     <!-- only one style tag is allowed, and it must have an "amp-custom" attribute -->
     <style amp-custom>
-      body {
-        background-color: white;
-        font-family: Helvetica, Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        color: #4d5763;
-      }
+    body {
+      background-color: white;
+      font-family: Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #4d5763;
+    }
 
-      .button {
-        border-radius: 4px;
-        moz-border-radius: 4px;
-        webkit-border-radius: 4px;
-        height: 40px;
-        width: 130px;
-        background-color: #10abe0;
-        -moz-box-shadow:    inset 0 0 -6px #000000;
-        -webkit-box-shadow: inset 0 0 -6px #000000;
-        box-shadow: 0px 2px 0px 0px  #0d89b3;
-        vertical-align: middle;
-        text-align: center;
-        align-items: center;
-        justify-content: center;
-      }
+    .button {
+      border-radius: 4px;
+      moz-border-radius: 4px;
+      webkit-border-radius: 4px;
+      height: 40px;
+      width: 130px;
+      background-color: #10abe0;
+      -moz-box-shadow:    inset 0 0 -6px #000000;
+      -webkit-box-shadow: inset 0 0 -6px #000000;
+      box-shadow: 0px 2px 0px 0px  #0d89b3;
+      vertical-align: middle;
+      text-align: center;
+      align-items: center;
+      justify-content: center;
+    }
 
-      a {
-        color: white;
-        text-decoration: none;
-        font-family: Helvetica, Arial, sans-serif;
-        font-weight: bold;
-      }
+    a {
+      color: white;
+      text-decoration: none;
+      font-family: Helvetica, Arial, sans-serif;
+      font-weight: bold;
+    }
 
-      .textIndent {
-        margin: 0px 0px 0px 10px;
-      }
+    .textIndent {
+      margin: 0px 0px 0px 10px;
+    }
 
-      .topMargin {
-        margin: 20px 0px 0px 0px;
-      }
+    .topMargin {
+      margin: 20px 0px 0px 0px;
+    }
 
-      .topMarginIndent {
-        margin: 20px 0px 0px 10px;
-      }
+    .topMarginIndent {
+      margin: 20px 0px 0px 10px;
+    }
 
-      .centerContent {
-        margin:0 auto;
-        max-width: 60%;
-      }
+    .centerContent {
+      margin:0 auto;
+      max-width: 60%;
+      /* background-color:#76a135; */
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+      flex: 1 1 auto;
+    }
 
-      .jobTitle {
-        margin: 10px 0px 6px 10px;
-        font-size: 1.6rem;
-        height: 30px;
-      }
+    .jobTitle {
+      margin: 10px 0px 6px 10px;
+      font-size: 1.6rem;
 
-      .topSpacer {
-        height: 40px;
-      }
+      /* background-color:#78cde1; */
+    }
 
-      .topLocation {
-        margin: 0px 0px 10px 10px;
-        font-size: 1.1rem;
-      }
+    .topSpacer {
+      height: 40px;
+    }
 
-      .thinLine {
-        border-bottom: 1px solid rgba(228,228,228,1);
-      }
+    .topLocation {
+      margin: 0px 0px 10px 10px;
+      font-size: 1.1rem;
+    }
 
-      .rightLine {
-        border-right: 1px solid rgba(228,228,228,1);
-        grid-column: 3 / 5;
-        grid-row: 1;
-      }
+    .thinLine {
+      border-bottom: 1px solid rgba(228,228,228,1);
+    }
 
-      .posted {
-          width: 33%;
-          grid-column: 1 / 3;
-          grid-row: 1;
-      }
+    .rightLine {
+      border-left: 1px solid rgba(228,228,228,1);
+      width: 15%
+    }
 
-      .gridWrap {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        grid-gap: 10px;
-        grid-auto-rows: minmax(100px, auto);
-      }
+    .posted {
+      /* background-color:#a17070 */
+    }
 
-      .apply {
-        grid-column: 3 / 5;
-        grid-row: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
+    .flexRow {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      /* background-color:#618190; */
+    }
 
-      .daysAgo {
-        grid-column: 2 / 5;
-        grid-row: 1;
-        font-weight: bold;
-      }
+    .apply {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* background-color:#3d5e1a; */
+    }
+
+    .daysAgo {
+      font-weight: bold;
+      /* background-color:#1d2b36; */
+    }
+
+    .jobBody {
+      flex: 1 1 auto;
+    }
     </style>
 
     <script type="application/ld+json"> {
@@ -164,7 +170,7 @@
       <div class="jobTitle"><%- title %></div>
       <div class="topLocation">Aurora, CO, United States</div>
       <div class="thinLine"></div>
-      <div class="gridWrap">
+      <div class="flexRow">
         <div class="posted topMarginIndent">Posted:</div>
         <div class="daysAgo topMargin"><%- timeAgo %></div>
         <div class="apply button topMargin">
@@ -172,16 +178,20 @@
             Apply
           </a>
         </div>
+
         <div class ="rightLine"></div>
       </div>
-      <br/>
-      <%- body %>;<br />
+
+      <div class="jobBody topMarginIndent">
+        <%- body %>;
+      </div>
+
       <div class="apply button topMargin">
         <a href="<%- url %>" >
           Apply
         </a>
       </div>
-
+      <br/><br/><br/><br/>
       <!--
       Location: <%- location %><br />
       <%- city %>, <%- state %><br />
