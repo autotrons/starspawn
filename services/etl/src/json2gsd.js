@@ -17,15 +17,20 @@ async function json2gsd(id, data) {
   return success(r2Result)
 }
 
-async function assemble(tmpl, data) {
+async function assemble(tmpl, data, meta) {
   try {
-    const result = new ObjectTemplate(tmpl).transform(data)
-    return success(result)
+    const r1 = new ObjectTemplate(tmpl).transform(data)
+    const r1Result = {
+      rendered: r1,
+      meta: meta
+    }
+    return success(r1Result)
   } catch (e) {
     return failure(e.toString(), {
-      error: "Couldn't translate template/data",
+      error: "could not translate template/data",
       tmpl,
-      data
+      data,
+      meta
     })
   }
 }
@@ -36,7 +41,9 @@ function mergeMeta(jobJson) {
     hiringOrganizationType: "Organization",
     postalAddressType: "PostalAddress",
     baseSalaryType: "MonetaryAmount",
-    valueType: "QuantitativeValue"
+    valueType: "QuantitativeValue",
+    jobPostingContext: "http://schema.org",
+    jobPostingType: "jobPosting"
   }
   try {
     Object.keys(types).forEach(key => {

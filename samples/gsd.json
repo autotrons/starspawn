@@ -1,0 +1,40 @@
+{
+    "@context" : "http://schema.org/",
+    "@type" : "JobPosting",
+    "title" : "Fitter and Turner",
+    "description" : "string",
+    "identifier": {
+      "@type": "PropertyValue",
+      "name": "MagsRUs Wheel Company",
+      "value": "1234567"
+    },
+    "datePosted" : "2017-01-18",
+    "validThrough" : "2017-03-18T00:00",
+    "employmentType" : "CONTRACTOR",
+    "hiringOrganization" : {
+      "@type" : "Organization",
+      "name" : "MagsRUs Wheel Company",
+      "sameAs" : "http://www.magsruswheelcompany.com",
+      "logo" : "http://www.example.com/images/logo.png"
+    },
+    "jobLocation" : {
+      "@type" : "Place",
+      "address" : {
+        "@type" : "PostalAddress",
+        "streetAddress" : "555 Clancy St",
+        "addressLocality" : "Detroit",
+        "addressRegion" : "MI",
+        "postalCode" : "48201",
+        "addressCountry": "US"
+      }
+    },
+    "baseSalary": {
+      "@type": "MonetaryAmount",
+      "currency": "USD",
+      "value": {
+        "@type": "QuantitativeValue",
+        "value": 40.00,
+        "unitText": "HOUR"
+      }
+    }
+  }

@@ -1,6 +1,7 @@
 const assert = require("assert")
 const { assertSuccess, payload, isFailure } = require("@pheasantplucker/failables")
 const { json2gsd, assemble, mergeMeta } = require("./json2gsd")
+const gsdTemplate = require("../../../samples/gsd.json")
 const uuid = require('uuid')
 const id = uuid.v4()
 
@@ -30,13 +31,15 @@ const tmpl = {
   ignoreEmpty: false,
   path: ".",
   as: {
+    "@context": "jobPostingContext",
+    "@type": "jobPostingType",
     title: "title",
     description: "body",
     identifier: {
       ignoreEmpty: false,
       path: ".",
       as: {
-        type: "identifierType",
+        "@type": "identifierType",
         name: "company",
         value: null
       }
@@ -47,7 +50,7 @@ const tmpl = {
     hiringOrganization: {
       ignoreEmpty: false,
       as: {
-        type: "hiringOrganizationType",
+        "@type": "hiringOrganizationType",
         name: "company",
         sameAs: "url",
         logo: null
@@ -56,7 +59,7 @@ const tmpl = {
     jobLocation: {
       ignoreEmpty: false,
       as: {
-        type: "postalAddressType",
+        "@type": "postalAddressType",
         streetAddress: null,
         addressLocality: "city",
         addressRegion: "state",
@@ -67,12 +70,12 @@ const tmpl = {
     baseSalary: {
       ignoreEmpty: false,
       as: {
-        type: "baseSalaryType",
+        "@type": "baseSalaryType",
         currency: null,
         value: {
           ignoreEmpty: false,
           as: {
-            type: "valueType",
+            "@type": "valueType",
             value: null,
             unitText: null
           }
@@ -82,14 +85,29 @@ const tmpl = {
   }
 }
 
+function compareGsdTemplate(input) {
+  const arr1 = Object.keys(gsdTemplate)
+  const arr2 = Object.keys(input)
+  
+  if(arr1.length !== arr2.length)
+    return false
+  for(var i = arr1.length; i--;) {
+      if(arr1[i] !== arr2[i])
+          return false;
+  }
+
+  return true;
+}
+
+
 describe("json2gsd.js", function() {
   describe("json2gsd()", function() {
-    it("Should return success and a result of transformed data", async function() {
+    it("Should return success and compare result against GSD Template keys", async function() {
       const data = { jobJson, tmpl }
       const r1 = await json2gsd(id, data)
       if (isFailure(r1)) return r1
       const r1Result = payload(r1)
-      assert(typeof r1Result === "object")
+      assert(compareGsdTemplate(r1Result.rendered) ===  true )
       assertSuccess(r1)
     })
   })
