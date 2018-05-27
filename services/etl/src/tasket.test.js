@@ -1,41 +1,127 @@
 const equal = require("assert").deepEqual
-const {
-  assertSuccess,
-  assertFailure,
-  payload,
-  meta
-} = require("@pheasantplucker/failables")
-const { tasket_ok, tasket_err } = require("./tasket")
+const tasket = require("./tasket")
 const uuid = require("uuid")
 
-describe.skip("tasket.js", function() {
-  describe("tasket_ok()", () => {
-    it("create a new tasket_ok from nothing", () => {
-      const result = tasket_ok()
-      assertSuccess(result)
-      equal(meta(result).id)
-      equal(meta(result).dt < 10, true)
-      equal(meta(result).wn, "tasket_test")
+describe("tasket.js", function() {
+  describe("ok()", () => {
+    it("create a new tasket from nothing", () => {
+      const t1 = tasket.ok()
+      tasket.assert(t1)
+      tasket.assert_empty(t1)
     })
-    it("create a new ok tasket", () => {
+    it("create tasket with some fields", () => {
       const id = uuid.v4()
-      const result = tasket_ok(
-        {},
-        {},
-        { id, st: Date.now(), wn: "tasket_test" }
+      const source = "worker1"
+      const trace = true
+      const test = false
+      const callback = "https://foo/bar"
+      const path = ["foo", "bar"]
+      const timeout = 42
+      const data = { job: 12345 }
+      const meta = { cache_hit: false }
+      const t1 = tasket.ok(
+        id,
+        source,
+        callback,
+        path,
+        data,
+        meta,
+        timeout,
+        trace,
+        test
       )
-      assertSuccess(result)
-      equal(meta(result).id, id)
-      equal(meta(result).dt < 10, true)
-      equal(meta(result).wn, "tasket_test")
+      tasket.assert_ok(t1)
+      equal(tasket.id(t1), id)
     })
-    it("create a err tasket", () => {
+    it("take a previous task and a payload", () => {
       const id = uuid.v4()
-      const result = tasket_err({}, { id, st: Date.now(), wn: "tasket_test" })
-      assertFailure(result)
-      equal(meta(result).id, id)
-      equal(meta(result).dt < 10, true)
-      equal(meta(result).wn, "tasket_test")
+      const source = "worker1"
+      const trace = true
+      const test = false
+      const callback = "https://foo/bar"
+      const path = ["foo", "bar"]
+      const timeout = 42
+      const data = { job: "abcd-efgh" }
+      const meta = { cache_hit: false }
+      const t1 = tasket.ok(
+        id,
+        source,
+        callback,
+        path,
+        data,
+        meta,
+        timeout,
+        trace,
+        test
+      )
+      tasket.assert_ok(t1)
+      const data2 = { job: "1234-5678" }
+      const [prev, next] = tasket.complete_ok(t1, data2)
+      tasket.assert_ok(next)
+      equal(tasket.completed(prev) >= tasket.created(prev), true)
+      equal(tasket.path(prev), path)
+      equal(tasket.path(next), ["bar"])
+    })
+  })
+  describe("fail()", () => {
+    it("create a new tracer from nothing", () => {
+      const t1 = tasket.fail()
+      tasket.assert(t1)
+    })
+    it("has some fields", () => {
+      const id = uuid.v4()
+      const source = "worker1"
+      const trace = true
+      const test = false
+      const callback = "https://foo/bar"
+      const path = ["foo", "bar"]
+      const timeout = 42
+      const data = { job: 12345 }
+      const meta = { cache_hit: false }
+      const t1 = tasket.fail(
+        id,
+        source,
+        callback,
+        path,
+        data,
+        meta,
+        timeout,
+        trace,
+        test
+      )
+      tasket.assert_fail(t1)
+      equal(tasket.id(t1), id)
+    })
+  })
+  describe("complete_fail()", () => {
+    it("complete with a failure", () => {
+      const id = uuid.v4()
+      const source = "worker1"
+      const trace = true
+      const test = false
+      const callback = "https://foo/bar"
+      const path = ["foo", "bar"]
+      const timeout = 42
+      const data = { job: "abcd-efgh" }
+      const meta = { cache_hit: false }
+      const t1 = tasket.ok(
+        id,
+        source,
+        callback,
+        path,
+        data,
+        meta,
+        timeout,
+        trace,
+        test
+      )
+      tasket.assert_ok(t1)
+      const error = "something bad happened"
+      const [prev, next] = tasket.complete_fail(t1, error)
+      tasket.assert_fail(next)
+      equal(tasket.completed(prev) >= tasket.created(prev), true)
+      equal(tasket.path(prev), path)
+      equal(tasket.path(next), ["bar"])
     })
   })
 })
