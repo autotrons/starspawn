@@ -31,68 +31,12 @@ const jobJson = {
   cpc: 0.24
 }
 
-const tmpl = {
-  ignoreEmpty: false,
-  path: ".",
-  as: {
-    "@context": "jobPostingContext",
-    "@type": "jobPostingType",
-    title: "title",
-    description: "body",
-    identifier: {
-      ignoreEmpty: false,
-      path: ".",
-      as: {
-        "@type": "identifierType",
-        name: "company",
-        value: null
-      }
-    },
-    datePosted: "posted_at",
-    validThrough: null,
-    employmentType: "category",
-    hiringOrganization: {
-      ignoreEmpty: false,
-      as: {
-        "@type": "hiringOrganizationType",
-        name: "company",
-        sameAs: "url",
-        logo: null
-      }
-    },
-    jobLocation: {
-      ignoreEmpty: false,
-      as: {
-        "@type": "postalAddressType",
-        streetAddress: null,
-        addressLocality: "city",
-        addressRegion: "state",
-        postalCode: "zip",
-        addressCountry: "country"
-      }
-    },
-    baseSalary: {
-      ignoreEmpty: false,
-      as: {
-        "@type": "baseSalaryType",
-        currency: null,
-        value: {
-          ignoreEmpty: false,
-          as: {
-            "@type": "valueType",
-            value: null,
-            unitText: null
-          }
-        }
-      }
-    }
-  }
-}
+const tmpl = require("../templates/appcast.json")
 
 function compareGsdTemplate(input) {
   const arr1 = Object.keys(gsdTemplate)
   const arr2 = Object.keys(input)
-  
+
   if(arr1.length !== arr2.length)
     return false
   for(var i = arr1.length; i--;) {
