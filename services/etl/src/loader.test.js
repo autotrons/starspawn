@@ -2,7 +2,7 @@ const {
   assertSuccess,
   assertFailure,
   payload
-} = require("@pheasantplucker/failables-node6")
+} = require("@pheasantplucker/failables")
 const {
   createDatastoreClient,
   readEntities,

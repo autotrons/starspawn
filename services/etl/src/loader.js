@@ -4,7 +4,7 @@ const {
   failure,
   isFailure,
   payload
-} = require("@pheasantplucker/failables-node6")
+} = require("@pheasantplucker/failables")
 const {
   createDatastoreClient,
   makeEntityByName,
