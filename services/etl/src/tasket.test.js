@@ -1,6 +1,8 @@
 const equal = require("assert").deepEqual
 const tasket = require("./tasket")
+const { try_until, sleep } = require("./tasket")
 const uuid = require("uuid")
+const log = console.log
 
 describe("tasket.js", function() {
   describe("ok()", () => {
@@ -122,6 +124,23 @@ describe("tasket.js", function() {
       equal(tasket.completed(prev) >= tasket.created(prev), true)
       equal(tasket.path(prev), path)
       equal(tasket.path(next), ["bar"])
+    })
+  })
+  describe("try_until()", () => {
+    it("try it until it is true", async () => {
+      let i = 0
+      let checks = 0
+      const handle = setInterval(() => {
+        i++
+      }, 10)
+      const result = await try_until(10, 110, async () => {
+        await sleep(20)
+        checks++
+        return i > 10
+      })
+      clearInterval(handle)
+      equal(checks > 3, true)
+      equal(checks < 6, true)
     })
   })
 })

@@ -188,6 +188,27 @@ function next(t) {
   return { id, target, next }
 }
 
+function sleep(ms) {
+  return new Promise(res => {
+    setTimeout(() => {
+      res()
+    }, ms)
+  })
+}
+
+async function try_until(interval, timeout, condition) {
+  let result = false
+  let start_time = Date.now()
+  while (result !== true) {
+    result = await condition()
+    if (result) return true
+    await sleep(interval)
+
+    if (Date.now() - start_time > timeout) return false
+  }
+  return false
+}
+
 module.exports = {
   ok,
   assert,
@@ -210,5 +231,7 @@ module.exports = {
   anyFailed,
   firstFailure,
   complete_ok,
-  complete_fail
+  complete_fail,
+  try_until,
+  sleep
 }

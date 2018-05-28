@@ -97,17 +97,6 @@ describe("etl.js", function() {
   })
 })
 
-async function try_until(interval, timeout, condition) {
-  let result = false
-  let start_time = Date.now()
-  while (result !== true) {
-    result = await condition()
-    await sleep(interval)
-    if (Date.now() - start_time > timeout) return false
-  }
-  return false
-}
-
 function sleep(ms) {
   return new Promise(res => {
     setTimeout(() => {
