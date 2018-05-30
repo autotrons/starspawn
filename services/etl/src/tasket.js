@@ -1,11 +1,11 @@
-const uuid = require("uuid")
-const equal = require("assert").deepEqual
+const uuid = require('uuid')
+const equal = require('assert').deepEqual
 const log = console.log
 
 const SUCCESS = 0
 const FAILURE = 1
 const EMPTY = 2
-const PROTOCOL_V1 = "tv1"
+const PROTOCOL_V1 = 'tv1'
 
 const protocol_version = f => f[0]
 const kind = f => f[1]
