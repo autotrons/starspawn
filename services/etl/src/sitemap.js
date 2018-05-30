@@ -5,7 +5,7 @@ const {
   payload,
   isFailure,
   meta,
-} = require('@pheasantplucker/failables-node6')
+} = require('@pheasantplucker/failables')
 const { map, values } = require('ramda')
 const { createQueryObj, runQuery } = require('@pheasantplucker/gc-datastore')
 const { save, createBucket } = require('@pheasantplucker/gc-cloudstorage')
@@ -47,7 +47,6 @@ const { save, createBucket } = require('@pheasantplucker/gc-cloudstorage')
 const SITEMAP_URL_COUNT = 5 // pass this in when calling sitemap()?
 const SITEMAP_BUCKET = 'starspawn_jobs/sitemaps'
 const BASE_URL = `https://storage.cloud.google.com`
-// https://storage.cloud.google.com/starspawn_jobs/test_sitemap_0.xml
 
 async function sitemap(id) {
   try {
@@ -130,7 +129,7 @@ function moreDataLeft(data) {
 }
 
 async function getJobs(query) {
-  const runResult = await runQuery(query) // => limit this to n number of results
+  const runResult = await runQuery(query)
   if (isFailure(runResult)) return runResult
   const jobData = payload(runResult)
   const metaData = meta(runResult)
