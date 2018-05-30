@@ -1,25 +1,25 @@
-const uuid = require("uuid")
-const rp = require("request-promise")
-const equal = require("assert").deepEqual
+const uuid = require('uuid')
+const rp = require('request-promise')
+const equal = require('assert').deepEqual
 const { assertSuccess, payload } = require(`@pheasantplucker/failables`)
-const { start, stop } = require("./etl")
+const { start, stop } = require('./etl')
 const {
   pull,
   createSubscriber,
-  createSubscription
-} = require("@pheasantplucker/gc-pubsub")
+  createSubscription,
+} = require('@pheasantplucker/gc-pubsub')
 
-const PROJECT_ID = "starspawn-201921"
+const PROJECT_ID = 'starspawn-201921'
 
 async function publish(id, topic, msg) {
   const options = {
-    uri: "http://localhost:8080/publish",
-    method: "POST",
+    uri: 'http://localhost:8080/publish',
+    method: 'POST',
     headers: {
-      "User-Agent": "Request-Promise"
+      'User-Agent': 'Request-Promise',
     },
     body: { message: { data: { id, topic, msg } } },
-    json: true // Automatically stringifies the body to JSON
+    json: true, // Automatically stringifies the body to JSON
   }
   const result = await rp(options)
   return result
@@ -39,7 +39,7 @@ describe(`publish.js`, function() {
   const sub = `etl_test_${uuid.v4()}`
   it(`should publish a message`, async () => {
     const body = {
-      truth: true
+      truth: true,
     }
     const message = { data: body }
     const result = await publish(id, topic, message)

@@ -1,4 +1,4 @@
-const { failure, success } = require("@pheasantplucker/failables")
+const { failure, success } = require('@pheasantplucker/failables')
 
 async function health_check(id, data) {
   try {
@@ -9,5 +9,5 @@ async function health_check(id, data) {
 }
 
 module.exports = {
-  health_check
+  health_check,
 }

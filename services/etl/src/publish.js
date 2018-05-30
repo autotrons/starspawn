@@ -2,15 +2,15 @@ const {
   isFailure,
   failure,
   success,
-  payload
-} = require("@pheasantplucker/failables")
+  payload,
+} = require('@pheasantplucker/failables')
 const {
   publishJson,
   createPublisher,
-  createTopic
-} = require("@pheasantplucker/gc-pubsub")
+  createTopic,
+} = require('@pheasantplucker/gc-pubsub')
 
-const PROJECT_ID = "starspawn-201921"
+const PROJECT_ID = 'starspawn-201921'
 async function publish(id, data) {
   const { topic, msg } = data
   const res1 = createPublisher(PROJECT_ID)
@@ -22,5 +22,5 @@ async function publish(id, data) {
 }
 
 module.exports = {
-  publish
+  publish,
 }

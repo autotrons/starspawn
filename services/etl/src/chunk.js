@@ -1,15 +1,15 @@
-const uuid = require("uuid")
+const uuid = require('uuid')
 const {
   failure,
   success,
   isFailure,
-  payload
-} = require("@pheasantplucker/failables")
-const miss = require("mississippi")
-const storage = require("@google-cloud/storage")()
-const { publish } = require("./pubsub")
+  payload,
+} = require('@pheasantplucker/failables')
+const miss = require('mississippi')
+const storage = require('@google-cloud/storage')()
+const { publish } = require('./pubsub')
 
-const COMPLETE = "complete"
+const COMPLETE = 'complete'
 
 async function chunk(id, data) {
   const {
@@ -19,7 +19,7 @@ async function chunk(id, data) {
     start_byte_offset,
     end_byte_offset,
     parse_topic,
-    continue_topic
+    continue_topic,
   } = data
 
   console.info(
@@ -31,7 +31,7 @@ async function chunk(id, data) {
   const readFileHandle = myBucket.file(filepart)
   const rStream = readFileHandle.createReadStream({
     start: start_byte_offset,
-    end: end_byte_offset
+    end: end_byte_offset,
   })
 
   async function pipeline() {
@@ -92,7 +92,7 @@ function find_blocks(rs, start_text, end_text, cursor = 0) {
   return new Promise((res, rej) => {
     const starttime = Date.now()
     let blocks = []
-    let buffer = ""
+    let buffer = ''
     let start_idx = -1
     let end_idx = -1
     let streamed_to = cursor
@@ -151,11 +151,11 @@ async function write_blocks(id, filename, blocks, topic) {
     const file = getFileHandle(filename)
     const preblob = `<?xml version="1.0" encoding="UTF-8"?>\n<root>\n`
     const postblob = `\n</root>`
-    const blob = blocks.join("\n")
+    const blob = blocks.join('\n')
     const r1 = await file.save(preblob + blob + postblob)
     const message = {
       data: Buffer.from(JSON.stringify({ id, filename })),
-      attributes: { id, filename }
+      attributes: { id, filename },
     }
     return publish(topic, message)
   } catch (e) {
@@ -187,12 +187,12 @@ function continue_work(
     start_text,
     end_text,
     parse_topic,
-    continue_topic
+    continue_topic,
   }
 
   const data = Buffer.from(JSON.stringify(args))
   const message = {
-    data
+    data,
   }
   return message
 }
@@ -202,8 +202,8 @@ function chop(str, idx) {
 }
 
 function split_filename(n) {
-  const [bucketpart, ...filepartarray] = n.split("/")
-  const filepart = filepartarray.join("/")
+  const [bucketpart, ...filepartarray] = n.split('/')
+  const filepart = filepartarray.join('/')
   return { bucketpart, filepart }
 }
 
@@ -218,5 +218,5 @@ module.exports = {
   chunk,
   find_blocks,
   write_blocks,
-  continue_work
+  continue_work,
 }

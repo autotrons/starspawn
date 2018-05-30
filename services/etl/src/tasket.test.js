@@ -4,20 +4,20 @@ const { try_until, sleep } = require("./tasket")
 const uuid = require("uuid")
 const log = console.log
 
-describe("tasket.js", function() {
-  describe("ok()", () => {
-    it("create a new tasket from nothing", () => {
+describe('tasket.js', function() {
+  describe('ok()', () => {
+    it('create a new tasket from nothing', () => {
       const t1 = tasket.ok()
       tasket.assert(t1)
       tasket.assert_empty(t1)
     })
-    it("create tasket with some fields", () => {
+    it('create tasket with some fields', () => {
       const id = uuid.v4()
-      const source = "worker1"
+      const source = 'worker1'
       const trace = true
       const test = false
-      const callback = "https://foo/bar"
-      const path = ["foo", "bar"]
+      const callback = 'https://foo/bar'
+      const path = ['foo', 'bar']
       const timeout = 42
       const data = { job: 12345 }
       const meta = { cache_hit: false }
@@ -35,15 +35,15 @@ describe("tasket.js", function() {
       tasket.assert_ok(t1)
       equal(tasket.id(t1), id)
     })
-    it("take a previous task and a payload", () => {
+    it('take a previous task and a payload', () => {
       const id = uuid.v4()
-      const source = "worker1"
+      const source = 'worker1'
       const trace = true
       const test = false
-      const callback = "https://foo/bar"
-      const path = ["foo", "bar"]
+      const callback = 'https://foo/bar'
+      const path = ['foo', 'bar']
       const timeout = 42
-      const data = { job: "abcd-efgh" }
+      const data = { job: 'abcd-efgh' }
       const meta = { cache_hit: false }
       const t1 = tasket.ok(
         id,
@@ -57,26 +57,26 @@ describe("tasket.js", function() {
         test
       )
       tasket.assert_ok(t1)
-      const data2 = { job: "1234-5678" }
+      const data2 = { job: '1234-5678' }
       const [prev, next] = tasket.complete_ok(t1, data2)
       tasket.assert_ok(next)
       equal(tasket.completed(prev) >= tasket.created(prev), true)
       equal(tasket.path(prev), path)
-      equal(tasket.path(next), ["bar"])
+      equal(tasket.path(next), ['bar'])
     })
   })
-  describe("fail()", () => {
-    it("create a new tracer from nothing", () => {
+  describe('fail()', () => {
+    it('create a new tracer from nothing', () => {
       const t1 = tasket.fail()
       tasket.assert(t1)
     })
-    it("has some fields", () => {
+    it('has some fields', () => {
       const id = uuid.v4()
-      const source = "worker1"
+      const source = 'worker1'
       const trace = true
       const test = false
-      const callback = "https://foo/bar"
-      const path = ["foo", "bar"]
+      const callback = 'https://foo/bar'
+      const path = ['foo', 'bar']
       const timeout = 42
       const data = { job: 12345 }
       const meta = { cache_hit: false }
@@ -95,16 +95,16 @@ describe("tasket.js", function() {
       equal(tasket.id(t1), id)
     })
   })
-  describe("complete_fail()", () => {
-    it("complete with a failure", () => {
+  describe('complete_fail()', () => {
+    it('complete with a failure', () => {
       const id = uuid.v4()
-      const source = "worker1"
+      const source = 'worker1'
       const trace = true
       const test = false
-      const callback = "https://foo/bar"
-      const path = ["foo", "bar"]
+      const callback = 'https://foo/bar'
+      const path = ['foo', 'bar']
       const timeout = 42
-      const data = { job: "abcd-efgh" }
+      const data = { job: 'abcd-efgh' }
       const meta = { cache_hit: false }
       const t1 = tasket.ok(
         id,
@@ -118,12 +118,12 @@ describe("tasket.js", function() {
         test
       )
       tasket.assert_ok(t1)
-      const error = "something bad happened"
+      const error = 'something bad happened'
       const [prev, next] = tasket.complete_fail(t1, error)
       tasket.assert_fail(next)
       equal(tasket.completed(prev) >= tasket.created(prev), true)
       equal(tasket.path(prev), path)
-      equal(tasket.path(next), ["bar"])
+      equal(tasket.path(next), ['bar'])
     })
   })
   describe("try_until()", () => {

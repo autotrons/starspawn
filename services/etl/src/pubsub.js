@@ -1,8 +1,8 @@
-const PROJECT = "starspawn-201921"
-const pubsub = require("@google-cloud/pubsub")
+const PROJECT = 'starspawn-201921'
+const pubsub = require('@google-cloud/pubsub')
 const pub_client = new pubsub.v1.PublisherClient({})
 const sub_client = new pubsub.v1.SubscriberClient({})
-const { failure, success } = require("@pheasantplucker/failables-node6")
+const { failure, success } = require('@pheasantplucker/failables-node6')
 
 function createTopic(topic) {
   const formattedName = pub_client.topicPath(PROJECT, topic)
@@ -33,7 +33,7 @@ function createSubscription(topic, sub) {
   const formattedTopic = sub_client.topicPath(PROJECT, topic)
   const request = {
     name: formattedName,
-    topic: formattedTopic
+    topic: formattedTopic,
   }
   return sub_client
     .createSubscription(request)
@@ -62,7 +62,7 @@ function publish(topic, messagesElement) {
   const messages = [messagesElement]
   const request = {
     topic: formattedTopic,
-    messages: messages
+    messages: messages,
   }
   return pub_client
     .publish(request)
@@ -81,7 +81,7 @@ function pull(sub, maxMessages) {
   var request = {
     subscription: formattedSubscription,
     maxMessages,
-    returnImmediately: false
+    returnImmediately: false,
   }
   return sub_client
     .pull(request)
@@ -97,7 +97,7 @@ function ack(sub, ackIds) {
   const formattedSubscription = sub_client.subscriptionPath(PROJECT, sub)
   const request = {
     subscription: formattedSubscription,
-    ackIds: ackIds
+    ackIds: ackIds,
   }
   return sub_client
     .acknowledge(request)
@@ -116,5 +116,5 @@ module.exports = {
   createTopic,
   createSubscription,
   deleteTopic,
-  deleteSubscription
+  deleteSubscription,
 }

@@ -1,43 +1,43 @@
-const equal = require("assert").deepEqual
+const equal = require('assert').deepEqual
 const uuid = require(`uuid`)
 const {
   assertSuccess,
   assertEmpty,
   success,
-  payload
-} = require("@pheasantplucker/failables")
-const { chunk, find_blocks, write_blocks, continue_work } = require("./chunk")
+  payload,
+} = require('@pheasantplucker/failables')
+const { chunk, find_blocks, write_blocks, continue_work } = require('./chunk')
 const {
   pull,
   ack,
   createSubscription,
   createTopic,
   deleteSubscription,
-  deleteTopic
-} = require("./pubsub")
-const fs = require("fs")
-const storage = require("@google-cloud/storage")()
+  deleteTopic,
+} = require('./pubsub')
+const fs = require('fs')
+const storage = require('@google-cloud/storage')()
 const MEGABYTE = Math.pow(2, 20)
 
 const TOPIC = `test-${uuid.v4()}`
 const SUBSCRIPTION = `test-${uuid.v4()}`
 
-describe("chunk.js", function() {
+describe('chunk.js', function() {
   this.timeout(540 * 1000)
-  before("should set shit up", async () => {
+  before('should set shit up', async () => {
     const r1 = await createTopic(TOPIC)
     assertSuccess(r1)
     const r2 = await createSubscription(TOPIC, SUBSCRIPTION)
     assertSuccess(r2)
   })
-  describe("write_block", () => {
-    it("write blocks to a file", async () => {
-      const blocks = ["<job><id>1</id></job>", "<job><id>2</id></job>"]
-      const id = "test_" + uuid.v4()
+  describe('write_block', () => {
+    it('write blocks to a file', async () => {
+      const blocks = ['<job><id>1</id></job>', '<job><id>2</id></job>']
+      const id = 'test_' + uuid.v4()
       const filename = `datafeeds/chunks/${id}/1.xml`
       const r1 = await write_blocks(id, filename, blocks, TOPIC)
       assertSuccess(r1)
-      const r2 = await exists("datafeeds", `chunks/${id}/1.xml`)
+      const r2 = await exists('datafeeds', `chunks/${id}/1.xml`)
       assertSuccess(r2, true)
       const r3 = await pull(SUBSCRIPTION, 1, false)
       assertSuccess(r3)
@@ -47,38 +47,38 @@ describe("chunk.js", function() {
       const r4 = await ack(SUBSCRIPTION, [ackId])
       assertSuccess(r4)
     })
-    it("does nothing if no blocks", async () => {
+    it('does nothing if no blocks', async () => {
       const blocks = []
-      const id = "test_" + uuid.v4()
+      const id = 'test_' + uuid.v4()
       const filename = `datafeeds/chunks/${id}/1.xml`
       const r1 = await write_blocks(id, filename, blocks, TOPIC)
       assertEmpty(r1)
     })
   })
-  describe("find_blocks", async () => {
-    it("chop the file into blocks of tag pairs", async () => {
+  describe('find_blocks', async () => {
+    it('chop the file into blocks of tag pairs', async () => {
       const id = uuid.v4()
-      const start_text = "<job>"
-      const end_text = "</job>"
-      const readstream = fs.createReadStream(__dirname + "/feed_100.xml", {
+      const start_text = '<job>'
+      const end_text = '</job>'
+      const readstream = fs.createReadStream(__dirname + '/feed_100.xml', {
         start: 0,
-        end: 6000
+        end: 6000,
       })
       const result = await find_blocks(readstream, start_text, end_text)
       assertSuccess(result)
       equal(payload(result).blocks.length > 0, true)
     })
   })
-  describe("continue_work", async () => {
-    it("if we do not need to do more work return false", async () => {
+  describe('continue_work', async () => {
+    it('if we do not need to do more work return false', async () => {
       const id = uuid.v4()
-      const filename = "datafeeds/full_feed/feed_100.xml"
+      const filename = 'datafeeds/full_feed/feed_100.xml'
       const cursor = Math.pow(2, 10) - 256
       const end_byte_offset = Math.pow(2, 10)
-      const start_text = "<job>"
-      const end_text = "</job>"
-      const parse_topic = "chunk_created"
-      const continue_topic = "chunk_work"
+      const start_text = '<job>'
+      const end_text = '</job>'
+      const parse_topic = 'chunk_created'
+      const continue_topic = 'chunk_work'
       const streamed_to = end_byte_offset
       const result = continue_work(
         id,
@@ -93,15 +93,15 @@ describe("chunk.js", function() {
       )
       equal(result, false)
     })
-    it("if we need more work return the payload to the next call", async () => {
+    it('if we need more work return the payload to the next call', async () => {
       const id = uuid.v4()
-      const filename = "datafeeds/full_feed/feed_100.xml"
+      const filename = 'datafeeds/full_feed/feed_100.xml'
       const cursor = Math.pow(2, 5)
       const end_byte_offset = Math.pow(2, 10)
-      const start_text = "<job>"
-      const end_text = "</job>"
-      const parse_topic = "chunk_created"
-      const continue_topic = "chunk_work"
+      const start_text = '<job>'
+      const end_text = '</job>'
+      const parse_topic = 'chunk_created'
+      const continue_topic = 'chunk_work'
       const streamed_to = end_byte_offset - 256
       const expected = {
         id,
@@ -111,7 +111,7 @@ describe("chunk.js", function() {
         start_text,
         end_text,
         parse_topic,
-        continue_topic
+        continue_topic,
       }
       const result = continue_work(
         id,
@@ -127,23 +127,23 @@ describe("chunk.js", function() {
       equal(JSON.parse(result.data), expected)
     })
   })
-  describe("chunk", async () => {
-    it("chunk a big xml file into blocks and write the file", async () => {
+  describe('chunk', async () => {
+    it('chunk a big xml file into blocks and write the file', async () => {
       const data = {
-        filename: "datafeeds/full_feed/feed_500k.xml",
+        filename: 'datafeeds/full_feed/feed_500k.xml',
         start_byte_offset: 0,
         end_byte_offset: 1 * Math.pow(2, 20),
-        start_text: "<job>",
-        end_text: "</job>",
-        parse_topic: "chunk_v1",
-        continue_topic: "chunk_recursive_v1"
+        start_text: '<job>',
+        end_text: '</job>',
+        parse_topic: 'chunk_v1',
+        continue_topic: 'chunk_recursive_v1',
       }
       const id = uuid.v4()
       const result = await chunk(id, data)
       assertSuccess(result)
     })
   })
-  after("clean up the topic and subscription", async () => {
+  after('clean up the topic and subscription', async () => {
     const r1 = await deleteTopic(TOPIC)
     assertSuccess(r1)
     const r2 = await deleteSubscription(TOPIC, SUBSCRIPTION)

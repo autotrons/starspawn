@@ -1,23 +1,23 @@
-const equal = require("assert").deepEqual
-const { promisify } = require("util")
-const fs = require("fs")
+const equal = require('assert').deepEqual
+const { promisify } = require('util')
+const fs = require('fs')
 const readFileAsync = promisify(fs.readFile)
-const { setupPubSub, TOPICS, start, stop } = require("./etl.js")
-const { assertSuccess, payload, meta } = require("@pheasantplucker/failables")
-const { exists } = require("@pheasantplucker/gc-cloudstorage")
-const { topicExists } = require("@pheasantplucker/gc-pubsub")
-const uuid = require("uuid")
-const rp = require("request-promise")
+const { setupPubSub, TOPICS, start, stop } = require('./etl.js')
+const { assertSuccess, payload, meta } = require('@pheasantplucker/failables')
+const { exists } = require('@pheasantplucker/gc-cloudstorage')
+const { topicExists } = require('@pheasantplucker/gc-pubsub')
+const uuid = require('uuid')
+const rp = require('request-promise')
 const log = console.log
 async function health_check(id) {
   const options = {
-    uri: "http://localhost:8080/health_check",
-    method: "POST",
+    uri: 'http://localhost:8080/health_check',
+    method: 'POST',
     headers: {
-      "User-Agent": "Request-Promise"
+      'User-Agent': 'Request-Promise',
     },
     body: { message: { data: { id } } },
-    json: true // Automatically stringifies the body to JSON
+    json: true, // Automatically stringifies the body to JSON
   }
   const result = await rp(options)
   return result
@@ -25,18 +25,18 @@ async function health_check(id) {
 
 async function appcast_pipeline(id) {
   const options = {
-    uri: "http://localhost:8080/appcast_pipeline_test",
-    method: "GET",
+    uri: 'http://localhost:8080/appcast_pipeline_test',
+    method: 'GET',
     headers: {
-      "User-Agent": "Request-Promise"
+      'User-Agent': 'Request-Promise',
     },
-    json: true // Automatically stringifies the body to JSON
+    json: true, // Automatically stringifies the body to JSON
   }
   const result = await rp(options)
   return result
 }
 
-describe("etl.js", function() {
+describe('etl.js', function() {
   this.timeout(540 * 1000)
   before(async () => {
     await start()
@@ -60,24 +60,24 @@ describe("etl.js", function() {
     })
   })
 
-  describe("/health_check", () => {
-    it("should return the id in a payload", async () => {
+  describe('/health_check', () => {
+    it('should return the id in a payload', async () => {
       const id = uuid.v4()
       const result = await health_check(id)
       assertSuccess(result)
     })
   })
 
-  describe.skip("/appcast_pipeline", () => {
-    it("should call all the functions in the pipeline", async () => {
+  describe.skip('/appcast_pipeline', () => {
+    it('should call all the functions in the pipeline', async () => {
       const called_functions = []
       const expected = [
-        "download",
-        "unzip",
-        "chunk",
-        "parse",
-        "json2gsd",
-        "loader"
+        'download',
+        'unzip',
+        'chunk',
+        'parse',
+        'json2gsd',
+        'loader',
       ]
       const r1 = await appcast_pipeline()
       assertSuccess(r1)

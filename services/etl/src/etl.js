@@ -1,8 +1,8 @@
-const express = require("express")
+const express = require('express')
 const app = express()
-const uuid = require("uuid")
-const bodyParser = require("body-parser")
-const { map } = require("ramda")
+const uuid = require('uuid')
+const bodyParser = require('body-parser')
+const { map } = require('ramda')
 const {
   anyFailed,
   firstFailure,
@@ -10,20 +10,20 @@ const {
   failure,
   success,
   payload,
-  meta
-} = require("@pheasantplucker/failables")
-const fs = require("fs")
-const { setProject, createTopic } = require("@pheasantplucker/gc-pubsub")
-const rp = require("request-promise")
+  meta,
+} = require('@pheasantplucker/failables')
+const fs = require('fs')
+const { setProject, createTopic } = require('@pheasantplucker/gc-pubsub')
+const rp = require('request-promise')
 
-const { download } = require("./download")
-const { unzip } = require("./unzip")
-const { chunk } = require("./chunk")
-const { publish } = require("./publish")
-const { loader } = require("./loader")
-const { json2gsd } = require("./json2gsd")
-const { parse } = require("./parse")
-const { health_check } = require("./health_check")
+const { download } = require('./download')
+const { unzip } = require('./unzip')
+const { chunk } = require('./chunk')
+const { publish } = require('./publish')
+const { loader } = require('./loader')
+const { json2gsd } = require('./json2gsd')
+const { parse } = require('./parse')
+const { health_check } = require('./health_check')
 
 // ==========================================================
 //
@@ -32,7 +32,7 @@ const { health_check } = require("./health_check")
 // ==========================================================
 const log = console.log
 const PORT = process.env.PORT || 8080
-const PROJECT_ID = "starspawn-201921"
+const PROJECT_ID = 'starspawn-201921'
 let SERVER
 app.use(bodyParser.json())
 
@@ -45,7 +45,7 @@ const FUNCTION_MAP = {
   loader,
   parse,
   json2gsd,
-  unzip
+  unzip,
 }
 
 // ==========================================================
@@ -53,25 +53,25 @@ const FUNCTION_MAP = {
 //                         ROUTES
 //
 // ==========================================================
-app.get("/:command", async (req, res) => {
+app.get('/:command', async (req, res) => {
   const id = uuid.v4()
-  let command = "none"
+  let command = 'none'
   try {
     command = req.params.command
-    if (command === "appcast_pipeline_test") {
+    if (command === 'appcast_pipeline_test') {
       const source_url =
-        "https://storage.googleapis.com/starspawn_tests/feed.xml.gz"
+        'https://storage.googleapis.com/starspawn_tests/feed.xml.gz'
       const target_file = `datafeeds/full_feed/${id}.xml.gz`
       const result = await appcast_download(id, source_url, target_file)
       return res_ok(res, id, command, {})
     }
-    return res_err(res, id, command, "no path")
+    return res_err(res, id, command, 'no path')
   } catch (e) {
     return res_err(res, id, command, e.toString())
   }
 })
 
-app.post("/:command", async function(req, res) {
+app.post('/:command', async function(req, res) {
   // Pull out task data
   let command, data, id, reply, source
   try {
@@ -104,13 +104,13 @@ app.post("/:command", async function(req, res) {
 //
 // ==========================================================
 
-const TOPICS = ["unzip_v1"]
+const TOPICS = ['unzip_v1']
 
 function do_trace(data, command) {
   const { id } = data
   if (data.trace) {
     const t = tasket(id, command, data.trace)
-    const s = fs.createWriteStream(`../logs/${id}.log`, { flags: "a" })
+    const s = fs.createWriteStream(`../logs/${id}.log`, { flags: 'a' })
     s.write(`${JSON.stringify(t)}\n`)
   }
 }
@@ -126,7 +126,7 @@ async function setupPubSub() {
 
 function parse_req_data(r) {
   try {
-    const decoded = new Buffer(r.body.message.data, "base64").toString("ascii")
+    const decoded = new Buffer(r.body.message.data, 'base64').toString('ascii')
     return JSON.parse(decoded)
   } catch (e) {
     return r.body.message.data
@@ -134,14 +134,14 @@ function parse_req_data(r) {
 }
 
 function res_ok(res, id, source, data) {
-  res.set("Content-Type", "application/json")
+  res.set('Content-Type', 'application/json')
   const m = { id, wn: source }
   res.status(200).send(success(data, m))
   return success(data, m)
 }
 
 function res_err(res, id, source, data) {
-  res.set("Content-Type", "application/json")
+  res.set('Content-Type', 'application/json')
   const m = { id, wn: source }
   console.error(data)
   res.status(500).send(failure(data, m))
@@ -150,13 +150,13 @@ function res_err(res, id, source, data) {
 
 async function appcast_download(id, source_url, target_file) {
   const options = {
-    uri: "http://localhost:8080/download",
-    method: "POST",
+    uri: 'http://localhost:8080/download',
+    method: 'POST',
     headers: {
-      "User-Agent": "Request-Promise"
+      'User-Agent': 'Request-Promise',
     },
     body: { message: { data: { id, source_url, target_file, trace: true } } },
-    json: true // Automatically stringifies the body to JSON
+    json: true, // Automatically stringifies the body to JSON
   }
   const result = await rp(options)
   return result
@@ -166,12 +166,12 @@ async function call_next_task(tasket) {
   const { id, target, next } = next(tasket)
   const options = {
     uri: `http://localhost:8080/${target}`,
-    method: "POST",
+    method: 'POST',
     headers: {
-      "User-Agent": "Request-Promise"
+      'User-Agent': 'Request-Promise',
     },
     body: { message: { data: next } },
-    json: true // Automatically stringifies the body to JSON
+    json: true, // Automatically stringifies the body to JSON
   }
   const result = await rp(options)
   return result
@@ -187,7 +187,7 @@ async function start() {
   return new Promise(function(resolve, reject) {
     SERVER = app.listen(PORT, () => {
       console.log(`App listening on port ${PORT}`)
-      console.log("Press Ctrl+C to quit.")
+      console.log('Press Ctrl+C to quit.')
       resolve(SERVER)
     })
   })
@@ -201,5 +201,5 @@ module.exports = {
   start,
   stop,
   setupPubSub,
-  TOPICS
+  TOPICS,
 }

@@ -1,13 +1,13 @@
 const {
   assertSuccess,
   payload,
-  isFailure
-} = require("@pheasantplucker/failables")
-const { parse, parseXmlToJson } = require("./parse")
-const equal = require("assert").deepEqual
-const path = require("path")
-const fs = require("fs")
-const uuid = require("uuid")
+  isFailure,
+} = require('@pheasantplucker/failables')
+const { parse, parseXmlToJson } = require('./parse')
+const equal = require('assert').deepEqual
+const path = require('path')
+const fs = require('fs')
+const uuid = require('uuid')
 
 const {
   createBucket,
@@ -15,11 +15,11 @@ const {
   uploadFile,
   exists,
   save,
-  getFile
-} = require("@pheasantplucker/gc-cloudstorage")
+  getFile,
+} = require('@pheasantplucker/gc-cloudstorage')
 
-const bucket = "starspawn_tests"
-const fileName = "chunk_output_100.xml"
+const bucket = 'starspawn_tests'
+const fileName = 'chunk_output_100.xml'
 const testFileCloud = `${bucket}/${fileName}`
 const testFileRelative = `../../../samples/${fileName}`
 const testFile = path.join(__dirname, testFileRelative)
@@ -30,8 +30,8 @@ const xml = `<?xml version="1.0" encoding="UTF-8"?>
 
 const json = {
   job: {
-    location: "Fort Lauderdale, FL, United States"
-  }
+    location: 'Fort Lauderdale, FL, United States',
+  },
 }
 
 const _testsetup = async () => {
@@ -50,14 +50,14 @@ const _testsetup = async () => {
 
 const thisId = uuid.v4()
 
-describe("parse.js", function() {
+describe('parse.js', function() {
   this.timeout(540 * 1000)
 
   before(() => {
     _testsetup()
   })
 
-  it("should convert the XML from the file into JSON and send it to load", async () => {
+  it('should convert the XML from the file into JSON and send it to load', async () => {
     const result = await parse(thisId, testFileCloud)
     assertSuccess(result)
   })

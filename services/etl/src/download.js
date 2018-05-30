@@ -2,11 +2,11 @@ const {
   isFailure,
   failure,
   success,
-  payload
-} = require("@pheasantplucker/failables")
-const get = require("simple-get")
-const { createWriteStream } = require("@pheasantplucker/gc-cloudstorage")
-const {} = require("@pheasantplucker/gc-pubsub")
+  payload,
+} = require('@pheasantplucker/failables')
+const get = require('simple-get')
+const { createWriteStream } = require('@pheasantplucker/gc-cloudstorage')
+const {} = require('@pheasantplucker/gc-pubsub')
 
 async function download(id, data) {
   try {
@@ -30,12 +30,12 @@ async function stream_to_storage(source_url, target_file) {
 
       getResponse
         .pipe(write_stream)
-        .on("error", function(err) {
-          console.log("here")
+        .on('error', function(err) {
+          console.log('here')
           resolve(failure(err.toString()))
         })
-        .on("finish", function() {
-          console.log("finish")
+        .on('finish', function() {
+          console.log('finish')
           resolve(success())
         })
     })
@@ -43,5 +43,5 @@ async function stream_to_storage(source_url, target_file) {
 }
 
 module.exports = {
-  download
+  download,
 }

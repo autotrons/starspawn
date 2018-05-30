@@ -2,13 +2,13 @@ const {
   isFailure,
   failure,
   success,
-  payload
-} = require("@pheasantplucker/failables")
+  payload,
+} = require('@pheasantplucker/failables')
 const {
   getReadStream,
-  createWriteStream
-} = require("@pheasantplucker/gc-cloudstorage")
-const zlib = require("zlib")
+  createWriteStream,
+} = require('@pheasantplucker/gc-cloudstorage')
+const zlib = require('zlib')
 const gzip = zlib.createUnzip()
 
 async function unzip(id, data) {
@@ -36,11 +36,11 @@ async function do_file_things(id, data) {
     readStream
       .pipe(gzip)
       .pipe(writeStream)
-      .on("finish", () => res(success(targetPath)))
-      .on("error", err => rej(failure(err.toString())))
+      .on('finish', () => res(success(targetPath)))
+      .on('error', err => rej(failure(err.toString())))
   })
 }
 
 module.exports = {
-  unzip
+  unzip,
 }

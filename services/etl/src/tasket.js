@@ -46,8 +46,8 @@ const set_created = (t, d) => {
 
 function ok(
   id = uuid.v4(),
-  source = "none",
-  callback = "none",
+  source = 'none',
+  callback = 'none',
   path = [],
   p = null,
   m = {},
@@ -74,7 +74,7 @@ function ok(
     path,
     callback,
     p,
-    m
+    m,
   ]
 }
 
@@ -95,8 +95,8 @@ function complete_fail(prev, p, m) {
 
 function fail(
   id = uuid.v4(),
-  source = "none",
-  callback = "none",
+  source = 'none',
+  callback = 'none',
   path = [],
   p = {},
   m = {},
@@ -123,7 +123,7 @@ function fail(
     path,
     callback,
     p,
-    m
+    m,
   ]
 }
 
@@ -170,13 +170,13 @@ const assert_empty = f => equal(isEmpty(f), true)
 const kindString = f => {
   switch (kind(f)) {
     case SUCCESS:
-      return "success"
+      return 'success'
     case FAILURE:
-      return "failure"
+      return 'failure'
     case EMPTY:
-      return "empty"
+      return 'empty'
     default:
-      return "unknown"
+      return 'unknown'
   }
 }
 
