@@ -129,7 +129,7 @@ function fail(
 
 const is_tasket = f => {
   if (protocol_version(f) === PROTOCOL_V1) {
-    if (isSuccess(f) || isFailure(f) || isEmpty(f)) {
+    if (is_success(f) || is_failure(f) || is_empty(f)) {
       return true
     }
   }
@@ -140,32 +140,25 @@ const assert = (f, p) => {
   equal(is_tasket(f), true)
 }
 
-const success = (payload, meta) => {
-  if (payload === undefined) return empty(meta)
-  return [PROTOCOL_V1, SUCCESS, payload, meta]
-}
-const failure = (payload, meta) => [PROTOCOL_V1, FAILURE, payload, meta]
-const empty = meta => [PROTOCOL_V1, EMPTY, undefined, meta]
-
-const isSuccess = f =>
+const is_success = f =>
   Array.isArray(f) && (kind(f) === SUCCESS || kind(f) === EMPTY)
-const isFailure = f => Array.isArray(f) && kind(f) === FAILURE
-const isEmpty = f => Array.isArray(f) && kind(f) === EMPTY
+const is_failure = f => Array.isArray(f) && kind(f) === FAILURE
+const is_empty = f => Array.isArray(f) && kind(f) === EMPTY
 
-const anyFailed = l => l.filter(isFailure).length > 0
-const firstFailure = l => l.filter(isFailure)[0]
+const any_failed = l => l.filter(is_failure).length > 0
+const first_failure = l => l.filter(is_failure)[0]
 
 const assert_ok = (f, p) => {
-  equal(isSuccess(f), true)
+  equal(is_success(f), true)
   if (p) equal(payload(f), p)
 }
 
 const assert_fail = (f, p) => {
-  equal(isFailure(f), true)
+  equal(is_failure(f), true)
   if (p) equal(payload(f), p)
 }
 
-const assert_empty = f => equal(isEmpty(f), true)
+const assert_empty = f => equal(is_empty(f), true)
 
 const kindString = f => {
   switch (kind(f)) {
@@ -199,7 +192,7 @@ function sleep(ms) {
 async function try_until(interval, timeout, condition) {
   let result = false
   let start_time = Date.now()
-  while (result !== true) {
+  while (result === false) {
     result = await condition()
     if (result) return true
     await sleep(interval)
@@ -219,17 +212,15 @@ module.exports = {
   path,
   payload,
   meta,
-  success,
   fail,
-  empty,
-  isSuccess,
-  isFailure,
-  isEmpty,
+  is_success,
+  is_failure,
+  is_empty,
   assert_ok,
   assert_fail,
   assert_empty,
-  anyFailed,
-  firstFailure,
+  any_failed,
+  first_failure,
   complete_ok,
   complete_fail,
   try_until,

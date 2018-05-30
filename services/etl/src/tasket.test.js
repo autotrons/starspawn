@@ -143,4 +143,30 @@ describe('tasket.js', function() {
       equal(checks < 6, true)
     })
   })
+  describe("trace_wait()", () => {
+    it("wait for all taskets to arrive", async () => {
+      const id = uuid.v4()
+      const source = "worker1"
+      const trace = true
+      const test = false
+      const callback = "https://foo/bar"
+      const path = ["foo", "bar"]
+      const timeout = 42
+      const data = { job: 12345 }
+      const meta = { cache_hit: false }
+      const t1 = tasket.ok(
+        id,
+        source,
+        callback,
+        path,
+        data,
+        meta,
+        timeout,
+        trace,
+        test
+      )
+      tasket.assert_ok(t1)
+      equal(tasket.id(t1), id)
+    })
+  })
 })
