@@ -6,7 +6,6 @@ const {
 const { parse, parseXmlToJson } = require('./parse')
 const equal = require('assert').deepEqual
 const path = require('path')
-const fs = require('fs')
 const uuid = require('uuid')
 
 const {
@@ -14,8 +13,6 @@ const {
   bucketExists,
   uploadFile,
   exists,
-  save,
-  getFile,
 } = require('@pheasantplucker/gc-cloudstorage')
 
 const bucket = 'starspawn_tests'
@@ -44,7 +41,7 @@ const _testsetup = async () => {
   if (isFailure(r2)) return r2
   const testFileExists = payload(r2)
   if (!testFileExists) {
-    const upload = await uploadFile(bucket, testFile)
+    await uploadFile(bucket, testFile)
   }
 }
 

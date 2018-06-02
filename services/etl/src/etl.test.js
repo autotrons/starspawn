@@ -46,20 +46,6 @@ describe('etl.js', function() {
     stop()
   })
 
-  describe(`setupPubSub()`, () => {
-    it(`should setup topics`, async () => {
-      const result = await setupPubSub()
-      assertSuccess(result)
-    })
-
-    TOPICS.forEach(topic => {
-      it(`should have created the topic: ${topic}`, async () => {
-        const result = await topicExists(topic)
-        assertSuccess(result)
-      })
-    })
-  })
-
   describe('/health_check', () => {
     it('should return the id in a payload', async () => {
       const id = uuid.v4()

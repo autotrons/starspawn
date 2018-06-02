@@ -1,21 +1,12 @@
-const uuid = require('uuid')
 const {
   failure,
   success,
   isFailure,
   payload,
 } = require('@pheasantplucker/failables')
-const storage = require('@google-cloud/storage')()
 const xml2js = require('xml2js')
 const parser = new xml2js.Parser({ explicitArray: false, trim: true })
-const {
-  createBucket,
-  bucketExists,
-  uploadFile,
-  exists,
-  save,
-  getFile,
-} = require('@pheasantplucker/gc-cloudstorage')
+const { getFile } = require('@pheasantplucker/gc-cloudstorage')
 
 async function parse(id, data) {
   const filePath = data
@@ -34,7 +25,7 @@ async function parse(id, data) {
 function parseXmlToJson(xml) {
   try {
     let json = {}
-    const parsedToJson = parser.parseString(xml, function(err, result) {
+    parser.parseString(xml, function(err, result) {
       json = result
     })
     return success(json)
