@@ -6,18 +6,17 @@ const {
 const {
   createDatastoreClient,
   readEntities,
-  getDatastoreKeySymbol,
 } = require('@pheasantplucker/gc-datastore')
 
-const { loader, getAttributes, jobsToEntities } = require('./loader')
+const { loader, jobsToEntities } = require('./loader')
 const equal = require('assert').deepEqual
 const uuid = require('uuid')
 
 const fakeJobArray = require('../../../samples/fakejobsarray.json')
-const datastore = createDatastoreClient()
-const dsKey = getDatastoreKeySymbol()
 
 const thisId = uuid.v4()
+
+createDatastoreClient()
 
 describe('loader.js', function() {
   this.timeout(540 * 1000)

@@ -43,5 +43,6 @@ module.exports = {
     test: true,
     beforeAll: true,
     afterAll: true,
+    __dirname: false,
   },
 }

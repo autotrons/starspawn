@@ -1,4 +1,3 @@
-const uuid = require('uuid')
 const {
   success,
   failure,
@@ -9,11 +8,11 @@ const {
   createDatastoreClient,
   makeEntityByName,
   writeEntity,
-  readEntities,
 } = require('@pheasantplucker/gc-datastore')
 
 const loader = async (id, jobs) => {
-  const datastore = createDatastoreClient()
+  createDatastoreClient()
+
   // all jobs need extra field IS_TEST = true/false
 
   const jobEntitiesResult = await jobsToEntities(id, jobs)

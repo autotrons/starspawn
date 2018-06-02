@@ -2,7 +2,7 @@ const { assertSuccess } = require('@pheasantplucker/failables')
 const { exists } = require('@pheasantplucker/gc-cloudstorage')
 const uuid = require('uuid')
 const { unzip } = require('./unzip')
-describe.only('unzip.js', function() {
+describe('unzip.js', function() {
   this.timeout(540 * 1000)
   describe('unzip()', () => {
     const source_file = 'full_feed/feed_100.xml.gz'

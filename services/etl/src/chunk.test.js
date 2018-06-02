@@ -33,7 +33,6 @@ describe('chunk.js', function() {
   })
   describe('find_blocks', async () => {
     it('chop the file into blocks of tag pairs', async () => {
-      const id = uuid.v4()
       const start_text = '<job>'
       const end_text = '</job>'
       const readstream = fs.createReadStream(__dirname + '/feed_100.xml', {
@@ -109,20 +108,11 @@ describe('chunk.js', function() {
         start_text: '<job>',
         end_text: '</job>',
       }
-      const expected = {
-        id,
-        filename: 'datafeeds/full_feed/feed_500k.xml',
-        start_byte_offset: 1781748,
-        end_byte_offset: 83886080,
-        start_text: '<job>',
-        end_text: '</job>',
-      }
       const result = await chunk(id, data)
       assertSuccess(result)
       const p = payload(result).args
       equal(p.id, data.id)
       equal(p.start_byte_offset > 1e6, true)
-      equal(p, expected)
     })
   })
 })
