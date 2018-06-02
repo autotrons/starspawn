@@ -1,16 +1,15 @@
-const uuid = require("uuid")
+const uuid = require('uuid')
 const {
   failure,
   success,
   isFailure,
-  payload
-} = require("@pheasantplucker/failables")
-const miss = require("mississippi")
-const storage = require("@google-cloud/storage")()
-const { publish } = require("./pubsub")
+  payload,
+} = require('@pheasantplucker/failables')
+const miss = require('mississippi')
+const storage = require('@google-cloud/storage')()
 
-const COMPLETE = "complete"
-const NAME = "chunk"
+const COMPLETE = 'complete'
+const NAME = 'chunk'
 
 async function chunk(id, data) {
   try {
@@ -19,7 +18,7 @@ async function chunk(id, data) {
       start_text,
       end_text,
       start_byte_offset,
-      end_byte_offset
+      end_byte_offset,
     } = data
 
     console.info(
@@ -31,7 +30,7 @@ async function chunk(id, data) {
     const readFileHandle = myBucket.file(filepart)
     const rStream = readFileHandle.createReadStream({
       start: start_byte_offset,
-      end: end_byte_offset
+      end: end_byte_offset,
     })
 
     const r1 = await find_blocks(
@@ -76,7 +75,7 @@ function find_blocks(rs, start_text, end_text, cursor = 0) {
   return new Promise((res, rej) => {
     const starttime = Date.now()
     let blocks = []
-    let buffer = ""
+    let buffer = ''
     let start_idx = -1
     let end_idx = -1
     let streamed_to = cursor
@@ -135,8 +134,12 @@ async function write_blocks(id, filename, blocks) {
     const file = getFileHandle(filename)
     const preblob = `<?xml version="1.0" encoding="UTF-8"?>\n<root>\n`
     const postblob = `\n</root>`
-    const blob = blocks.join("\n")
+    const blob = blocks.join('\n')
     const r1 = await file.save(preblob + blob + postblob)
+    if (isFailure(r1)) {
+      console.error(`${id} ${NAME} write_blocks await file.save ${payload(r1)}`)
+      return r1
+    }
     return success(blocks.length)
   } catch (e) {
     console.error(`${id} ${NAME} ${e.toString()}`)
@@ -163,7 +166,7 @@ function continue_work(
     start_byte_offset: cursor,
     end_byte_offset: end_byte_offset,
     start_text,
-    end_text
+    end_text,
   }
 
   return success({ more_work: true, args })
@@ -174,8 +177,8 @@ function chop(str, idx) {
 }
 
 function split_filename(n) {
-  const [bucketpart, ...filepartarray] = n.split("/")
-  const filepart = filepartarray.join("/")
+  const [bucketpart, ...filepartarray] = n.split('/')
+  const filepart = filepartarray.join('/')
   return { bucketpart, filepart }
 }
 
@@ -190,5 +193,5 @@ module.exports = {
   chunk,
   find_blocks,
   write_blocks,
-  continue_work
+  continue_work,
 }

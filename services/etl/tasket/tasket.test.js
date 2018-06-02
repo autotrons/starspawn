@@ -1,7 +1,7 @@
-const equal = require("assert").deepEqual
-const tasket = require("./tasket")
-const { try_until, sleep } = require("./tasket")
-const uuid = require("uuid")
+const equal = require('assert').deepEqual
+const tasket = require('./tasket')
+const { try_until, sleep } = require('./tasket')
+const uuid = require('uuid')
 const log = console.log
 
 describe('tasket.js', function() {
@@ -126,8 +126,8 @@ describe('tasket.js', function() {
       equal(tasket.path(next), ['bar'])
     })
   })
-  describe("try_until()", () => {
-    it("try it until it is true", async () => {
+  describe('try_until()', () => {
+    it('try it until it is true', async () => {
       let i = 0
       let checks = 0
       const handle = setInterval(() => {
@@ -143,14 +143,14 @@ describe('tasket.js', function() {
       equal(checks < 6, true)
     })
   })
-  describe("trace_wait()", () => {
-    it("wait for all taskets to arrive", async () => {
+  describe('trace_wait()', () => {
+    it('wait for all taskets to arrive', async () => {
       const id = uuid.v4()
-      const source = "worker1"
+      const source = 'worker1'
       const trace = true
       const test = false
-      const callback = "https://foo/bar"
-      const path = ["foo", "bar"]
+      const callback = 'https://foo/bar'
+      const path = ['foo', 'bar']
       const timeout = 42
       const data = { job: 12345 }
       const meta = { cache_hit: false }

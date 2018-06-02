@@ -224,5 +224,5 @@ module.exports = {
   complete_ok,
   complete_fail,
   try_until,
-  sleep
+  sleep,
 }

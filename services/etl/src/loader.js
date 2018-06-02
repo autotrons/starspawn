@@ -1,16 +1,16 @@
-const uuid = require("uuid")
+const uuid = require('uuid')
 const {
   success,
   failure,
   isFailure,
-  payload
-} = require("@pheasantplucker/failables")
+  payload,
+} = require('@pheasantplucker/failables')
 const {
   createDatastoreClient,
   makeEntityByName,
   writeEntity,
-  readEntities
-} = require("@pheasantplucker/gc-datastore")
+  readEntities,
+} = require('@pheasantplucker/gc-datastore')
 
 const loader = async (id, jobs) => {
   const datastore = createDatastoreClient()
@@ -32,7 +32,7 @@ const jobsToEntities = (id, jobs) => {
   const kind = 'jobs' //hmm, testing data?
   try {
     const entities = jobs.map(job => {
-      const tasketId = { tasketId: id}
+      const tasketId = { tasketId: id }
       const fullJob = Object.assign({}, job, tasketId)
       const r1 = makeEntityByName(kind, job.job_reference, fullJob)
       if (isFailure(r1)) return failure(r1)
@@ -41,7 +41,7 @@ const jobsToEntities = (id, jobs) => {
     return success(entities)
   } catch (e) {
     return failure(e.toString(), {
-      jobs: jobs
+      jobs: jobs,
     })
   }
 }

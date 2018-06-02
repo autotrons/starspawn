@@ -1,19 +1,19 @@
 const {
   assertSuccess,
   assertFailure,
-  payload
-} = require("@pheasantplucker/failables")
+  payload,
+} = require('@pheasantplucker/failables')
 const {
   createDatastoreClient,
   readEntities,
-  getDatastoreKeySymbol
-} = require("@pheasantplucker/gc-datastore")
+  getDatastoreKeySymbol,
+} = require('@pheasantplucker/gc-datastore')
 
 const { loader, getAttributes, jobsToEntities } = require('./loader')
 const equal = require('assert').deepEqual
-const uuid = require("uuid")
+const uuid = require('uuid')
 
-const fakeJobArray = require("../../../samples/fakejobsarray.json")
+const fakeJobArray = require('../../../samples/fakejobsarray.json')
 const datastore = createDatastoreClient()
 const dsKey = getDatastoreKeySymbol()
 
