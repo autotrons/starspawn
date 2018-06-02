@@ -1,9 +1,8 @@
-const equal = require('assert').deepEqual
-const { assertSuccess, payload, meta } = require('@pheasantplucker/failables')
+const { assertSuccess } = require('@pheasantplucker/failables')
 const { exists } = require('@pheasantplucker/gc-cloudstorage')
 const uuid = require('uuid')
 const { unzip } = require('./unzip')
-describe('unzip.js', function() {
+describe.only('unzip.js', function() {
   this.timeout(540 * 1000)
   describe('unzip()', () => {
     const source_file = 'full_feed/feed_100.xml.gz'
