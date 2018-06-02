@@ -1,12 +1,9 @@
 const assert = require('assert')
-const {
-  assertSuccess,
-  payload,
-  isFailure,
-} = require('@pheasantplucker/failables')
+const { assertSuccess, payload } = require('@pheasantplucker/failables')
 const { json2gsd, assemble, mergeMeta } = require('./json2gsd')
 const gsdTemplate = require('../../../samples/gsd.json')
 const uuid = require('uuid')
+
 const id = uuid.v4()
 
 const jobJson = {
@@ -26,7 +23,7 @@ const jobJson = {
   url:
     'https://click.appcast.io/track/oan6v1?cs=ae4&amp;exch=1a&amp;bid=TEz0xVerpiuhxLt0LS4mUA==',
   body:
-    'HealthTrust Workforce Solutions offers Registered Nurses (RNs) job opportunities in leading healthcare facilities across the country. The specialties we staff include ICU, Critical Care, Med/Surg, Telemetry, ER, PACU, Labor &amp; Delivery, and more!&lt;p&gt; With regional and satellite recruitment offices nationwide, we work around the clock to provide the best support for our Per Diem Nurses. We offer flexible scheduling, meaning you get first preference on where and when to work, first call / last cancelled and one of the most competitive compensation packages in the market.&lt;p&gt; If you are a registered nurse (RN) and are interested in learning more about our careers, please fill out the form below and one of our skilled recruiters will contact you shortly.&lt;p&gt; &lt;strong&gt;Please note that certain requirements must be met in order to be eligible to work per diem with HealthTrust Workforce Solutions.&lt;/strong&gt; &lt;li&gt;Graduate from an accredited nursing school   &lt;li&gt;Minimum of one year acute care experience in a hospital setting   &lt;li&gt;Current State Nursing License   &lt;li&gt;All appropriate certifications for the position to which you are applying',
+    'HealthTrust Workforce Solutions &lt;li&gt;Minimum of one year acute care experience in a hospital setting   &lt;li&gt;Current State Nursing License   &lt;li&gt;All appropriate certifications for the position to which you are applying',
   cpa: 5.831,
   cpc: 0.24,
 }
@@ -50,20 +47,21 @@ describe('json2gsd.js', function() {
     it('Should return success and compare result against GSD Template keys', async function() {
       const data = { jobJson, tmpl }
       const r1 = await json2gsd(id, data)
-      if (isFailure(r1)) return r1
-      const r1Result = payload(r1)
-      assert(compareGsdTemplate(r1Result.rendered) === true)
+      assertSuccess(r1)
+      const gsdPayload = payload(r1)
+      const gsd = gsdPayload.rendered
+      const checkKeysAgainstTemplate = compareGsdTemplate(gsd)
+      assert(checkKeysAgainstTemplate)
       assertSuccess(r1)
     })
   })
   describe('assemble()', function() {
     it('should add template and data', async function() {
-      const data = { jobJson, tmpl }
       const r1 = mergeMeta(jobJson)
-      if (isFailure) return r1
-      const r1Result = payload(r1)
-      const r2 = await assemble(r1, tmpl)
-      assert(typeof result === 'object')
+      assertSuccess(r1)
+      const meta = payload(r1)
+      const r2 = await assemble(tmpl, jobJson, meta)
+      assert(typeof r2 === 'object')
       assertSuccess(r2)
     })
   })
