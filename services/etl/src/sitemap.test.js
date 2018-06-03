@@ -1,17 +1,14 @@
 const { assertSuccess, payload } = require('@pheasantplucker/failables')
-const { exists, deleteFile } = require('@pheasantplucker/gc-cloudstorage')
+const { exists } = require('@pheasantplucker/gc-cloudstorage')
 const {
   sitemap,
   formatUrl,
-  getJobs,
   paginateJobs,
   buildSitemapIndex,
   SITEMAP_BUCKET,
   paginate,
 } = require('./sitemap')
 const equal = require('assert')
-const { example1 } = require('../../../samples/sitemap')
-const MEGABYTE = Math.pow(2, 20)
 const uuid = require('uuid')
 
 describe('sitemap.js', function() {
@@ -19,14 +16,13 @@ describe('sitemap.js', function() {
 
   describe(`sitemap()`, () => {
     const id = uuid.v4()
-    const count = 500
+    const count = 50
     const iteration = 0
     const sitemapPaths = []
 
-    it.only(`should build the sitemap`, async () => {
-      const data = { id, count, iteration, sitemapPaths}
+    it(`should build the sitemap`, async () => {
+      const data = { id, count, iteration, sitemapPaths }
       const result = await sitemap(id, data)
-      console.log(`payload(result):`, payload(result))
       assertSuccess(result)
     })
   })
@@ -73,9 +69,9 @@ describe('sitemap.js', function() {
     // })
   })
 
-  describe.skip(`paginate()`, () => {
+  describe(`paginate()`, () => {
     const id = uuid.v4()
-    const count = 500
+    const count = 50
     const iteration = 0
     let paths = []
     let p1
@@ -87,7 +83,12 @@ describe('sitemap.js', function() {
       equal(p1.count, count)
       equal(p1.id, id)
       equal(p1.sitemapPaths.length, p1.iteration)
-      const { id: id2, count: count2, iteration: iteration2, sitemapPaths: sitemapPaths2 } = payload(result)
+      const {
+        id: id2,
+        count: count2,
+        iteration: iteration2,
+        sitemapPaths: sitemapPaths2,
+      } = payload(result)
       const r2 = await paginate(id2, count2, iteration2, sitemapPaths2)
       assertSuccess(r2)
       paths = payload(r2).sitemapPaths

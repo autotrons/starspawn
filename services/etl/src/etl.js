@@ -13,7 +13,6 @@ const {
   meta,
 } = require('@pheasantplucker/failables')
 const fs = require('fs')
-const { setProject, createTopic } = require('@pheasantplucker/gc-pubsub')
 const rp = require('request-promise')
 
 const { download } = require('./download')
