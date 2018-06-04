@@ -9,11 +9,6 @@ const {
   success,
   payload,
 } = require('@pheasantplucker/failables')
-<<<<<<< HEAD
-const fs = require('fs')
-=======
-
->>>>>>> routing logic init and eslint on etl.js
 const rp = require('request-promise')
 
 const { download } = require('./download')
