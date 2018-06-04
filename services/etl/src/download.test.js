@@ -13,7 +13,7 @@ describe(`download.js`, function() {
         'https://storage.googleapis.com/starspawn_tests/feed.xml.gz'
       const target_file = `datafeeds/full_feed/${id}.xml.gz`
       const result = await download(id, {source_url, target_file})
-      assertSuccess(result)
+      assertSuccess(result, {target_file})
       const r2 = await exists(target_file)
       assertSuccess(r2, true)
     })

@@ -53,6 +53,7 @@ describe('chunk.js', function() {
       const start_text = '<job>'
       const end_text = '</job>'
       const streamed_to = end_byte_offset
+      const target_file = 'foo/bar'
       const result = continue_work(
         id,
         filename,
@@ -60,11 +61,13 @@ describe('chunk.js', function() {
         end_byte_offset,
         start_text,
         end_text,
-        streamed_to
+        streamed_to,
+        target_file
       )
       assertSuccess(result)
       const p = payload(result)
       equal(p.more_work, false)
+      equal(p.args.target_file, target_file)
     })
     it('if we need more work return the payload to the next call', async () => {
       const id = uuid.v4()
@@ -74,6 +77,7 @@ describe('chunk.js', function() {
       const start_text = '<job>'
       const end_text = '</job>'
       const streamed_to = end_byte_offset - 256
+      const target_file = 'foo/bar'
       const expected = {
         id,
         filename,
@@ -81,6 +85,7 @@ describe('chunk.js', function() {
         end_byte_offset,
         start_text,
         end_text,
+        target_file,
       }
       const result = continue_work(
         id,
@@ -89,7 +94,8 @@ describe('chunk.js', function() {
         end_byte_offset,
         start_text,
         end_text,
-        streamed_to
+        streamed_to,
+        target_file
       )
       assertSuccess(result)
       const p = payload(result)

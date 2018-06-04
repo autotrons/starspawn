@@ -5,7 +5,11 @@ const {
   extract_arguments,
   get_next_command,
 } = require('./etl.js')
-const { assertSuccess, success } = require('@pheasantplucker/failables')
+const {
+  assertSuccess,
+  success,
+  //  payload,
+} = require('@pheasantplucker/failables')
 const uuid = require('uuid')
 const rp = require('request-promise')
 
@@ -19,6 +23,19 @@ async function health_check(id) {
       'User-Agent': 'Request-Promise',
     },
     body: { message: { data: { id } } },
+    json: true, // Automatically stringifies the body to JSON
+  }
+  const result = await rp(options)
+  return result
+}
+
+async function appcast_pipeline(id) {
+  const options = {
+    uri: 'http://localhost:8080/appcast_pipeline_test',
+    method: 'GET',
+    headers: {
+      'User-Agent': 'Request-Promise',
+    },
     json: true, // Automatically stringifies the body to JSON
   }
   const result = await rp(options)
@@ -62,6 +79,47 @@ describe('etl.js', function() {
       assertSuccess(r1, { id: test_id, command: test_command, data: test_data })
     })
   })
+  describe('get_next_command()', () => {
+    it('download to unzip', () => {
+      const id = uuid.v4()
+      const prev_command = 'download'
+      const source_file = 'foobar/boobaz.xml'
+      const target_file = `datafeeds/unziped/${id}.xml`
+      const prev_failable = success({ target_file: source_file })
+      const result = get_next_command(id, prev_command, prev_failable)
+      assertSuccess(result, {
+        next_command: 'unzip',
+        next_args: { source_file, target_file },
+      })
+    })
+    it('unzip to chunk', () => {
+      const id = uuid.v4()
+      const prev_command = 'unzip'
+      const source_file = `datafeeds/unziped/${id}.xml`
+      const prev_failable = success({ target_file: source_file })
+
+      const filename = source_file
+      const start_text = '<job>'
+      const end_text = '</job>'
+      const start_byte_offset = 0
+      const end_byte_offset = 0
+      const next_command = 'chunk'
+      const next_args = {
+        filename,
+        start_text,
+        end_text,
+        start_byte_offset,
+        end_byte_offset,
+      }
+
+      const result = get_next_command(id, prev_command, prev_failable)
+      assertSuccess(result, {
+        next_command,
+        next_args,
+      })
+    })
+  })
+
   describe('/health_check', () => {
     it('should return the id in a payload', async () => {
       const id = uuid.v4()
@@ -69,41 +127,31 @@ describe('etl.js', function() {
       assertSuccess(result)
     })
   })
-  describe('get_next_command()', () => {
-    it('should return the id in a payload', () => {
-      const id = uuid.v4()
-      const prev_command = 'download'
-      const prev_failable = success()
-      const result = get_next_command(id, prev_command, prev_failable)
-      assertSuccess(result, { next_command: 'unzip', next_args: {} })
+  describe('/appcast_pipeline', () => {
+    it('start the appcast pipeline', async () => {
+      const r1 = await appcast_pipeline()
+      assertSuccess(r1)
+      //const id = payload(r1).id
+      // const r2 = await try_until(500, 2 * 1000, async () => {
+      //   try {
+      //     // see if the jobs are in the database
+      //   } catch (e) {
+      //     return false
+      //   }
+      // })
     })
   })
-
-  // describe.skip('/appcast_pipeline', () => {
-  //   it('should call all the functions in the pipeline', async () => {
-  //     const called_functions = []
-  //     const expected = [
-  //       'download',
-  //       'unzip',
-  //       'chunk',
-  //       'parse',
-  //       'json2gsd',
-  //       'loader',
-  //     ]
-  //     const r1 = await appcast_pipeline()
-  //     assertSuccess(r1)
-  //     const id = payload(r1).id
-  //     const r2 = await try_until(500, 2 * 1000, async () => {
-  //       try {
-  //         const file_data = await readFileAsync(`src/${is}.log`)
-  //         const hases = expected.map(t => file_data.includes(t))
-  //         if (all_true(hases)) return true
-  //         return false
-  //       } catch (e) {
-  //         return false
-  //       }
-  //     })
-  //     equal(called_functions, expected)
-  //   })
-  // })
 })
+
+// async function try_until(interval, timeout, condition) {
+//   let result = false
+//   let start_time = Date.now()
+//   while (result === false) {
+//     result = await condition()
+//     if (result) return true
+//     await sleep(interval)
+
+//     if (Date.now() - start_time > timeout) return false
+//   }
+//   return false
+// }

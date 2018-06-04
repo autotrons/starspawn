@@ -6,7 +6,7 @@ const {
 } = require('@pheasantplucker/failables')
 const {
   getReadStream,
-  createWriteStream,
+  createWriteStream
 } = require('@pheasantplucker/gc-cloudstorage')
 const zlib = require('zlib')
 const gzip = zlib.createUnzip()
@@ -20,15 +20,13 @@ async function unzip(id, data) {
 }
 
 async function do_file_things(id, data) {
-  const { source_bucket, source_file, target_bucket, target_file } = data
+  const { source_file, target_file } = data
 
-  const targetPath = `${target_bucket}/${target_file}`
-  const writeStreamResult = await createWriteStream(targetPath)
+  const writeStreamResult = await createWriteStream(target_file)
   if (isFailure(writeStreamResult)) return writeStreamResult
   const writeStream = payload(writeStreamResult)
 
-  const sourcePath = `${source_bucket}/${source_file}`
-  const createStreamResult = await getReadStream(sourcePath, {})
+  const createStreamResult = await getReadStream(source_file)
   if (isFailure(createStreamResult)) return createStreamResult
   const readStream = payload(createStreamResult)
 
@@ -36,8 +34,8 @@ async function do_file_things(id, data) {
     readStream
       .pipe(gzip)
       .pipe(writeStream)
-      .on('finish', () => res(success(targetPath)))
-      .on('error', err => rej(failure(err.toString())))
+      .on('finish', () => res(success({target_file})))
+      .on('error', err => res(failure(err.toString())))
   })
 }
 

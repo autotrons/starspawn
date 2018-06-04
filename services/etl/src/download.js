@@ -33,7 +33,7 @@ async function stream_to_storage(source_url, target_file) {
           resolve(failure(err.toString()))
         })
         .on('finish', function() {
-          resolve(success())
+          resolve(success({target_file}))
         })
     })
   })

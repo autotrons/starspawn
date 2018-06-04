@@ -20,18 +20,26 @@ async function chunk(id, data) {
       start_byte_offset,
       end_byte_offset,
     } = data
-
     console.info(
       `${id} ${NAME} starting on ${filename} at ${start_byte_offset} to ${end_byte_offset}`
     )
 
+    let stream_options = {}
+    if (!end_byte_offset) {
+      stream_options = {
+        start: start_byte_offset,
+      }
+    } else {
+      stream_options = {
+        start: start_byte_offset,
+        end: end_byte_offset,
+      }
+    }
+
     const { bucketpart, filepart } = split_filename(filename)
     const myBucket = storage.bucket(bucketpart)
     const readFileHandle = myBucket.file(filepart)
-    const rStream = readFileHandle.createReadStream({
-      start: start_byte_offset,
-      end: end_byte_offset,
-    })
+    const rStream = readFileHandle.createReadStream(stream_options)
 
     const r1 = await find_blocks(
       rStream,
@@ -47,11 +55,8 @@ async function chunk(id, data) {
     const cursor = payload(r1).cursor
     const streamed_to = payload(r1).streamed_to
     const sub_id = uuid.v4()
-    const r2 = await write_blocks(
-      id,
-      `datafeeds/chunks/${id}/${sub_id}.xml`,
-      blocks
-    )
+    const target_file = `datafeeds/chunks/${id}/${sub_id}.xml`
+    const r2 = await write_blocks(id, target_file, blocks)
     if (isFailure(r2)) {
       console.error(`${id} ${NAME} write_blocks ${payload(r2)}`)
       return r2
@@ -63,7 +68,8 @@ async function chunk(id, data) {
       end_byte_offset,
       start_text,
       end_text,
-      streamed_to
+      streamed_to,
+      target_file
     )
   } catch (err) {
     console.error(`${id} ${NAME} ${err.toString()}`)
@@ -154,12 +160,9 @@ function continue_work(
   end_byte_offset,
   start_text,
   end_text,
-  streamed_to
+  streamed_to,
+  target_file
 ) {
-  if (streamed_to >= end_byte_offset) {
-    console.info(`${id} ${NAME} end of section reached`)
-    return success({ more_work: false })
-  }
   const args = {
     id,
     filename,
@@ -167,6 +170,11 @@ function continue_work(
     end_byte_offset: end_byte_offset,
     start_text,
     end_text,
+    target_file,
+  }
+  if (streamed_to >= end_byte_offset) {
+    console.info(`${id} ${NAME} end of section reached`)
+    return success({ more_work: false, args })
   }
 
   return success({ more_work: true, args })

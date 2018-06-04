@@ -63,7 +63,10 @@ app.get('/:command', async (req, res) => {
       const source_url =
         'https://storage.googleapis.com/starspawn_tests/feed.xml.gz'
       const target_file = `datafeeds/full_feed/${id}.xml.gz`
-      const result = await appcast_download(id, source_url, target_file)
+      const result = await http_post(id, 'download', {
+        source_url,
+        target_file,
+      })
       return respond(res, id, command, result)
     }
     return respond(res, id, command, failure('no path'))
@@ -92,7 +95,7 @@ function extract_arguments(req) {
     const command = req.params.command
     const data = parse_req_data(req)
     let id = data.id
-    if (!id) id = uuidd.v4()
+    if (!id) id = uuid.v4()
     return success({ id, command, data })
   } catch (e) {
     return failure(e.toString())
@@ -101,6 +104,7 @@ function extract_arguments(req) {
 
 async function post_command_handler(id, command, args) {
   try {
+    console.info(`${id} ${command}`)
     const result = await FUNCTION_MAP[command](id, args)
     if (isFailure(result)) return result
     const r2 = get_next_command(id, command, result)
@@ -114,19 +118,38 @@ async function post_command_handler(id, command, args) {
 }
 
 function get_next_command(id, prev_command, prev_results) {
+  const p = payload(prev_results)
   if (prev_command === 'health_check') {
     return success({ next_command: 'end', next_args: {} })
   }
   if (prev_command === 'download') {
-    return success({ next_command: 'unzip', next_args: {} })
+    const source_file = p.target_file
+    const target_file = `datafeeds/unziped/${id}.xml`
+    const next_args = { source_file, target_file }
+    const next_command = 'unzip'
+    return success({ next_command, next_args })
   }
-  // // if(command === "download") download_unzip(reply)
-  // if (command === "unzip") unzip_chunk(reply)
-  // if (command === "chunk") {
-  //   if (payload(reply).more_work) chunk_chunk(reply)
-  //   else chunk_parse(reply)
-  // }
-  // deal with function failure
+  if (prev_command === 'unzip') {
+    const filename = p.target_file
+    const start_text = '<job>'
+    const end_text = '</job>'
+    const start_byte_offset = 0
+    const end_byte_offset = 0
+    const next_command = 'chunk'
+    const next_args = {
+      filename,
+      start_text,
+      end_text,
+      start_byte_offset,
+      end_byte_offset,
+    }
+    return success({ next_command, next_args })
+  }
+  if (prev_command === 'chunk') {
+    const next_command = 'end'
+    const next_args = {}
+    return success({ next_command, next_args })
+  }
   return failure('no next command')
 }
 
@@ -179,20 +202,6 @@ function respond(res, id, command, failable) {
   } else {
     res.status(500).send(failure('did not return a failable', m))
   }
-}
-
-async function appcast_download(id, source_url, target_file) {
-  const options = {
-    uri: 'http://localhost:8080/download',
-    method: 'POST',
-    headers: {
-      'User-Agent': 'Request-Promise',
-    },
-    body: { message: { data: { id, source_url, target_file, trace: true } } },
-    json: true, // Automatically stringifies the body to JSON
-  }
-  const result = await rp(options)
-  return result
 }
 
 // ==========================================================
