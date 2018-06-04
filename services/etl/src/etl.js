@@ -2,17 +2,18 @@ const express = require('express')
 const app = express()
 const uuid = require('uuid')
 const bodyParser = require('body-parser')
-const { map } = require('ramda')
 const {
-  anyFailed,
-  firstFailure,
   isFailure,
+  isSuccess,
   failure,
   success,
   payload,
-  meta,
 } = require('@pheasantplucker/failables')
+<<<<<<< HEAD
 const fs = require('fs')
+=======
+
+>>>>>>> routing logic init and eslint on etl.js
 const rp = require('request-promise')
 
 const { download } = require('./download')
@@ -30,7 +31,7 @@ const { health_check } = require('./health_check')
 // ==========================================================
 const log = console.log
 const PORT = process.env.PORT || 8080
-const PROJECT_ID = 'starspawn-201921'
+
 let SERVER
 app.use(bodyParser.json())
 
@@ -44,6 +45,14 @@ const FUNCTION_MAP = {
   json2gsd,
   unzip,
 }
+
+process.on('unhandledRejection', (reason, p) => {
+  log(`Unhandled Rejection ${reason.stack}`)
+})
+
+process.on('uncaughtException', err => {
+  log(err, 'UNHANDLED_EXCEPTION')
+})
 
 // ==========================================================
 //
@@ -60,30 +69,71 @@ app.get('/:command', async (req, res) => {
         'https://storage.googleapis.com/starspawn_tests/feed.xml.gz'
       const target_file = `datafeeds/full_feed/${id}.xml.gz`
       const result = await appcast_download(id, source_url, target_file)
-      return res_ok(res, id, command, {})
+      return respond(res, id, command, result)
     }
-    return res_err(res, id, command, 'no path')
+    return respond(res, id, command, failure('no path'))
   } catch (e) {
-    return res_err(res, id, command, e.toString())
+    return respond(res, id, command, e.toString())
   }
 })
 
 app.post('/:command', async function(req, res) {
-  // Pull out task data
+  try {
+    const r1 = extract_arguments(req)
+    if (isFailure(r1)) {
+      respond(res, undefined, req.params.command, r1)
+      return
+    }
+    const { id, command, data } = payload(r1)
+    const result = await post_command_handler(id, command, data)
+    respond(res, id, command, result)
+  } catch (e) {
+    respond(res, undefined, req.params.command, failure(e.toString()))
+  }
+})
+
+function extract_arguments(req) {
   try {
     const command = req.params.command
     const data = parse_req_data(req)
     let id = data.id
-    if (!id) id = uuid.v4()
-    const reply = await FUNCTION_MAP[command](id, data)
-    const next_command = get_next_command(id, command, reply)
-    http_post(next_command)
-
-    return respond(res, id, command, reply)
+    if (!id) id = uuidd.v4()
+    return success({ id, command, data })
   } catch (e) {
-    return respond(res, id, command, failure(e.toString()))
+    return failure(e.toString())
   }
-})
+}
+
+async function post_command_handler(id, command, args) {
+  try {
+    const result = await FUNCTION_MAP[command](id, args)
+    if (isFailure(result)) return result
+    const r2 = get_next_command(id, command, result)
+    if (isFailure(r2)) return r2
+    const { next_command, next_args } = payload(r2)
+    if (next_command !== 'end') http_post(id, next_command, next_args)
+    return result
+  } catch (e) {
+    return failure(e.toString())
+  }
+}
+
+function get_next_command(id, prev_command, prev_results) {
+  if (prev_command === 'health_check') {
+    return success({ next_command: 'end', next_args: {} })
+  }
+  if (prev_command === 'download') {
+    return success({ next_command: 'unzip', next_args: {} })
+  }
+  // // if(command === "download") download_unzip(reply)
+  // if (command === "unzip") unzip_chunk(reply)
+  // if (command === "chunk") {
+  //   if (payload(reply).more_work) chunk_chunk(reply)
+  //   else chunk_parse(reply)
+  // }
+  // deal with function failure
+  return failure('no next command')
+}
 
 // ==========================================================
 //
@@ -91,66 +141,49 @@ app.post('/:command', async function(req, res) {
 //
 // ==========================================================
 
-async function http_post(next_command) {
+async function http_post(id, command, args) {
+  const data = Object.assign({}, args, { id })
   try {
     const options = {
-      uri: 'http://localhost:8080/download',
+      uri: `http://localhost:8080/${command}`,
       method: 'POST',
       headers: {
         'User-Agent': 'Request-Promise',
       },
-      body: { message: { data: { id, source_url, target_file, trace: true } } },
+      body: { message: { data } },
       json: true, // Automatically stringifies the body to JSON
     }
     const result = await rp(options)
     return result
   } catch (e) {
+    console.error(`${id} ${command} http_post ${e.toString()}`)
     // TODO what do we do with failures in the ETL pipeline
     // should this try again? maybe?
   }
 }
 
-function get_next_command() {
-  // This function should determine what step is to be called next
-  if (command === 'download') generic_next(mapToUnZip(reply))
-  // if(command === "download") download_unzip(reply)
-  if (command === 'unzip') unzip_chunk(reply)
-  if (command === 'chunk') {
-    if (payload(reply).more_work) chunk_chunk(reply)
-    else chunk_parse(reply)
-  }
-  // deal with function failure
-}
-
-function do_trace(data, command) {
-  const { id } = data
-  if (data.trace) {
-    const t = tasket(id, command, data.trace)
-    const s = fs.createWriteStream(`../logs/${id}.log`, { flags: 'a' })
-    s.write(`${JSON.stringify(t)}\n`)
-  }
-}
-
 function parse_req_data(r) {
   try {
-    const decoded = new Buffer(r.body.message.data, 'base64').toString('ascii')
-    return JSON.parse(decoded)
+    // const decoded = new Buffer(r.body.message.data, "base64").toString("ascii")
+    // return JSON.parse(decoded)
+    return r.body.message.data
   } catch (e) {
     return r.body.message.data
   }
 }
 
 function respond(res, id, command, failable) {
-  if (isFailure(failable)) {
-    res.set('Content-Type', 'application/json')
-    const m = { id, wn: source }
-    res.status(500).send(failure(data, m))
-    return failure(data, m)
-  }
   res.set('Content-Type', 'application/json')
-  const m = { id, wn: source }
-  res.status(200).send(success(data, m))
-  return success(data, m)
+  const m = { id, command }
+  if (isFailure(failable)) {
+    const f = failure(payload(failable), m)
+    res.status(500).send(f)
+  } else if (isSuccess(failable)) {
+    const f = success(payload(failable), m)
+    res.status(200).send(f)
+  } else {
+    res.status(500).send(failure('did not return a failable', m))
+  }
 }
 
 async function appcast_download(id, source_url, target_file) {
@@ -161,36 +194,6 @@ async function appcast_download(id, source_url, target_file) {
       'User-Agent': 'Request-Promise',
     },
     body: { message: { data: { id, source_url, target_file, trace: true } } },
-    json: true, // Automatically stringifies the body to JSON
-  }
-  const result = await rp(options)
-  return result
-}
-
-async function download_unzip(download_result) {
-  const id = meta(download_result).id
-  const options = {
-    uri: 'http://localhost:8080/unzip',
-    method: 'POST',
-    headers: {
-      'User-Agent': 'Request-Promise',
-    },
-    body: { message: { data: { id, source_url, target_file, trace: true } } },
-    json: true, // Automatically stringifies the body to JSON
-  }
-  const result = await rp(options)
-  return result
-}
-
-async function call_next_task(tasket) {
-  const { id, target, next } = next(tasket)
-  const options = {
-    uri: `http://localhost:8080/${target}`,
-    method: 'POST',
-    headers: {
-      'User-Agent': 'Request-Promise',
-    },
-    body: { message: { data: next } },
     json: true, // Automatically stringifies the body to JSON
   }
   const result = await rp(options)
@@ -220,4 +223,7 @@ function stop() {
 module.exports = {
   start,
   stop,
+  post_command_handler,
+  extract_arguments,
+  get_next_command,
 }
