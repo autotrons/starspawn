@@ -165,9 +165,8 @@ function chunk_chunk_parse(id, p) {
     const c2 = make_next_command('parse', { filePath: p.args.target_file })
     return success([c1, c2])
   }
-  const next_command = 'end'
-  const next_args = {}
-  return success([{ next_command, next_args }])
+  const c1 = make_next_command('parse', { filePath: p.args.target_file })
+  return success([c1])
 }
 
 // ==========================================================

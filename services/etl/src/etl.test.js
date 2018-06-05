@@ -153,6 +153,33 @@ describe('etl.js', function() {
         },
       ])
     })
+    it('chunk to parse because chunk is complete', () => {
+      const id = uuid.v4()
+      const prev_command = 'chunk'
+      const filename = `datafeeds/unziped/${id}.xml`
+      const start_text = '<job>'
+      const end_text = '</job>'
+      const start_byte_offset = 100 * 1000
+      const end_byte_offset = 200 * 1000
+      const target_file = `datafeeds/chunks/${id}/1234-5678.xml`
+      const prev_args = {
+        filename,
+        start_text,
+        end_text,
+        start_byte_offset,
+        end_byte_offset,
+        target_file,
+      }
+      const prev_failable = success({ more_work: false, args: prev_args })
+
+      const result = get_next_command(id, prev_command, prev_failable)
+      assertSuccess(result, [
+        {
+          next_command: 'parse',
+          next_args: { filePath: target_file },
+        },
+      ])
+    })
   })
 
   describe('/health_check', () => {
