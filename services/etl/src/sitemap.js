@@ -10,40 +10,6 @@ const { createQueryObj, runQuery } = require('@pheasantplucker/gc-datastore')
 const { save } = require('@pheasantplucker/gc-cloudstorage')
 const { get } = require('@pheasantplucker/http')
 
-/*  OUTSTANDING QUESTIONS
-    - If we submit the sitemap xml directly to google, do we need to have the physical file? (cloudstorage? localfile?)
-      - I think so...
-    - How do we tell Google that we updated the sitemap?
-      - http.Get('http://www.google.com/ping?sitemap=http://www.blowjobs.com/sitemapIndex.xml')
-    - How do we manage individual jobs becoming invalid?
-    - How do sitemaps work?
-      - You tell google about your sitemap (or they go looking, but that will happen less frequently)
-      - Tells Google about frequency of return (as suggestion only, no guarantees)
-      -
-    - How do we get crawlers/indexing to occur?
-      - Source: https://support.google.com/webmasters/answer/6065812?hl=en
-        - How do we get Google to (re)crawl a website? ->https://www.google.com/webmasters/tools/googlebot-fetch
-      -  https://stackoverflow.com/questions/9466360/how-to-request-google-to-re-crawl-my-website
-    - How does google handle us telling them about new sitemaps every ~3 hours?
-      - Can we optimize this since we will be working with so many jobs?
-    - What is the difference between `robots.txt` and the sitemap???
-
-
-      RESOURCES:
-      - https://blog.kissmetrics.com/get-google-to-index/
-
-
-*/
-
-/*  POTENTIAL PROCESS
-  - CRON job triggers the download + sitemap updating? on an offset timeframe????
-  - sitemap queries all jobs from datastore (those that are written within <loader>)
-      - If you get them all, and recreate the sitemap each time, you don't have to worry about managing
-      the jobs that may have overlap in the sitemap, and those that include stale links
-  - iterate over them and build the sitemap and write it locally (replacing the old one)
-  - tell google we have a new sitemap
-*/
-
 const SERVICE_NAME = `SITEMAP`
 const SITEMAP_URL_COUNT = 100 // pass this in when calling sitemap()?
 const SITEMAP_BUCKET = 'starspawn_jobs/sitemaps'
