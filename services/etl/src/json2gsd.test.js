@@ -44,9 +44,8 @@ function compareGsdTemplate(input) {
 
 describe('json2gsd.js', function() {
   describe('json2gsd()', function() {
-    it('Should return success and compare result against GSD Template keys', async function() {
-      const data = { jobJson, tmpl }
-      const r1 = await json2gsd(id, data)
+    it('Should return success and compare result against GSD Template keys', function() {
+      const r1 = json2gsd(jobJson)
       assertSuccess(r1)
       const gsdPayload = payload(r1)
       const gsd = gsdPayload.rendered
@@ -56,11 +55,11 @@ describe('json2gsd.js', function() {
     })
   })
   describe('assemble()', function() {
-    it('should add template and data', async function() {
+    it('should add template and data', function() {
       const r1 = mergeMeta(jobJson)
       assertSuccess(r1)
       const meta = payload(r1)
-      const r2 = await assemble(tmpl, jobJson, meta)
+      const r2 = assemble(tmpl, jobJson)
       assert(typeof r2 === 'object')
       assertSuccess(r2)
     })

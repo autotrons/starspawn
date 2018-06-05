@@ -1,36 +1,28 @@
-const ObjectTemplate = require('json2json').ObjectTemplate
+const { ObjectTemplate } = require('json2json')
 const {
   failure,
   payload,
   success,
   isFailure,
 } = require('@pheasantplucker/failables')
+const APPCAST_TEMPLATE = require('../templates/appcast.json')
 
-async function json2gsd(id, data) {
-  let { jobJson, tmpl } = data
-  const r1 = mergeMeta(jobJson)
+function json2gsd(jobs) {
+  const r1 = mergeMeta(jobs)
   if (isFailure(r1)) return r1
-  const r1Result = payload(r1)
-  const r2 = await assemble(tmpl, r1Result)
-  if (isFailure(r2)) return r2
-  const r2Result = payload(r2)
-  return success(r2Result)
+  const merged = payload(r1)
+  return assemble(APPCAST_TEMPLATE, merged)
 }
 
-async function assemble(tmpl, data, meta) {
+function assemble(tmpl, data) {
   try {
     const r1 = new ObjectTemplate(tmpl).transform(data)
-    const r1Result = {
-      rendered: r1,
-      meta: meta,
-    }
-    return success(r1Result)
+    return success({ rendered: r1 })
   } catch (e) {
     return failure(e.toString(), {
       error: 'could not translate template/data',
       tmpl,
       data,
-      meta,
     })
   }
 }
