@@ -29,18 +29,18 @@ async function health_check(id) {
   return result
 }
 
-async function appcast_pipeline(id) {
-  const options = {
-    uri: 'http://localhost:8080/appcast_pipeline_test',
-    method: 'GET',
-    headers: {
-      'User-Agent': 'Request-Promise',
-    },
-    json: true, // Automatically stringifies the body to JSON
-  }
-  const result = await rp(options)
-  return result
-}
+// async function appcast_pipeline(id) {
+//   const options = {
+//     uri: 'http://localhost:8080/appcast_pipeline_test',
+//     method: 'GET',
+//     headers: {
+//       'User-Agent': 'Request-Promise',
+//     },
+//     json: true, // Automatically stringifies the body to JSON
+//   }
+//   const result = await rp(options)
+//   return result
+// }
 
 describe('etl.js', function() {
   this.timeout(540 * 1000)
@@ -87,10 +87,12 @@ describe('etl.js', function() {
       const target_file = `datafeeds/unziped/${id}.xml`
       const prev_failable = success({ target_file: source_file })
       const result = get_next_command(id, prev_command, prev_failable)
-      assertSuccess(result, {
-        next_command: 'unzip',
-        next_args: { source_file, target_file },
-      })
+      assertSuccess(result, [
+        {
+          next_command: 'unzip',
+          next_args: { source_file, target_file },
+        },
+      ])
     })
     it('unzip to chunk', () => {
       const id = uuid.v4()
@@ -113,10 +115,43 @@ describe('etl.js', function() {
       }
 
       const result = get_next_command(id, prev_command, prev_failable)
-      assertSuccess(result, {
-        next_command,
-        next_args,
-      })
+      assertSuccess(result, [
+        {
+          next_command,
+          next_args,
+        },
+      ])
+    })
+    it('chunk to chunk & parse', () => {
+      const id = uuid.v4()
+      const prev_command = 'chunk'
+      const filename = `datafeeds/unziped/${id}.xml`
+      const start_text = '<job>'
+      const end_text = '</job>'
+      const start_byte_offset = 100 * 1000
+      const end_byte_offset = 200 * 1000
+      const target_file = `datafeeds/chunks/${id}/1234-5678.xml`
+      const prev_args = {
+        filename,
+        start_text,
+        end_text,
+        start_byte_offset,
+        end_byte_offset,
+        target_file,
+      }
+      const prev_failable = success({ more_work: true, args: prev_args })
+
+      const result = get_next_command(id, prev_command, prev_failable)
+      assertSuccess(result, [
+        {
+          next_command: 'chunk',
+          next_args: prev_args,
+        },
+        {
+          next_command: 'parse',
+          next_args: { filePath: target_file },
+        },
+      ])
     })
   })
 
@@ -127,20 +162,20 @@ describe('etl.js', function() {
       assertSuccess(result)
     })
   })
-  describe('/appcast_pipeline', () => {
-    it('start the appcast pipeline', async () => {
-      const r1 = await appcast_pipeline()
-      assertSuccess(r1)
-      //const id = payload(r1).id
-      // const r2 = await try_until(500, 2 * 1000, async () => {
-      //   try {
-      //     // see if the jobs are in the database
-      //   } catch (e) {
-      //     return false
-      //   }
-      // })
-    })
-  })
+  // describe('/appcast_pipeline', () => {
+  //   it('start the appcast pipeline', async () => {
+  //     const r1 = await appcast_pipeline()
+  //     assertSuccess(r1)
+  //     //const id = payload(r1).id
+  //     // const r2 = await try_until(500, 2 * 1000, async () => {
+  //     //   try {
+  //     //     // see if the jobs are in the database
+  //     //   } catch (e) {
+  //     //     return false
+  //     //   }
+  //     // })
+  //   })
+  // })
 })
 
 // async function try_until(interval, timeout, condition) {

@@ -7,39 +7,37 @@ const {
 } = require('@pheasantplucker/failables')
 const miss = require('mississippi')
 const storage = require('@google-cloud/storage')()
+const {stats} = require('@pheasantplucker/gc-cloudstorage')
 
 const COMPLETE = 'complete'
 const NAME = 'chunk'
 
 async function chunk(id, data) {
   try {
-    const {
+    let {
       filename,
       start_text,
       end_text,
       start_byte_offset,
       end_byte_offset,
     } = data
+
+    if (end_byte_offset===undefined || end_byte_offset === null || end_byte_offset === 0) {
+      const stat_result = await stats(filename)
+      end_byte_offset = payload(stat_result).size
+    }
+
     console.info(
       `${id} ${NAME} starting on ${filename} at ${start_byte_offset} to ${end_byte_offset}`
     )
 
-    let stream_options = {}
-    if (!end_byte_offset) {
-      stream_options = {
-        start: start_byte_offset,
-      }
-    } else {
-      stream_options = {
-        start: start_byte_offset,
-        end: end_byte_offset,
-      }
-    }
-
     const { bucketpart, filepart } = split_filename(filename)
     const myBucket = storage.bucket(bucketpart)
     const readFileHandle = myBucket.file(filepart)
-    const rStream = readFileHandle.createReadStream(stream_options)
+    const rStream = readFileHandle.createReadStream({
+      start: start_byte_offset,
+      end: end_byte_offset,
+    })
 
     const r1 = await find_blocks(
       rStream,
@@ -51,6 +49,7 @@ async function chunk(id, data) {
       console.error(`${id} ${NAME} find_blocks ${payload(r1)}`)
       return r1
     }
+    rStream.destroy()
     const blocks = payload(r1).blocks
     const cursor = payload(r1).cursor
     const streamed_to = payload(r1).streamed_to

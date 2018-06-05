@@ -116,6 +116,25 @@ describe('chunk.js', function() {
       }
       const result = await chunk(id, data)
       assertSuccess(result)
+      const p = payload(result)
+      const args = p.args
+      const more_work = p.more_work
+      equal(more_work, true)
+      equal(args.id, data.id)
+      equal(args.start_byte_offset > 1e6, true)
+    })
+    it('no end_byte_offset should read the whole file', async () => {
+      const id = uuid.v4()
+      const data = {
+        id,
+        filename: 'datafeeds/full_feed/feed_500k.xml',
+        start_byte_offset: 0,
+        end_byte_offset: 0,
+        start_text: '<job>',
+        end_text: '</job>',
+      }
+      const result = await chunk(id, data)
+      assertSuccess(result)
       const p = payload(result).args
       equal(p.id, data.id)
       equal(p.start_byte_offset > 1e6, true)

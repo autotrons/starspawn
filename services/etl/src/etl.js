@@ -109,8 +109,11 @@ async function post_command_handler(id, command, args) {
     if (isFailure(result)) return result
     const r2 = get_next_command(id, command, result)
     if (isFailure(r2)) return r2
-    const { next_command, next_args } = payload(r2)
-    if (next_command !== 'end') http_post(id, next_command, next_args)
+    const next_commands = payload(r2)
+    for (let i = 0; i < next_commands.length; i++) {
+      const { next_command, next_args } = next_commands[i]
+      if (next_command !== 'end') http_post(id, next_command, next_args)
+    }
     return result
   } catch (e) {
     return failure(e.toString())
@@ -127,7 +130,7 @@ function get_next_command(id, prev_command, prev_results) {
     const target_file = `datafeeds/unziped/${id}.xml`
     const next_args = { source_file, target_file }
     const next_command = 'unzip'
-    return success({ next_command, next_args })
+    return success([{ next_command, next_args }])
   }
   if (prev_command === 'unzip') {
     const filename = p.target_file
@@ -143,14 +146,23 @@ function get_next_command(id, prev_command, prev_results) {
       start_byte_offset,
       end_byte_offset,
     }
-    return success({ next_command, next_args })
+    return success([{ next_command, next_args }])
   }
   if (prev_command === 'chunk') {
+    if (p.more_work) {
+      const c1 = make_next_command('chunk', p.args)
+      const c2 = make_next_command('parse', { filePath: p.args.target_file })
+      return success([c1, c2])
+    }
     const next_command = 'end'
     const next_args = {}
-    return success({ next_command, next_args })
+    return success([{ next_command, next_args }])
   }
-  return failure('no next command')
+  return failure(`${id} command ${prev_command} no next command found`)
+}
+
+function make_next_command(next_command, next_args) {
+  return { next_command, next_args }
 }
 
 // ==========================================================
