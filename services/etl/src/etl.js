@@ -123,46 +123,51 @@ async function post_command_handler(id, command, args) {
 function get_next_command(id, prev_command, prev_results) {
   const p = payload(prev_results)
   if (prev_command === 'health_check') {
-    return success({ next_command: 'end', next_args: {} })
+    const c1 = make_next_command('end', {})
+    return success([c1])
   }
   if (prev_command === 'download') {
-    const source_file = p.target_file
-    const target_file = `datafeeds/unziped/${id}.xml`
-    const next_args = { source_file, target_file }
-    const next_command = 'unzip'
-    return success([{ next_command, next_args }])
+    return download_unzip(id, p)
   }
   if (prev_command === 'unzip') {
-    const filename = p.target_file
-    const start_text = '<job>'
-    const end_text = '</job>'
-    const start_byte_offset = 0
-    const end_byte_offset = 0
-    const next_command = 'chunk'
-    const next_args = {
-      filename,
-      start_text,
-      end_text,
-      start_byte_offset,
-      end_byte_offset,
-    }
-    return success([{ next_command, next_args }])
+    return unzip_chunk(id, p)
   }
   if (prev_command === 'chunk') {
-    if (p.more_work) {
-      const c1 = make_next_command('chunk', p.args)
-      const c2 = make_next_command('parse', { filePath: p.args.target_file })
-      return success([c1, c2])
-    }
-    const next_command = 'end'
-    const next_args = {}
-    return success([{ next_command, next_args }])
+    return chunk_chunk_parse(id, p)
   }
   return failure(`${id} command ${prev_command} no next command found`)
 }
 
-function make_next_command(next_command, next_args) {
-  return { next_command, next_args }
+function download_unzip(id, p) {
+  const next_args = {
+    source_file: p.target_file,
+    target_file: `datafeeds/unziped/${id}.xml`,
+  }
+  const c1 = make_next_command('unzip', next_args)
+  return success([c1])
+}
+
+function unzip_chunk(id, p) {
+  const next_args = {
+    filename: p.target_file,
+    start_text: '<job>',
+    end_text: '</job>',
+    start_byte_offset: 0,
+    end_byte_offset: 0,
+  }
+  const c1 = make_next_command('chunk', next_args)
+  return success([c1])
+}
+
+function chunk_chunk_parse(id, p) {
+  if (p.more_work) {
+    const c1 = make_next_command('chunk', p.args)
+    const c2 = make_next_command('parse', { filePath: p.args.target_file })
+    return success([c1, c2])
+  }
+  const next_command = 'end'
+  const next_args = {}
+  return success([{ next_command, next_args }])
 }
 
 // ==========================================================
@@ -190,6 +195,10 @@ async function http_post(id, command, args) {
     // TODO what do we do with failures in the ETL pipeline
     // should this try again? maybe?
   }
+}
+
+function make_next_command(next_command, next_args) {
+  return { next_command, next_args }
 }
 
 function parse_req_data(r) {
