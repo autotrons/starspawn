@@ -5,7 +5,7 @@ const { unzip } = require('./unzip')
 describe('unzip.js', function() {
   this.timeout(540 * 1000)
   describe('unzip()', () => {
-    const source_file = 'datafeeds/full_feed/feed_100.xml.gz'
+    const source_file = 'starspawn_tests/feed_100.xml.gz'
     const target_file = `datafeeds/unziped/${uuid.v4()}.xml`
 
     it('split up a file', async () => {
@@ -14,7 +14,7 @@ describe('unzip.js', function() {
         source_file,
         target_file,
       })
-      assertSuccess(result, {target_file})
+      assertSuccess(result, { target_file })
     })
 
     it(`should have streamed file`, async () => {

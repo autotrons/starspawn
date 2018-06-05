@@ -7,7 +7,7 @@ const {
 } = require('@pheasantplucker/failables')
 const miss = require('mississippi')
 const storage = require('@google-cloud/storage')()
-const {stats} = require('@pheasantplucker/gc-cloudstorage')
+const { stats } = require('@pheasantplucker/gc-cloudstorage')
 
 const COMPLETE = 'complete'
 const NAME = 'chunk'
@@ -22,7 +22,11 @@ async function chunk(id, data) {
       end_byte_offset,
     } = data
 
-    if (end_byte_offset===undefined || end_byte_offset === null || end_byte_offset === 0) {
+    if (
+      end_byte_offset === undefined ||
+      end_byte_offset === null ||
+      end_byte_offset === 0
+    ) {
       const stat_result = await stats(filename)
       end_byte_offset = payload(stat_result).size
     }

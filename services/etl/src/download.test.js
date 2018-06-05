@@ -1,8 +1,7 @@
-const equal = require('assert').deepEqual
-const { assertSuccess, payload, meta } = require('@pheasantplucker/failables')
+const { assertSuccess } = require('@pheasantplucker/failables')
 const { exists } = require('@pheasantplucker/gc-cloudstorage')
 const uuid = require('uuid')
-const {download} = require('./download')
+const { download } = require('./download')
 
 describe(`download.js`, function() {
   this.timeout(10 * 1000)
@@ -12,8 +11,8 @@ describe(`download.js`, function() {
       const source_url =
         'https://storage.googleapis.com/starspawn_tests/feed.xml.gz'
       const target_file = `datafeeds/full_feed/${id}.xml.gz`
-      const result = await download(id, {source_url, target_file})
-      assertSuccess(result, {target_file})
+      const result = await download(id, { source_url, target_file })
+      assertSuccess(result, { target_file })
       const r2 = await exists(target_file)
       assertSuccess(r2, true)
     })

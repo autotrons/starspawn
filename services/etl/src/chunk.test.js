@@ -108,7 +108,7 @@ describe('chunk.js', function() {
       const id = uuid.v4()
       const data = {
         id,
-        filename: 'datafeeds/full_feed/feed_500k.xml',
+        filename: 'starspawn_tests/feed_500k.xml',
         start_byte_offset: 0,
         end_byte_offset: 80 * Math.pow(2, 20),
         start_text: '<job>',
@@ -127,7 +127,7 @@ describe('chunk.js', function() {
       const id = uuid.v4()
       const data = {
         id,
-        filename: 'datafeeds/full_feed/feed_500k.xml',
+        filename: 'starspawn_tests/feed_500k.xml',
         start_byte_offset: 0,
         end_byte_offset: 0,
         start_text: '<job>',

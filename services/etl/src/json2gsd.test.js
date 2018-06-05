@@ -2,9 +2,6 @@ const assert = require('assert')
 const { assertSuccess, payload } = require('@pheasantplucker/failables')
 const { json2gsd, assemble, mergeMeta } = require('./json2gsd')
 const gsdTemplate = require('../../../samples/gsd.json')
-const uuid = require('uuid')
-
-const id = uuid.v4()
 
 const jobJson = {
   location: 'Fort Lauderdale, FL, United States',
@@ -58,7 +55,6 @@ describe('json2gsd.js', function() {
     it('should add template and data', function() {
       const r1 = mergeMeta(jobJson)
       assertSuccess(r1)
-      const meta = payload(r1)
       const r2 = assemble(tmpl, jobJson)
       assert(typeof r2 === 'object')
       assertSuccess(r2)

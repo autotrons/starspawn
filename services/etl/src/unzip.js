@@ -6,7 +6,7 @@ const {
 } = require('@pheasantplucker/failables')
 const {
   getReadStream,
-  createWriteStream
+  createWriteStream,
 } = require('@pheasantplucker/gc-cloudstorage')
 const zlib = require('zlib')
 const gzip = zlib.createUnzip()
@@ -34,7 +34,7 @@ async function do_file_things(id, data) {
     readStream
       .pipe(gzip)
       .pipe(writeStream)
-      .on('finish', () => res(success({target_file})))
+      .on('finish', () => res(success({ target_file })))
       .on('error', err => res(failure(err.toString())))
   })
 }
