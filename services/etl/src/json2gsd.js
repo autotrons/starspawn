@@ -28,7 +28,7 @@ function assemble(tmpl, data) {
 }
 
 function mergeMeta(jobJson) {
-  let types = {
+  const types = {
     identifierType: 'PropertyValue',
     hiringOrganizationType: 'Organization',
     postalAddressType: 'PostalAddress',
@@ -37,18 +37,9 @@ function mergeMeta(jobJson) {
     jobPostingContext: 'http://schema.org',
     jobPostingType: 'jobPosting',
   }
-  try {
-    Object.keys(types).forEach(key => {
-      jobJson[key] = types[key]
-    })
-    return success(jobJson)
-  } catch (e) {
-    return failure(e.toString(), {
-      error: "Couldn't merge objects",
-      jobJson,
-      types,
-    })
-  }
+
+  const jobsWithTypes = Object.assign({}, jobJson, types)
+  return success(jobsWithTypes)
 }
 
 module.exports = {

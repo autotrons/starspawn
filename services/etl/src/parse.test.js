@@ -7,6 +7,7 @@ const { parse, parseXmlToJson } = require('./parse')
 const equal = require('assert').deepEqual
 const path = require('path')
 const uuid = require('uuid')
+const assert = require('assert')
 
 const {
   createBucket,
@@ -54,9 +55,21 @@ describe('parse.js', function() {
     _testsetup()
   })
 
-  it('should convert the XML from the file into JSON and send it to load', async () => {
-    const result = await parse(thisId, testFileCloud)
-    assertSuccess(result)
+  describe(`parse()`, () => {
+    it('should convert the XML from the file into JSON and send it to load', async () => {
+      const result = await parse(thisId, testFileCloud)
+      assertSuccess(result)
+      const parseRet = payload(result)
+      assert(parseRet.jsonJobs)
+      assert(parseRet.jsonJobs.root.job[0].city)
+    })
+
+    it(`should return google structured data`, async () => {
+      const result = await parse(thisId, testFileCloud)
+      assertSuccess(result)
+      const parseRet = payload(result)
+      assert(parseRet.jsonJobs.root.job[0].gsd)
+    })
   })
 
   describe(`parseXmlToJson()`, () => {
