@@ -3,3 +3,7 @@ cron:
   url: /appcast_pipeline_test
   schedule: every 5 minutes
   target: etl
+- description: unzip test
+  url: /unzip_test
+  schedule: every 5 minutes
+  target: etl

@@ -59,12 +59,23 @@ app.get('/:command', async (req, res) => {
   let command = 'none'
   try {
     command = req.params.command
+
     if (command === 'appcast_pipeline_test') {
       const source_url =
         'https://storage.googleapis.com/starspawn_tests/feed.xml.gz'
       const target_file = `datafeeds/full_feed/${id}.xml.gz`
       const result = await http_post(id, 'download', {
         source_url,
+        target_file,
+      })
+      return respond(res, id, command, result)
+    }
+
+    if (command === 'unzip_test') {
+      const source_file = 'starspawn_tests/feed_100.xml.gz'
+      const target_file = `datafeeds/unzip/${id}.xml.gz`
+      const result = await http_post(id, 'unzip', {
+        source_file,
         target_file,
       })
       return respond(res, id, command, result)
