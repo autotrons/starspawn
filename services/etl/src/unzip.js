@@ -29,11 +29,13 @@ async function do_file_things(id, data) {
   const createStreamResult = await getReadStream(source_file)
   if (isFailure(createStreamResult)) return createStreamResult
   const readStream = payload(createStreamResult)
+  return unzip_it(readStream, writeStream, gzip, target_file)
+}
 
-  return new Promise((res, rej) => {
-    readStream
-      .pipe(gzip)
-      .pipe(writeStream)
+function unzip_it(rs, ws, gzip, target_file) {
+  return new Promise(res => {
+    rs.pipe(gzip)
+      .pipe(ws)
       .on('finish', () => res(success({ target_file })))
       .on('error', err => res(failure(err.toString())))
   })
