@@ -48,7 +48,7 @@ const _testsetup = async () => {
 
 const thisId = uuid.v4()
 
-describe.only('parse.js', function() {
+describe('parse.js', function() {
   this.timeout(540 * 1000)
 
   before(() => {
