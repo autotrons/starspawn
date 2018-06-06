@@ -48,7 +48,7 @@ const _testsetup = async () => {
 
 const thisId = uuid.v4()
 
-describe('parse.js', function() {
+describe.only('parse.js', function() {
   this.timeout(540 * 1000)
 
   before(() => {
@@ -56,7 +56,7 @@ describe('parse.js', function() {
   })
 
   describe(`parse()`, () => {
-    it('should convert the XML from the file into JSON and send it to load', async () => {
+    it('should convert the XML from the file into JSON', async () => {
       const result = await parse(thisId, testFileCloud)
       assertSuccess(result)
       const parseRet = payload(result)
@@ -70,6 +70,8 @@ describe('parse.js', function() {
       const parseRet = payload(result)
       assert(parseRet.jsonJobs.root.job[0].gsd)
     })
+
+    it(`should write a file`, async () => {})
   })
 
   describe(`parseXmlToJson()`, () => {
