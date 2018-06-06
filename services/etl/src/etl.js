@@ -135,6 +135,9 @@ function get_next_command(id, prev_command, prev_results) {
   if (prev_command === 'chunk') {
     return chunk_chunk_parse(id, p)
   }
+  if (prev_command === 'parse') {
+    return parse_loader(id, p)
+  }
   return failure(`${id} command ${prev_command} no next command found`)
 }
 
@@ -166,6 +169,14 @@ function chunk_chunk_parse(id, p) {
     return success([c1, c2])
   }
   const c1 = make_next_command('parse', { filePath: p.args.target_file })
+  return success([c1])
+}
+
+function parse_loader(id, p) {
+  const next_args = {
+    filename: p.target_file,
+  }
+  const c1 = make_next_command('loader', next_args)
   return success([c1])
 }
 

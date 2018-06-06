@@ -37,11 +37,11 @@ async function do_file_things(id, data) {
   const jsonJobs = { root: { job: gsd } }
 
   const subid = uuid.v4()
-  const filename = `${target_bucket}${id}/${subid}.json`
-  const r5 = await save(filename, JSON.stringify(jsonJobs))
+  const target_file = `${target_bucket}/${id}/${subid}.json`
+  const r5 = await save(target_file, JSON.stringify(jsonJobs))
   if (isFailure(r5)) return r5
 
-  return success({ id, jsonJobs, filename })
+  return success({ id, jsonJobs, target_file })
 }
 
 async function addGoogleStructuredData(json) {

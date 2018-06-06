@@ -9,13 +9,28 @@ const {
   makeEntityByName,
   writeEntity,
 } = require('@pheasantplucker/gc-datastore')
+const uuid = require('uuid')
+const { getFile } = require('@pheasantplucker/gc-cloudstorage')
 
-const loader = async (id, jobs) => {
-  createDatastoreClient()
+async function loader(id, data) {
+  try {
+    return do_file_things(id, data)
+  } catch (e) {
+    return failure(e.toString())
+  }
+}
+
+async function do_file_things(id, data) {
+  const { filename } = data
+
+  const r2 = await getFile(filename)
+  if (isFailure(r2)) return r2
+  const jobs = JSON.parse(payload(r2))
+  const jobArray = jobs.root.job
 
   // all jobs need extra field IS_TEST = true/false
 
-  const jobEntitiesResult = await jobsToEntities(id, jobs)
+  const jobEntitiesResult = await jobsToEntities(id, jobArray)
   if (isFailure(jobEntitiesResult)) return failure(jobEntitiesResult)
 
   const jobEntities = payload(jobEntitiesResult)

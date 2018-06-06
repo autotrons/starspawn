@@ -12,7 +12,8 @@ const { loader, jobsToEntities } = require('./loader')
 const equal = require('assert').deepEqual
 const uuid = require('uuid')
 
-const fakeJobArray = require('../../../samples/fakejobsarray.json')
+const filename = `starspawn_tests/parsed_output.json`
+const fakeJobArray = require(`../../../samples/fakejobsarray.json`)
 
 const thisId = uuid.v4()
 
@@ -21,7 +22,7 @@ createDatastoreClient()
 describe('loader.js', function() {
   this.timeout(540 * 1000)
   it('should load a list of jobs into Datastore', async () => {
-    const result = await loader(thisId, fakeJobArray)
+    const result = await loader(thisId, {filename})
     assertSuccess(result)
     const writtenJobs = payload(result)
     const job1Key = writtenJobs.jobEntities[0].key
@@ -30,13 +31,7 @@ describe('loader.js', function() {
     assertSuccess(readCheckResult)
 
     const readData = payload(readCheckResult)
-    equal(readData[job1UniqueId].title, fakeJobArray[0].title)
-  })
-
-  it(`should fail if not given body.message`, async () => {
-    const badData = {}
-    const result = await loader(thisId, badData)
-    assertFailure(result)
+    equal(readData[job1UniqueId].title, 'Per Diem TRAVEL ICU Nurse (RN)')
   })
 })
 
