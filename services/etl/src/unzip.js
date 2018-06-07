@@ -9,7 +9,6 @@ const {
   createWriteStream,
 } = require('@pheasantplucker/gc-cloudstorage')
 const zlib = require('zlib')
-const gzip = zlib.createUnzip()
 
 async function unzip(id, data) {
   try {
@@ -21,7 +20,7 @@ async function unzip(id, data) {
 
 async function do_file_things(id, data) {
   const { source_file, target_file } = data
-  console.info(`${id} unzip ${target_file}`)
+  console.info(`${id} starting unzip ${target_file}`)
 
   const writeStreamResult = await createWriteStream(target_file)
   if (isFailure(writeStreamResult)) return writeStreamResult
@@ -30,13 +29,13 @@ async function do_file_things(id, data) {
   const createStreamResult = await getReadStream(source_file)
   if (isFailure(createStreamResult)) return createStreamResult
   const readStream = payload(createStreamResult)
-  return unzip_it(id, readStream, writeStream, gzip, target_file)
+  return unzip_it(id, readStream, writeStream, target_file)
 }
 
-function unzip_it(id, rs, ws, gzip, target_file) {
+function unzip_it(id, rs, ws, target_file) {
+  const gzip = zlib.createUnzip()
   return new Promise(res => {
-    rs
-      .pipe(gzip)
+    rs.pipe(gzip)
       .pipe(ws)
       .on('finish', () => {
         console.info(`${id} wrote ${target_file}`)
