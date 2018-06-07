@@ -26,20 +26,20 @@ async function do_file_things(id, data) {
 
   createDatastoreClient(GC_PROJECT_ID)
 
-  const r2 = await getFile(filename)
-  if (isFailure(r2)) return r2
-  const jobs = JSON.parse(payload(r2))
+  const r1 = await getFile(filename)
+  if (isFailure(r1)) return r1
+  const jobs = JSON.parse(payload(r1))
   const jobArray = jobs.root.job
 
   // all jobs need extra field IS_TEST = true/false
 
   const jobEntitiesResult = await jobsToEntities(id, jobArray)
-  if (isFailure(jobEntitiesResult)) return failure(jobEntitiesResult)
+  if (isFailure(jobEntitiesResult)) return jobEntitiesResult
 
   const jobEntities = payload(jobEntitiesResult)
 
   const writeResult = await writeEntity(jobEntities)
-  if (isFailure(writeResult)) return failure(writeResult)
+  if (isFailure(writeResult)) return writeResult
   const writePayload = payload(writeResult)
 
   return success({ jobEntities, writePayload })
