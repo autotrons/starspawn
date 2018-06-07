@@ -7,8 +7,11 @@ const {
 const {
   makeEntityByName,
   writeEntity,
+  createDatastoreClient,
 } = require('@pheasantplucker/gc-datastore')
 const { getFile } = require('@pheasantplucker/gc-cloudstorage')
+
+const { GC_PROJECT_ID } = process.env
 
 async function loader(id, data) {
   try {
@@ -20,6 +23,8 @@ async function loader(id, data) {
 
 async function do_file_things(id, data) {
   const { filename } = data
+
+  createDatastoreClient(GC_PROJECT_ID)
 
   const r2 = await getFile(filename)
   if (isFailure(r2)) return r2

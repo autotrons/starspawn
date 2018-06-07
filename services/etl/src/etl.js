@@ -115,7 +115,7 @@ function extract_arguments(req) {
 
 async function post_command_handler(id, command, args) {
   try {
-    console.info(`${id} ${command} ${args}`)
+    console.info(`${id} ${command} ${JSON.stringify(args)}`)
     const result = await FUNCTION_MAP[command](id, args)
     if (isFailure(result)) return result
     const r2 = get_next_command(id, command, result)

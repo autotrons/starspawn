@@ -9,7 +9,7 @@ const uuid = require('uuid')
 const { json2gsd } = require('./json2gsd.js')
 const parser = new xml2js.Parser({ explicitArray: false, trim: true })
 const { getFile, save } = require('@pheasantplucker/gc-cloudstorage')
-const target_bucket = `datafeeds/parsed/`
+const target_bucket = `datafeeds/parsed`
 
 async function parse(id, data) {
   try {
