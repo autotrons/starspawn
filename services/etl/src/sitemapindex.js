@@ -1,4 +1,4 @@
-const { map } = require('ramda')
+const { map, curry } = require('ramda')
 const { save } = require('@pheasantplucker/gc-cloudstorage')
 // const { get } = require('@pheasantplucker/http')
 const {
@@ -14,7 +14,7 @@ const BASE_URL = `https://joblog.app`
 async function sitemapindex(id, data) {
   const { sitemapPaths } = data
   const bucket = whichBucket(data)
-  const r1 = await buildSitemapIndex(sitemapPaths, bucket)
+  const r1 = await buildSitemapIndex(bucket, sitemapPaths)
   if (isFailure(r1)) return failure(payload(r1), id)
   // const indexPath = payload(r1)
   // const r2 = await tellGoogle() // does not take params, just tells them where it is at a fixed place
@@ -23,8 +23,9 @@ async function sitemapindex(id, data) {
   return r1
 }
 
-async function buildSitemapIndex(sitemaps, target_bucket) {
-  const sitemapBlocks = map(buildSitemapBlock, sitemaps)
+async function buildSitemapIndex(target_bucket, sitemaps) {
+  const buildBlocks = curry(buildSitemapBlock)
+  const sitemapBlocks = map(buildBlocks(target_bucket), sitemaps)
   const indexFile = `
     <?xml version="1.0" encoding="UTF-8"?>
     <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -37,8 +38,8 @@ async function buildSitemapIndex(sitemaps, target_bucket) {
   return success(indexFilePath)
 }
 
-function buildSitemapBlock(path) {
-  const url = formatUrl(`${BASE_URL}/${path}`)
+function buildSitemapBlock(bucket, fileName) {
+  const url = formatUrl(`${BASE_URL}/${bucket}/sitemaps/${fileName}`)
   return `
     <sitemap>
       <loc>${url}</loc>

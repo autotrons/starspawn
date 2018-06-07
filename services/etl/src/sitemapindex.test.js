@@ -53,7 +53,7 @@ describe(`sitemapindex.js`, () => {
     let indexFilePath
 
     it(`should build the sitemap index file`, async () => {
-      const result = await buildSitemapIndex(sitemaps, SITEMAP_BUCKET)
+      const result = await buildSitemapIndex(SITEMAP_BUCKET, sitemaps)
       assertSuccess(result, `${SITEMAP_BUCKET}/sitemapindex.xml`)
       indexFilePath = payload(result)
     })
