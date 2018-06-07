@@ -62,7 +62,7 @@ app.get('/:command', async (req, res) => {
 
     if (command === 'appcast_loader_cron') {
       const source_url =
-        'https://storage.googleapis.com/starspawn_tests/feed.xml.gz'
+        'https://exchangefeeds.s3.amazonaws.com/9d2dcb702d7d6b801f34227c04c8bb23/feed.xml.gz'
       const target_file = `datafeeds/full_feed/${id}.xml.gz`
       const result = await http_post(id, 'download', {
         source_url,
