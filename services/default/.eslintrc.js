@@ -1,6 +1,7 @@
 module.exports = {
   env: {
     es6: true,
+    mocha: true,
   },
   parserOptions: {
     ecmaVersion: 8,
@@ -42,5 +43,6 @@ module.exports = {
     test: true,
     beforeAll: true,
     afterAll: true,
+    __dirname: false,
   },
 }
