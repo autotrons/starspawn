@@ -47,11 +47,11 @@ function buildSitemapBlock(path) {
   `
 }
 
-async function tellGoogle() {
-  const fullUrl = `${BASE_URL}/${sitemapindex.xml}`
-  const encodedUrl = encodeURIComponent(fullUrl)
-  return get(`http://www.google.com/ping?sitemap=${encodedUrl}`)
-}
+// async function tellGoogle() {
+//   const fullUrl = `${BASE_URL}/${sitemapindex.xml}`
+//   const encodedUrl = encodeURIComponent(fullUrl)
+//   return get(`http://www.google.com/ping?sitemap=${encodedUrl}`)
+// }
 
 function whichBucket(data) {
   if (data.target_bucket) return data.target_bucket
