@@ -11,7 +11,7 @@ const {
 const equal = require('assert')
 const uuid = require('uuid')
 
-describe('sitemap.js', function() {
+describe.only('sitemap.js', function() {
   this.timeout(540 * 1000)
 
   describe(`sitemap()`, () => {

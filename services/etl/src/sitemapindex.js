@@ -6,18 +6,17 @@ const {
   success,
   payload,
   isFailure,
-  // meta,
 } = require('@pheasantplucker/failables')
 
 const SITEMAP_BUCKET = 'starspawn_jobs/sitemaps'
 const BASE_URL = `https://joblog.app`
 
 async function sitemapindex(id, data) {
-  const { sitemapPaths, target_bucket } = data
+  const { sitemapPaths } = data
   const bucket = whichBucket(data)
   const r1 = await buildSitemapIndex(sitemapPaths, bucket)
   if (isFailure(r1)) return failure(payload(r1), id)
-  const indexPath = payload(r1)
+  // const indexPath = payload(r1)
   // const r2 = await tellGoogle() // does not take params, just tells them where it is at a fixed place
   // console.log(`payload(r2):`, payload(r2))
   // return r2

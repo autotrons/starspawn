@@ -8,12 +8,11 @@ const {
 const { map, values } = require('ramda')
 const { createQueryObj, runQuery } = require('@pheasantplucker/gc-datastore')
 const { save } = require('@pheasantplucker/gc-cloudstorage')
-const { get } = require('@pheasantplucker/http')
 
 const SERVICE_NAME = `SITEMAP`
 const SITEMAP_URL_COUNT = 100 // pass this in when calling sitemap()?
 const SITEMAP_BUCKET = 'starspawn_jobs/sitemaps'
-const BASE_URL = `https://storage.cloud.google.com`
+const BASE_URL = `https://joblog.app`
 
 async function sitemap(id, data) {
   try {
@@ -23,80 +22,11 @@ async function sitemap(id, data) {
       iteration,
       cursor,
       sitemapPaths,
-      more_work = true,
     } = data
-    if (more_work) {
-      return paginate(id, count, iteration, sitemapPaths, cursor)
-    } else {
-      const r2 = await buildSitemapIndex(sitemapPaths)
-      if (isFailure(r2)) return failure(payload(r2), id)
-      const indexUrl = payload(r2)
-      const r3 = await tellGoogle(indexUrl)
-      if (isFailure(r3)) return failure(payload(r3), id)
-      return success({ more_work: false }, id)
-    }
+    return paginate(id, count, iteration, sitemapPaths, cursor)
   } catch (e) {
     return failure(e.toString())
   }
-}
-
-async function tellGoogle(url) {
-  return get(`http://www.google.com/ping?sitemap=${url}`)
-}
-
-async function buildSitemapIndex(sitemaps) {
-  const sitemapBlocks = map(buildSitemapBlock, sitemaps)
-  const indexFile = `
-    <?xml version="1.0" encoding="UTF-8"?>
-    <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-      ${sitemapBlocks.join('\n')}
-    </sitemapindex>
-  `
-  const indexFilePath = `${SITEMAP_BUCKET}/sitemapindex.xml`
-  const r2 = await save(indexFilePath, indexFile)
-  if (isFailure(r2)) return r2
-  return success(indexFilePath)
-}
-
-function buildSitemapBlock(path) {
-  const url = formatUrl(`${BASE_URL}/${path}`)
-
-  return `
-    <sitemap>
-      <loc>${url}</loc>
-      <lastmod>${new Date().toISOString()}</lastmod>
-    </sitemap>
-  `
-}
-
-async function paginateJobs(count) {
-  const r1 = await createQueryObj('jobs')
-  if (isFailure(r1)) return r1
-  let query = payload(r1)
-  query = query.limit(count)
-  let pageCursor
-  let iterationCount = 0
-  let sitemapPath
-  let sitemapPaths = []
-  while (true) {
-    if (pageCursor) {
-      query = query.start(pageCursor)
-    }
-    const r2 = await getJobs(query)
-    if (isFailure(r2)) return r2
-    const jobs = payload(r2)
-    const metaData = meta(r2)
-    pageCursor = extractCursor(metaData)
-    let shouldContinue = moreDataLeft(metaData)
-    if (!shouldContinue) break
-    const sitemap = buildSitemap(jobs)
-    sitemapPath = `${SITEMAP_BUCKET}/test_sitemap_${iterationCount}.xml`
-    const r4 = await save(sitemapPath, sitemap)
-    if (isFailure(r4)) return r4
-    sitemapPaths.push(sitemapPath)
-    iterationCount++
-  }
-  return success(sitemapPaths)
 }
 
 async function paginate(id, count, iteration = 0, sitemapPaths = [], cursor) {
@@ -166,7 +96,7 @@ async function getJobs(query) {
 }
 
 function buildUrl(job) {
-  return `https://render-dot-starspawn-201921.appspot.com/${job}`
+  return `${BASE_URL}/${job}`
 }
 
 function extractFields(data) {
@@ -209,8 +139,6 @@ module.exports = {
   buildSitemap,
   formatUrl,
   getJobs,
-  paginateJobs,
-  buildSitemapIndex,
   paginate,
   SITEMAP_BUCKET,
 }
