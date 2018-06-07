@@ -33,9 +33,8 @@ async function do_file_things(id, data) {
 }
 
 function unzip_it(id, rs, ws, target_file) {
-  const gzip = zlib.createUnzip()
   return new Promise(res => {
-    rs.pipe(gzip)
+    rs.pipe(zlib.createUnzip())
       .pipe(ws)
       .on('finish', () => {
         console.info(`${id} wrote ${target_file}`)
