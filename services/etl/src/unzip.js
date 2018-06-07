@@ -35,7 +35,8 @@ async function do_file_things(id, data) {
 
 function unzip_it(id, rs, ws, gzip, target_file) {
   return new Promise(res => {
-    rs.pipe(gzip)
+    rs
+      .pipe(gzip)
       .pipe(ws)
       .on('finish', () => {
         console.info(`${id} wrote ${target_file}`)

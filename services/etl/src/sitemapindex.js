@@ -1,6 +1,6 @@
 const { map } = require('ramda')
 const { save } = require('@pheasantplucker/gc-cloudstorage')
-const { get } = require('@pheasantplucker/http')
+// const { get } = require('@pheasantplucker/http')
 const {
   failure,
   success,

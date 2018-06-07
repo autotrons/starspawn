@@ -1,8 +1,4 @@
-const {
-  assertSuccess,
-  assertFailure,
-  payload,
-} = require('@pheasantplucker/failables')
+const { assertSuccess, payload } = require('@pheasantplucker/failables')
 const {
   createDatastoreClient,
   readEntities,
@@ -22,7 +18,7 @@ createDatastoreClient()
 describe('loader.js', function() {
   this.timeout(540 * 1000)
   it('should load a list of jobs into Datastore', async () => {
-    const result = await loader(thisId, {filename})
+    const result = await loader(thisId, { filename })
     assertSuccess(result)
     const writtenJobs = payload(result)
     const job1Key = writtenJobs.jobEntities[0].key

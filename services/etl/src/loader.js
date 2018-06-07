@@ -5,11 +5,9 @@ const {
   payload,
 } = require('@pheasantplucker/failables')
 const {
-  createDatastoreClient,
   makeEntityByName,
   writeEntity,
 } = require('@pheasantplucker/gc-datastore')
-const uuid = require('uuid')
 const { getFile } = require('@pheasantplucker/gc-cloudstorage')
 
 async function loader(id, data) {
