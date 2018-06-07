@@ -38,32 +38,50 @@ async function do_file_things(id, data) {
 
   const jobEntities = payload(jobEntitiesResult)
 
-  const writeResult = await writeEntity(jobEntities)
-  if (isFailure(writeResult)) return writeResult
-  const writePayload = payload(writeResult)
+  const drain_result = await drain_write_entities(jobEntities)
+  if (isFailure(drain_result)) return drain_result
 
-  return success({ jobEntities, writePayload })
+  return success({ jobEntities })
 }
 
 const jobsToEntities = (id, jobs) => {
-  const kind = 'jobs' //hmm, testing data?
   try {
-    const entities = jobs.map(job => {
+    const kind = 'jobs' //hmm, testing data?
+    const entities = []
+    for (let i = 0; i < jobs.length; i++) {
+      const job = jobs[i]
       const tasketId = { tasketId: id }
       const fullJob = Object.assign({}, job, tasketId)
-      const r1 = makeEntityByName(kind, job.job_reference, fullJob)
-      if (isFailure(r1)) return failure(r1)
-      return payload(r1)
-    })
+      const ent = payload(makeEntityByName(kind, job.job_reference, fullJob))
+      entities.push(ent)
+    }
     return success(entities)
   } catch (e) {
-    return failure(e.toString(), {
-      jobs: jobs,
-    })
+    return failure(e.toString())
   }
+}
+
+async function drain_write_entities(ents) {
+  const batches = make_batches(ents, 500)
+  for (let i = 0; i < batches.length; i++) {
+    const writeResult = await writeEntity(batches[i])
+    if (isFailure(writeResult)) return writeResult
+  }
+  return success()
+}
+
+function make_batches(items, batch_size) {
+  let batches = []
+  let i, j, temp
+  for (i = 0, j = items.length; i < j; i += batch_size) {
+    temp = items.slice(i, i + batch_size)
+    batches.push(temp)
+  }
+  return batches
 }
 
 module.exports = {
   loader,
   jobsToEntities,
+  make_batches,
 }

@@ -4,7 +4,7 @@ const {
   readEntities,
 } = require('@pheasantplucker/gc-datastore')
 
-const { loader, jobsToEntities } = require('./loader')
+const { loader, jobsToEntities, make_batches } = require('./loader')
 const equal = require('assert').deepEqual
 const uuid = require('uuid')
 
@@ -14,6 +14,21 @@ const fakeJobArray = require(`../../../samples/fakejobsarray.json`)
 const thisId = uuid.v4()
 
 createDatastoreClient()
+
+describe(`batches()`, () => {
+  it(`create the batches`, () => {
+    const expected = [[1, 2], [3, 4], [5, 6], [7, 8], [9]]
+    const result = make_batches([1, 2, 3, 4, 5, 6, 7, 8, 9], 2)
+    equal(result, expected)
+  })
+})
+
+describe(`jobstoEntities()`, () => {
+  it(`should take an array of jobs and return an array of entities`, () => {
+    const result = jobsToEntities(thisId, fakeJobArray)
+    assertSuccess(result)
+  })
+})
 
 describe('loader.js', function() {
   this.timeout(540 * 1000)
@@ -28,12 +43,5 @@ describe('loader.js', function() {
 
     const readData = payload(readCheckResult)
     equal(readData[job1UniqueId].title, 'Per Diem TRAVEL ICU Nurse (RN)')
-  })
-})
-
-describe(`jobstoEntities()`, () => {
-  it(`should take an array of jobs and return an array of entities`, () => {
-    const result = jobsToEntities(thisId, fakeJobArray)
-    assertSuccess(result)
   })
 })
