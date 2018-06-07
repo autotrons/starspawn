@@ -144,7 +144,8 @@ function get_next_command(id, prev_command, prev_results) {
     return parse_loader(id, p)
   }
   if (prev_command === 'loader') {
-    return make_next_command('end', {})
+    const c1 = make_next_command('end', {})
+    return success([c1])
   }
   return failure(`${id} command ${prev_command} no next command found`)
 }
