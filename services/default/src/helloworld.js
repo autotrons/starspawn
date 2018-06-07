@@ -16,7 +16,6 @@ app.get('/:sitemapFile', async (req, res) => {
   const filePath = req.params.sitemapFile
   const r1 = await getFile(`${SITEMAP_BUCKET}/${filePath}`)
   if (isFailure(r1)) return r1
-
   res.status(200).send(payload(r1))
 })
 
