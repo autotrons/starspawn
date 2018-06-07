@@ -20,7 +20,6 @@ async function unzip(id, data) {
 
 async function do_file_things(id, data) {
   const { source_file, target_file } = data
-  console.info(`${id} starting unzip ${target_file}`)
 
   const writeStreamResult = await createWriteStream(target_file)
   if (isFailure(writeStreamResult)) return writeStreamResult
@@ -37,7 +36,6 @@ function unzip_it(id, rs, ws, target_file) {
     rs.pipe(zlib.createUnzip())
       .pipe(ws)
       .on('finish', () => {
-        console.info(`${id} wrote ${target_file}`)
         res(success({ target_file }))
       })
       .on('error', err => {

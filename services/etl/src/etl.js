@@ -60,7 +60,7 @@ app.get('/:command', async (req, res) => {
   try {
     command = req.params.command
 
-    if (command === 'appcast_pipeline_test') {
+    if (command === 'appcast_loader_cron') {
       const source_url =
         'https://storage.googleapis.com/starspawn_tests/feed.xml.gz'
       const target_file = `datafeeds/full_feed/${id}.xml.gz`
@@ -71,14 +71,8 @@ app.get('/:command', async (req, res) => {
       return respond(res, id, command, result)
     }
 
-    if (command === 'unzip_test') {
-      const source_file = 'starspawn_tests/feed_100.xml.gz'
-      const target_file = `datafeeds/unzip/${id}.xml.gz`
-      const result = await http_post(id, 'unzip', {
-        source_file,
-        target_file,
-      })
-      return respond(res, id, command, result)
+    if (command === 'sitemap_cron') {
+      // TODO put sitemap kick off code here
     }
     return respond(res, id, command, failure('no path'))
   } catch (e) {
@@ -148,6 +142,9 @@ function get_next_command(id, prev_command, prev_results) {
   }
   if (prev_command === 'parse') {
     return parse_loader(id, p)
+  }
+  if (prev_command === 'loader') {
+    return make_next_command('end', {})
   }
   return failure(`${id} command ${prev_command} no next command found`)
 }
