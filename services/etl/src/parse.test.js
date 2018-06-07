@@ -55,7 +55,7 @@ describe('parse.js', function() {
     _testsetup()
   })
 
-  describe.only(`parse()`, () => {
+  describe(`parse()`, () => {
     it('should convert the XML from the file into JSON', async () => {
       const data = { filePath: testFileCloud }
       const result = await parse(thisId, data)
