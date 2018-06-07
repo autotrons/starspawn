@@ -55,9 +55,10 @@ describe('parse.js', function() {
     _testsetup()
   })
 
-  describe(`parse()`, () => {
+  describe.only(`parse()`, () => {
     it('should convert the XML from the file into JSON', async () => {
-      const result = await parse(thisId, testFileCloud)
+      const data = { filePath: testFileCloud }
+      const result = await parse(thisId, data)
       assertSuccess(result)
       const parseRet = payload(result)
       assert(parseRet.jsonJobs)
@@ -65,7 +66,8 @@ describe('parse.js', function() {
     })
 
     it(`should return google structured data`, async () => {
-      const result = await parse(thisId, testFileCloud)
+      const data = { filePath: testFileCloud }
+      const result = await parse(thisId, data)
       assertSuccess(result)
       const parseRet = payload(result)
       assert(parseRet.jsonJobs.root.job[0].gsd)

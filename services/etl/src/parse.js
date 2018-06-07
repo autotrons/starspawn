@@ -20,7 +20,7 @@ async function parse(id, data) {
 }
 
 async function do_file_things(id, data) {
-  const filePath = data
+  let { filePath } = data
 
   const r2 = await getFile(filePath)
   if (isFailure(r2)) return r2
