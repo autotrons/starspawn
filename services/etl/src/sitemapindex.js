@@ -66,5 +66,7 @@ const formatUrl = url => {
 
 module.exports = {
   sitemapindex,
+  buildSitemapIndex,
+  formatUrl,
   SITEMAP_BUCKET,
 }
