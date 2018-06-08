@@ -5,12 +5,12 @@ const {
   payload,
 } = require('@pheasantplucker/failables')
 const {
-  makeEntityByName,
+  makeDatastoreKey,
   writeEntity,
   createDatastoreClient,
 } = require('@pheasantplucker/gc-datastore')
 const { getFile } = require('@pheasantplucker/gc-cloudstorage')
-
+const md5 = require('md5')
 const { GC_PROJECT_ID } = process.env
 
 async function loader(id, data) {
@@ -46,13 +46,9 @@ async function do_file_things(id, data) {
 
 const jobsToEntities = (id, jobs) => {
   try {
-    const kind = 'jobs' //hmm, testing data?
     const entities = []
     for (let i = 0; i < jobs.length; i++) {
-      const job = jobs[i]
-      const tasketId = { tasketId: id }
-      const fullJob = Object.assign({}, job, tasketId)
-      const ent = payload(makeEntityByName(kind, job.job_reference, fullJob))
+      const ent = appcast_datastore_job(jobs[i])
       entities.push(ent)
     }
     return success(entities)
@@ -63,11 +59,16 @@ const jobsToEntities = (id, jobs) => {
 
 async function drain_write_entities(ents) {
   const batches = make_batches(ents, 500)
+  let write_results = []
   for (let i = 0; i < batches.length; i++) {
-    const writeResult = await writeEntity(batches[i])
-    if (isFailure(writeResult)) return writeResult
+    const r1 = await writeEntity(batches[i])
+    if (isFailure(r1)) {
+      console.log(payload(r1))
+      return r1
+    }
+    write_results = [...write_results, payload(r1)]
   }
-  return success()
+  return success(write_results)
 }
 
 function make_batches(items, batch_size) {
@@ -80,8 +81,51 @@ function make_batches(items, batch_size) {
   return batches
 }
 
+function appcast_id(j) {
+  const copy = Object.assign({}, j, { gsd: '' })
+  return md5(JSON.stringify(copy))
+}
+
+function appcast_datastore_job(j, is_test = false) {
+  const kind = 'job'
+  const id = appcast_id(j)
+  const key = payload(makeDatastoreKey(kind, id))
+  const data = {
+    id: id,
+    body: j.body,
+    category: j.category,
+    city: j.city,
+    company: j.company,
+    country: j.company,
+    cpc: j.cpc,
+    cpa: j.cpa,
+    html_jobs: j.html_jobs,
+    job_reference: j.job_reference,
+    job_type: j.job_type,
+    location: j.location,
+    mobile_friendly_apply: j.mobile_friendly_apply,
+    posted_at: new Date(j.posted_at),
+    created_at: new Date(Date.now()),
+    state: j.state,
+    title: j.title,
+    url: j.url,
+    zip: j.zip,
+    gsd: JSON.stringify(j.gsd),
+    source: 'appcast',
+    is_test,
+  }
+  return {
+    key,
+    excludeFromIndexes: ['body', 'gsd'],
+    method: 'insert',
+    data,
+  }
+}
+
 module.exports = {
   loader,
   jobsToEntities,
   make_batches,
+  appcast_datastore_job,
+  drain_write_entities,
 }
