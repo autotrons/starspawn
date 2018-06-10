@@ -20,7 +20,7 @@
     "eslint-plugin-prettier": "^2.6.0",
     "eslint-watch": "^3.1.3",
     "mocha": "^5.1.1",
-    "prettier": "^1.13.4"
+    "prettier": "^1.13.5"
   },
   "dependencies": {
     "@google-cloud/debug-agent": "^2.5.1",
@@ -29,7 +29,7 @@
     "@pheasantplucker/failables": "^2.0.4",
     "@pheasantplucker/failables-node6": "^2.0.3",
     "@pheasantplucker/gc-cloudstorage": "0.0.4",
-    "@pheasantplucker/gc-datastore": "^1.0.2",
+    "@pheasantplucker/gc-datastore": "^1.0.3",
     "@pheasantplucker/gc-pubsub": "^3.0.0",
     "@pheasantplucker/http": "^1.0.2",
     "body-parser": "^1.18.3",

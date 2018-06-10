@@ -8,6 +8,7 @@ const {
   makeDatastoreKey,
   writeEntity,
   createDatastoreClient,
+  lookup,
 } = require('@pheasantplucker/gc-datastore')
 const { getFile } = require('@pheasantplucker/gc-cloudstorage')
 const md5 = require('md5')
@@ -30,8 +31,6 @@ async function do_file_things(id, data) {
   if (isFailure(r1)) return r1
   const jobs = JSON.parse(payload(r1))
   const jobArray = jobs.root.job
-
-  // all jobs need extra field IS_TEST = true/false
 
   const jobEntitiesResult = await jobsToEntities(id, jobArray)
   if (isFailure(jobEntitiesResult)) return jobEntitiesResult
@@ -61,12 +60,17 @@ async function drain_write_entities(ents) {
   const batches = make_batches(ents, 500)
   let write_results = []
   for (let i = 0; i < batches.length; i++) {
-    const r1 = await writeEntity(batches[i])
-    if (isFailure(r1)) {
-      console.log(payload(r1))
-      return r1
+    const r1 = await findMissingEntities(batches[i])
+
+    if (isFailure(r1)) return r1
+    const missingEntities = payload(r1)
+
+    const r2 = await writeEntity(missingEntities)
+    if (isFailure(r2)) {
+      console.log(r2)
+      return r2
     }
-    write_results = [...write_results, payload(r1)]
+    write_results = [...write_results, payload(r2)]
   }
   return success(write_results)
 }
@@ -122,10 +126,50 @@ function appcast_datastore_job(j, is_test = false) {
   }
 }
 
+async function findMissingEntities(ents) {
+  const entityKeys = await ents.map(e => {
+    return e.key
+  })
+  const lookupResp = await lookup(entityKeys)
+  if (isFailure(lookupResp)) return lookupResp
+  const lookupObj = payload(lookupResp)
+  const missing = lookupObj.missing
+  const missingArray = makeArray(missing)
+
+  const makePath = (kind, name) => {
+    return kind + '/' + name
+  }
+
+  const missingPaths = await missingArray.map(ent => {
+    const kind = ent.entity.key.path[0].kind
+    const name = ent.entity.key.path[0].name
+    return makePath(kind, name)
+  })
+
+  const cleanMissing = [].concat.apply([], missingPaths)
+
+  const missingEntities = await ents.filter(e => {
+    if (e === undefined) return false
+    const kind = e.key.kind
+    const name = e.key.name
+    const thisPath = makePath(kind, name)
+    if (cleanMissing.indexOf(thisPath) > -1) return true
+    return false
+  })
+
+  return success(missingEntities)
+}
+
+const makeArray = input => {
+  if (Array.isArray(input)) return input
+  return [input]
+}
+
 module.exports = {
   loader,
   jobsToEntities,
   make_batches,
   appcast_datastore_job,
   drain_write_entities,
+  findMissingEntities,
 }
