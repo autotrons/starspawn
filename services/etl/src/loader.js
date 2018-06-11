@@ -12,7 +12,8 @@ const {
 } = require('@pheasantplucker/gc-datastore')
 const { getFile } = require('@pheasantplucker/gc-cloudstorage')
 const md5 = require('md5')
-const { GC_PROJECT_ID } = process.env
+//const { GC_PROJECT_ID } = process.env
+const GC_PROJECT_ID = 'starspawn-201921'
 
 async function loader(id, data) {
   try {
@@ -37,7 +38,7 @@ async function do_file_things(id, data) {
 
   const jobEntities = payload(jobEntitiesResult)
 
-  const drain_result = await drain_write_entities(jobEntities)
+  const drain_result = await drain_write_entities(id, jobEntities)
   if (isFailure(drain_result)) return drain_result
 
   return success({ jobEntities })
@@ -56,7 +57,7 @@ const jobsToEntities = (id, jobs) => {
   }
 }
 
-async function drain_write_entities(ents) {
+async function drain_write_entities(id, ents) {
   const batches = make_batches(ents, 500)
   let write_results = []
   for (let i = 0; i < batches.length; i++) {
@@ -64,7 +65,7 @@ async function drain_write_entities(ents) {
 
     if (isFailure(r1)) return r1
     const missingEntities = payload(r1)
-
+    console.info(`${id} loader drain_write_entities writing ${missingEntities.length} jobs`)
     const r2 = await writeEntity(missingEntities)
     if (isFailure(r2)) {
       console.log(r2)
@@ -85,9 +86,12 @@ function make_batches(items, batch_size) {
   return batches
 }
 
-function appcast_id(j) {
+function appcast_hash(j) {
   const copy = Object.assign({}, j, { gsd: '' })
   return md5(JSON.stringify(copy))
+}
+function appcast_id(j) {
+  return md5(j.job_reference + j.posted_at)
 }
 
 function appcast_datastore_job(j, is_test = false) {
@@ -115,6 +119,7 @@ function appcast_datastore_job(j, is_test = false) {
     url: j.url,
     zip: j.zip,
     gsd: JSON.stringify(j.gsd),
+    hash: appcast_hash(j),
     source: 'appcast',
     is_test,
   }
