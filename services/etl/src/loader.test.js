@@ -25,7 +25,7 @@ const thisId = uuid.v4()
 
 createDatastoreClient()
 
-describe.only('loader.js', function() {
+describe('loader.js', function() {
   this.timeout(540 * 1000)
 
   describe(`batches()`, () => {
