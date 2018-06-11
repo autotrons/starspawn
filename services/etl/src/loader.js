@@ -100,7 +100,7 @@ function appcast_datastore_job(j, is_test = false) {
     category: j.category,
     city: j.city,
     company: j.company,
-    country: j.company,
+    country: j.country,
     cpc: j.cpc,
     cpa: j.cpa,
     html_jobs: j.html_jobs,
