@@ -3,7 +3,7 @@ Ingest all the things
 
 # Pipeline links
 to kick off the the pipeline
-https://etl-dot-starspawn-201921.appspot.com/appcast_pipeline_test
+https://etl-dot-starspawn-201921.appspot.com/appcast_loader_cron
 
 # Builds
 * Downloads https://console.cloud.google.com/gcr/builds?project=starspawn-201921&query=tags%20%3D%20%22download%22
