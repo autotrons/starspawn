@@ -1,6 +1,7 @@
-const { assertSuccess, payload } = require('@pheasantplucker/failables')
+const { assertSuccess, payload, meta } = require('@pheasantplucker/failables')
 const { exists } = require('@pheasantplucker/gc-cloudstorage')
-const { sitemap, formatUrl, paginate } = require('./sitemap')
+const { createQueryObj } = require('@pheasantplucker/gc-datastore')
+const { sitemap, formatUrl, paginate, getJobs, extractCursor, moreDataLeft } = require('./sitemap')
 const equal = require('assert')
 const uuid = require('uuid')
 
@@ -71,6 +72,31 @@ describe('sitemap.js', function() {
       const url = 'http://plzslashtrail.me/ok/'
       const result = formatUrl(url)
       equal(result, url)
+    })
+  })
+
+  describe.skip(`UTILITY:: count datastore rows`, () => {
+
+    it(`should count rows`, async () => {
+      let counter = 0
+      let cursor
+
+      while (true) {
+        const r1 = await createQueryObj('job')
+        assertSuccess(r1)
+        let query = payload(r1).limit(10000)
+        if (cursor) {
+          query = query.start(cursor)
+        }
+        const result = await getJobs(query)
+        const data = payload(result)
+        const metaData = meta(result)
+        counter += data.length
+        cursor = extractCursor(metaData)
+        const more_work = moreDataLeft(metaData)
+        console.log(`counter:`, counter)
+        if (!more_work) break
+      }
     })
   })
 })

@@ -30,7 +30,7 @@ async function sitemap(id, data) {
 }
 
 async function paginate(id, count, iteration = 0, sitemapPaths = [], cursor) {
-  const r1 = await createQueryObj('jobs')
+  const r1 = await createQueryObj('job')
   if (isFailure(r1)) {
     console.error(`${id} ${SERVICE_NAME} createQueryObj ${payload(r1)}`)
     return failure(payload(r1), id)
@@ -141,4 +141,6 @@ module.exports = {
   getJobs,
   paginate,
   SITEMAP_BUCKET,
+  extractCursor,
+  moreDataLeft
 }
