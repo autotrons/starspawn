@@ -36,6 +36,16 @@ describe('loader.js', function() {
     })
   })
 
+  // describe(`record_write_count()`, () => {
+  //   it(`write a row with the id and count of jobs written`, () => {
+  //     const expected = 5
+  //     const id = uuid.v4()
+  //     const r1 = await record_write_count(id, 5)
+  //     assertSuccess(r2)
+  //     const r2 = await query
+  //   })
+  // })
+
   describe(`datastore_job()`, () => {
     it(`create a job with datastore schema`, async () => {
       const file_data = await getFile(filename)
