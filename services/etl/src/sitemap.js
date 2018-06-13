@@ -142,5 +142,5 @@ module.exports = {
   paginate,
   SITEMAP_BUCKET,
   extractCursor,
-  moreDataLeft
+  moreDataLeft,
 }
