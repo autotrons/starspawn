@@ -7,7 +7,7 @@ const {
 } = require('@pheasantplucker/failables')
 const miss = require('mississippi')
 const storage = require('@google-cloud/storage')()
-const { stats } = require('@pheasantplucker/gc-cloudstorage')
+const { stats, getBucket } = require('@pheasantplucker/gc-cloudstorage')
 
 const COMPLETE = 'complete'
 const NAME = 'chunk'
@@ -36,7 +36,7 @@ async function chunk(id, data) {
     )
 
     const { bucketpart, filepart } = split_filename(filename)
-    const myBucket = storage.bucket(bucketpart)
+    const myBucket = getBucket(bucketpart)
     const readFileHandle = myBucket.file(filepart)
     const rStream = readFileHandle.createReadStream({
       start: start_byte_offset,
@@ -133,6 +133,7 @@ function find_blocks(rs, start_text, end_text, cursor = 0) {
   })
 }
 
+let jobCount = 0
 async function write_blocks(id, filename, blocks) {
   try {
     if (blocks.length <= 0) {
@@ -140,6 +141,8 @@ async function write_blocks(id, filename, blocks) {
       return success(blocks.length)
     }
     console.info(`${id} try to write ${blocks.length} blocks to ${filename}`)
+    jobCount += blocks.length
+    console.info(`jobCount:::::::::::::`, jobCount)
     const file = getFileHandle(filename)
     const preblob = `<?xml version="1.0" encoding="UTF-8"?>\n<root>\n`
     const postblob = `\n</root>`
@@ -195,7 +198,7 @@ function split_filename(n) {
 
 function getFileHandle(filepath) {
   const { bucketpart, filepart } = split_filename(filepath)
-  const bucket = storage.bucket(bucketpart)
+  const bucket = getBucket(bucketpart)
   const file = bucket.file(filepart)
   return file
 }

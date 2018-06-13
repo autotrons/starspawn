@@ -8,6 +8,7 @@ const {
 const { chunk, find_blocks, write_blocks, continue_work } = require('./chunk')
 const fs = require('fs')
 const storage = require('@google-cloud/storage')()
+const { exists } = require('@pheasantplucker/gc-cloudstorage')
 
 const TOPIC = `test-${uuid.v4()}`
 
@@ -40,6 +41,7 @@ describe('chunk.js', function() {
         end: 6000,
       })
       const result = await find_blocks(readstream, start_text, end_text)
+      console.log(`payload(result):`, payload(result))
       assertSuccess(result)
       equal(payload(result).blocks.length > 0, true)
     })
@@ -104,24 +106,24 @@ describe('chunk.js', function() {
     })
   })
   describe('chunk', async () => {
-    it('chunk a big xml file into blocks and write the file', async () => {
+    it.only('chunk a big xml file into blocks and write the file', async () => {
       const id = uuid.v4()
-      const data = {
+      let data = {
         id,
         filename: 'starspawn_tests/feed_500k.xml',
         start_byte_offset: 0,
-        end_byte_offset: 80 * Math.pow(2, 20),
+        end_byte_offset: 0,
         start_text: '<job>',
         end_text: '</job>',
       }
-      const result = await chunk(id, data)
-      assertSuccess(result)
-      const p = payload(result)
-      const args = p.args
-      const more_work = p.more_work
-      equal(more_work, true)
-      equal(args.id, data.id)
-      equal(args.start_byte_offset > 1e6, true)
+      while (true) {
+        const result = await chunk(id, data)
+        assertSuccess(result)
+        const p = payload(result)
+        data = p.args
+        const more_work = p.more_work
+        if (!more_work) break
+      }
     })
     it('no end_byte_offset should read the whole file', async () => {
       const id = uuid.v4()
@@ -142,7 +144,7 @@ describe('chunk.js', function() {
   })
 })
 
-async function exists(bucket, filename) {
+async function exists1(bucket, filename) {
   const result = await storage
     .bucket(bucket)
     .file(filename)
