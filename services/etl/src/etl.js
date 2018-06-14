@@ -234,7 +234,7 @@ function respond(res, id, command, failable) {
   res.set('Content-Type', 'application/json')
   const m = { id, command }
   if (isFailure(failable)) {
-    const f = failure(payload(failable), m)
+    const f = failure(JSON.stringify(payload(failable), null, '\t'), m)
     res.status(500).send(f)
   } else if (isSuccess(failable)) {
     const f = success(payload(failable), m)

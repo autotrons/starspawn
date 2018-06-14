@@ -11,6 +11,8 @@ const { stats } = require('@pheasantplucker/gc-cloudstorage')
 
 const COMPLETE = 'complete'
 const NAME = 'chunk'
+const BLOCK_LIMIT = 250
+const CHUNK_TIMEOUT_MS = 500 * 1000
 
 async function chunk(id, data) {
   try {
@@ -110,8 +112,8 @@ function find_blocks(rs, start_text, end_text, cursor = 0) {
         cursor += end_idx
         buffer = chop(buffer, end_idx)
         // should we bail out now
-        const times_up = Date.now() - starttime > 500 * 1000
-        const block_limit = blocks.length >= 1000
+        const times_up = Date.now() - starttime > CHUNK_TIMEOUT_MS
+        const block_limit = blocks.length >= BLOCK_LIMIT
         if (times_up || block_limit) {
           more(COMPLETE)
         }
