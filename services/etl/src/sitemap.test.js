@@ -37,7 +37,7 @@ describe('sitemap.js', function() {
 
   describe(`paginate()`, () => {
     const id = uuid.v4()
-    const count = 50
+    const count = 1
     const iteration = 0
     let paths = []
     let p1
