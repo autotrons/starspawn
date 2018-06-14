@@ -11,8 +11,9 @@ app.get('/:jobId', async (req, res) => {
     const r1 = await getFile(`${SITEMAP_BUCKET}/${req.params.jobId}`)
     if (isFailure(r1)) return r1
     res.status(200).send(payload(r1))
+  } else {
+    render(req, res)
   }
-  render(req, res)
 })
 
 // Start the server
