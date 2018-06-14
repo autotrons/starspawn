@@ -1,7 +1,14 @@
 const { assertSuccess, payload, meta } = require('@pheasantplucker/failables')
 const { exists } = require('@pheasantplucker/gc-cloudstorage')
 const { createQueryObj } = require('@pheasantplucker/gc-datastore')
-const { sitemap, formatUrl, paginate, getJobs, extractCursor, moreDataLeft } = require('./sitemap')
+const {
+  sitemap,
+  formatUrl,
+  paginate,
+  getJobs,
+  extractCursor,
+  moreDataLeft,
+} = require('./sitemap')
 const equal = require('assert')
 const uuid = require('uuid')
 
@@ -76,7 +83,6 @@ describe('sitemap.js', function() {
   })
 
   describe.skip(`UTILITY:: count datastore rows`, () => {
-
     it(`should count rows`, async () => {
       let counter = 0
       let cursor

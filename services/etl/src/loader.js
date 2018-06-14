@@ -65,7 +65,9 @@ async function drain_write_entities(id, ents) {
 
     if (isFailure(r1)) return r1
     const missingEntities = payload(r1)
-    console.info(`${id} loader drain_write_entities writing ${missingEntities.length} jobs`)
+    console.info(
+      `${id} loader drain_write_entities writing ${missingEntities.length} jobs`
+    )
     const r2 = await writeEntity(missingEntities)
     if (isFailure(r2)) {
       console.log(r2)
