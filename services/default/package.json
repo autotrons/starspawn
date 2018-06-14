@@ -1,14 +1,17 @@
 {
-  "name": "helloworld",
-  "version": "0.0.1",
+  "name": "render",
+  "version": "1.0.0",
   "description": "",
-  "main": "./src/helloworld.js",
+  "main": "./src/render.js",
   "scripts": {
-    "start": "node ./src/helloworld.js",
-    "test": "mocha ./src/*.spec.js",
-    "testwatch": "mocha --watch ./src/*.spec.js",
+    "start": "node ./index.js",
+    "test": "mocha ./src/*.test.js",
+    "testwatch": "mocha --watch ./src/*.test.js",
     "lint": "esw .eslintrc.js src/ lib/ tests/ -w --fix --ignore-pattern !.eslintrc.js",
-    "deploy": "gcloud app deploy"
+    "lint-etl": "esw .eslintrc.js src/etl.js src/etl.test.js -w --fix --ignore-pattern !.eslintrc.js",
+    "lint-chunk": "esw .eslintrc.js src/chunk.js src/chunk.test.js -w --fix --ignore-pattern !.eslintrc.js",
+    "deploy": "gcloud app deploy",
+    "cron-deploy": "gcloud app deploy cron.yaml"
   },
   "engines": {
     "node": "8.x"
@@ -16,19 +19,25 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "himalaya": "^1.1.0",
     "mocha": "^5.1.1",
     "onchange": "^4.0.0",
-    "prettier": "1.12.1",
     "eslint": "^4.17.0",
-    "eslint-plugin-jest": "^21.9.0",
     "eslint-plugin-prettier": "^2.6.0",
-    "eslint-watch": "^3.1.3"
+    "eslint-watch": "^3.1.3",
+    "prettier": "^1.13.5"
   },
   "dependencies": {
-    "@pheasantplucker/failables": "^2.0.4",
-    "@pheasantplucker/gc-cloudstorage": "^1.0.3",
-    "@pheasantplucker/http": "^1.0.2",
-    "express": "^4.16.3"
+    "@pheasantplucker/failables": "^2.0.3",
+    "@pheasantplucker/gc-datastore": "^1.0.0",
+    "consolidate": "^0.15.1",
+    "ejs": "^2.6.1",
+    "express": "^4.16.3",
+    "he": "^1.1.1",
+    "time-ago": "^0.2.1",
+    "uuid": "3.2.1"
   },
   "prettier": {
     "semi": false,
