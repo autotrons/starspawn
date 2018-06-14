@@ -39,7 +39,7 @@ async function buildSitemapIndex(target_bucket, sitemaps) {
 }
 
 function buildSitemapBlock(bucket, fileName) {
-  const url = formatUrl(`${BASE_URL}/${bucket}/sitemaps/${fileName}`)
+  const url = formatUrl(`${BASE_URL}/${fileName}`)
   return `
     <sitemap>
       <loc>${url}</loc>
