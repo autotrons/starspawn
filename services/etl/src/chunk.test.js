@@ -121,7 +121,8 @@ describe('chunk.js', function() {
       const more_work = p.more_work
       equal(more_work, true)
       equal(args.id, data.id)
-      equal(args.start_byte_offset > 1e6, true)
+      // this magic number is a total guess and might not test anything
+      equal(args.start_byte_offset > 1e5, true)
     })
     it('no end_byte_offset should read the whole file', async () => {
       const id = uuid.v4()
@@ -137,7 +138,8 @@ describe('chunk.js', function() {
       assertSuccess(result)
       const p = payload(result).args
       equal(p.id, data.id)
-      equal(p.start_byte_offset > 1e6, true)
+      // this magic number is a total guess and might not test anything
+      equal(p.start_byte_offset > 1e5, true)
     })
   })
 })
