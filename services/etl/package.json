@@ -26,7 +26,7 @@
     "@google-cloud/debug-agent": "^2.5.1",
     "@google-cloud/pubsub": "^0.18.0",
     "@google-cloud/storage": "^1.6.0",
-    "@pheasantplucker/failables": "^2.0.4",
+    "@pheasantplucker/failables": "^2.0.8",
     "@pheasantplucker/failables-node6": "^2.0.3",
     "@pheasantplucker/gc-cloudstorage": "0.0.4",
     "@pheasantplucker/gc-datastore": "^1.0.3",

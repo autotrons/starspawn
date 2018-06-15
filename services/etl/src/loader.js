@@ -12,8 +12,8 @@ const {
 } = require('@pheasantplucker/gc-datastore')
 const { getFile } = require('@pheasantplucker/gc-cloudstorage')
 const md5 = require('md5')
-//const { GC_PROJECT_ID } = process.env
-const GC_PROJECT_ID = 'starspawn-201921'
+
+createDatastoreClient('starspawn-201921')
 
 async function loader(id, data) {
   try {
@@ -25,8 +25,6 @@ async function loader(id, data) {
 
 async function do_file_things(id, data) {
   const { filename } = data
-
-  createDatastoreClient(GC_PROJECT_ID)
 
   const r1 = await getFile(filename)
   if (isFailure(r1)) return r1

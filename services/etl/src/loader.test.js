@@ -4,7 +4,6 @@ const {
   readEntities,
   makeEntityByName,
 } = require('@pheasantplucker/gc-datastore')
-const { GC_PROJECT_ID } = process.env
 const { getFile } = require('@pheasantplucker/gc-cloudstorage')
 
 const {
@@ -23,7 +22,7 @@ const fakeJobArray = require(`../../../samples/fakejobsarray.json`)
 
 const thisId = uuid.v4()
 
-createDatastoreClient()
+createDatastoreClient('starspawn-201921')
 
 describe('loader.js', function() {
   this.timeout(540 * 1000)
@@ -35,16 +34,6 @@ describe('loader.js', function() {
       equal(result, expected)
     })
   })
-
-  // describe(`record_write_count()`, () => {
-  //   it(`write a row with the id and count of jobs written`, () => {
-  //     const expected = 5
-  //     const id = uuid.v4()
-  //     const r1 = await record_write_count(id, 5)
-  //     assertSuccess(r2)
-  //     const r2 = await query
-  //   })
-  // })
 
   describe(`datastore_job()`, () => {
     it(`create a job with datastore schema`, async () => {
@@ -70,12 +59,7 @@ describe('loader.js', function() {
     })
   })
 
-  // describe(`drain_write_entities()`, () => {
-  //   it(`should take an array of jobs and return an array of entities`, () => {
-  //     const result = jobsToEntities(thisId, fakeJobArray)
-  //     assertSuccess(result)
-  //   })
-  // })
+  describe(`drain_write_entities()`, () => {})
 
   describe('loader()', function() {
     it('should load a list of jobs into Datastore', async () => {
@@ -94,7 +78,6 @@ describe('loader.js', function() {
 
   describe(`findMissingEntities()`, () => {
     it(`should return the array of entities not in DB`, async () => {
-      createDatastoreClient(GC_PROJECT_ID)
       const newEntity = payload(
         makeEntityByName('testKind', uuid.v4(), { a: 'c' })
       )
