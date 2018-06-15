@@ -18,6 +18,7 @@ const { loader } = require('./loader')
 const { json2gsd } = require('./json2gsd')
 const { parse } = require('./parse')
 const { sitemap } = require('./sitemap')
+const { sitemapindex } = require('./sitemapindex')
 const { health_check } = require('./health_check')
 
 // ==========================================================
@@ -40,6 +41,8 @@ const FUNCTION_MAP = {
   parse,
   json2gsd,
   unzip,
+  sitemap,
+  sitemapindex,
 }
 
 process.on('unhandledRejection', (reason, p) => {
@@ -73,12 +76,12 @@ app.get('/:command', async (req, res) => {
     }
 
     if (command === 'sitemap_cron') {
-      const count = 50
+      const count = 1000
       const iteration = 0
       const sitemapPaths = []
 
-      const data = { id, count, iteration, sitemapPaths }
-      const result = await sitemap(id, data)
+      const data = { count, iteration, sitemapPaths }
+      const result = await http_post(id, 'sitemap', data)
       return respond(res, id, command, result)
     }
     return respond(res, id, command, failure('no path'))
@@ -138,6 +141,13 @@ function get_next_command(id, prev_command, prev_results) {
     const c1 = make_next_command('end', {})
     return success([c1])
   }
+  if (prev_command === 'sitemap') {
+    return sitemap_sitemap_sitemapindex(id, p)
+  }
+  if (prev_command === 'sitemapindex') {
+    const c1 = make_next_command('end', {})
+    return success([c1])
+  }
   if (prev_command === 'download') {
     return download_unzip(id, p)
   }
@@ -175,6 +185,19 @@ function unzip_chunk(id, p) {
     end_byte_offset: 0,
   }
   const c1 = make_next_command('chunk', next_args)
+  return success([c1])
+}
+
+function sitemap_sitemap_sitemapindex(id, p) {
+  if (p.more_work) {
+    delete p.more_work
+    delete p.id
+    const c1 = make_next_command('sitemap', p)
+    return success([c1])
+  }
+  const c1 = make_next_command('sitemapindex', {
+    sitemapPaths: p.sitemapPaths,
+  })
   return success([c1])
 }
 

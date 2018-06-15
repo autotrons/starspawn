@@ -20,6 +20,11 @@ async function sitemapindex(id, data) {
   // const r2 = await tellGoogle() // does not take params, just tells them where it is at a fixed place
   // console.log(`payload(r2):`, payload(r2))
   // return r2
+  /*
+    return {
+      indexPath: payload(r1)
+    }
+  */
   return r1
 }
 

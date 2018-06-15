@@ -51,7 +51,7 @@ async function paginate(id, count, iteration = 0, sitemapPaths = [], cursor) {
   const shouldContinue = moreDataLeft(metaData)
   const jobs = payload(r2)
   const sitemap = buildSitemap(jobs)
-  const sitemapPath = `${SITEMAP_BUCKET}/test_sitemap_${iteration}.xml`
+  const sitemapPath = `${SITEMAP_BUCKET}/sitemap_${iteration}.xml`
 
   const options = { predefinedAcl: 'publicRead' }
   const r3 = await save(sitemapPath, sitemap, options)

@@ -94,6 +94,89 @@ describe('etl.js', function() {
     })
   })
   describe('get_next_command()', () => {
+    it('sitemap to sitemap', () => {
+      const id = uuid.v4()
+      const prev_command = 'sitemap'
+      const count = 50
+      const iteration = 1
+      const sitemapPaths = [
+        `foo_bucket/test_sitemap_0.xml`,
+        `foo_bucket/test_sitemap_1.xml`,
+      ]
+      const cursor = 'asdf-adsf-adsf-asdf'
+      const more_work = true
+
+      const data = {
+        id,
+        iteration,
+        cursor,
+        more_work,
+        sitemapPaths,
+        count,
+      }
+
+      const prev_failable = success(data)
+      const result = get_next_command(id, prev_command, prev_failable)
+      assertSuccess(result, [
+        {
+          next_command: 'sitemap',
+          next_args: { iteration, cursor, sitemapPaths, count },
+        },
+      ])
+    })
+    it('sitemap to sitemapindex', () => {
+      const id = uuid.v4()
+      const prev_command = 'sitemap'
+      const count = 50
+      const iteration = 1
+      const sitemapPaths = [
+        `foo_bucket/test_sitemap_0.xml`,
+        `foo_bucket/test_sitemap_1.xml`,
+      ]
+      const cursor = 'asdf-adsf-adsf-asdf'
+      const more_work = false
+
+      const data = {
+        id,
+        iteration,
+        cursor,
+        more_work,
+        sitemapPaths,
+        count,
+      }
+
+      const prev_failable = success(data)
+      const result = get_next_command(id, prev_command, prev_failable)
+      assertSuccess(result, [
+        {
+          next_command: 'sitemapindex',
+          next_args: { sitemapPaths },
+        },
+      ])
+    })
+    it('sitemapindex to end', () => {
+      const id = uuid.v4()
+      const prev_command = 'sitemapindex'
+      const indexPath = `foo_bucket/theindex.xml`
+      const sitemapPaths = [
+        `foo_bucket/test_sitemap_0.xml`,
+        `foo_bucket/test_sitemap_1.xml`,
+      ]
+
+      const data = {
+        id,
+        sitemapPaths,
+      }
+
+      const prev_failable = success(data)
+      const result = get_next_command(id, prev_command, prev_failable)
+      assertSuccess(result, [
+        {
+          next_command: 'end',
+          next_args: {},
+        },
+      ])
+    })
     it('download to unzip', () => {
       const id = uuid.v4()
       const prev_command = 'download'
