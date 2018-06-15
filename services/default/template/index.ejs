@@ -2,10 +2,10 @@
 <html AMP lang="en">
   <head>
     <meta charset="utf-8">
-    <title><%- title %> Job in <%- location %></title>
+    <title><%- title %> <%- city %> <%- state %></title>
 
     <!-- We need to change the href to point to the page!! -->
-    <link rel="canonical" href="https://render-dot-starspawn-201921.appspot.com/">
+    <link rel="canonical" href="https://joblog.app/<%- id %>">
 
     <meta name="Description" content="Employer: <%- company %>, City: <%- city %>, State: <%- state %>">
     <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
@@ -123,7 +123,7 @@
     <div class="centerContent">
       <div class="topSpacer"></div>
       <div class="jobTitle"><%- title %></div>
-      <div class="topLocation">Aurora, CO, United States</div>
+      <div class="topLocation"><%- state %> <%- city %></div>
       <div class="thinLine"></div>
       <div class="flexRow">
         <div class="posted topMarginIndent">Posted:</div>
