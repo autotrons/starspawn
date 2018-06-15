@@ -10,6 +10,7 @@ app.get('/:jobId', async (req, res) => {
   if (extension(req.params.jobId) === 'xml') {
     const r1 = await getFile(`${SITEMAP_BUCKET}/${req.params.jobId}`)
     if (isFailure(r1)) return r1
+    res.set('Content-Type', 'text/xml')
     res.status(200).send(payload(r1))
   } else {
     render(req, res)
