@@ -157,7 +157,6 @@ describe('etl.js', function() {
     it('sitemapindex to end', () => {
       const id = uuid.v4()
       const prev_command = 'sitemapindex'
-      const indexPath = `foo_bucket/theindex.xml`
       const sitemapPaths = [
         `foo_bucket/test_sitemap_0.xml`,
         `foo_bucket/test_sitemap_1.xml`,
