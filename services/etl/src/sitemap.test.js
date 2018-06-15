@@ -8,6 +8,7 @@ const {
   getJobs,
   extractCursor,
   moreDataLeft,
+  SITEMAP_BUCKET
 } = require('./sitemap')
 const equal = require('assert')
 const uuid = require('uuid')
@@ -61,9 +62,9 @@ describe('sitemap.js', function() {
     })
 
     it(`should have written that file bruh`, async () => {
-      const r1 = await exists(paths[0])
+      const r1 = await exists(`${SITEMAP_BUCKET}/${paths[0]}`)
       assertSuccess(r1, true)
-      const r2 = await exists(paths[1])
+      const r2 = await exists(`${SITEMAP_BUCKET}/${paths[1]}`)
       assertSuccess(r2, true)
     })
   })

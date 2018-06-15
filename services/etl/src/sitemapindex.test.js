@@ -15,7 +15,7 @@ describe(`sitemapindex.js`, () => {
   describe(`sitemapindex()`, () => {
     const id = uuid.v4()
     const expectedPath = `${BUCKET}/sitemapindex.xml`
-    const paths = [`bleep/blop/bloop.xml`]
+    const paths = [`bloop.xml`]
     let path
     it(`should create sitemapindex file`, async () => {
       const result = await sitemapindex(id, {
@@ -48,8 +48,8 @@ describe(`sitemapindex.js`, () => {
 
   describe(`buildSitemapIndex()`, () => {
     const sitemaps = [
-      `${BUCKET}/test_sitemap_0.xml`,
-      `${BUCKET}/test_sitemap_1.xml`,
+      `test_sitemap_0.xml`,
+      `test_sitemap_1.xml`,
     ]
     let indexFilePath
 
