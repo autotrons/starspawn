@@ -9,7 +9,7 @@ const {
   buildSitemapIndex,
   formatUrl,
 } = require('./sitemapindex')
-const BUCKET = `${SITEMAP_BUCKET}_test`
+const BUCKET = `${SITEMAP_BUCKET}/test`
 
 describe(`sitemapindex.js`, () => {
   describe(`sitemapindex()`, () => {
@@ -20,7 +20,7 @@ describe(`sitemapindex.js`, () => {
     it(`should create sitemapindex file`, async () => {
       const result = await sitemapindex(id, {
         sitemapPaths: paths,
-        target_bucket: `${SITEMAP_BUCKET}_test`,
+        target_bucket: `${BUCKET}`,
       })
       assertSuccess(result, expectedPath)
       path = payload(result)

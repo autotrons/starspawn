@@ -76,11 +76,12 @@ app.get('/:command', async (req, res) => {
     }
 
     if (command === 'sitemap_cron') {
+      const destination = 'starspawn_jobs/sitemaps'
       const count = 1000
       const iteration = 0
       const sitemapPaths = []
 
-      const data = { count, iteration, sitemapPaths }
+      const data = { count, iteration, sitemapPaths, destination }
       const result = await http_post(id, 'sitemap', data)
       return respond(res, id, command, result)
     }

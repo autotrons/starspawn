@@ -26,14 +26,12 @@ async function sitemapindex(id, data) {
 async function buildSitemapIndex(target_bucket, sitemaps) {
   const buildBlocks = curry(buildSitemapBlock)
   const sitemapBlocks = map(buildBlocks(target_bucket), sitemaps)
-  const indexFile = `
-    <?xml version="1.0" encoding="UTF-8"?>
+  const indexFile = `<?xml version="1.0" encoding="UTF-8"?>
     <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
       ${sitemapBlocks.join('\n')}
     </sitemapindex>
   `
   const indexFilePath = `${target_bucket}/sitemapindex.xml`
-  //const options = { predefinedAcl: 'publicRead' }
   const options = {}
   const r2 = await save(indexFilePath, indexFile, options)
   if (isFailure(r2)) return r2
@@ -42,8 +40,7 @@ async function buildSitemapIndex(target_bucket, sitemaps) {
 
 function buildSitemapBlock(bucket, fileName) {
   const url = formatUrl(`${BASE_URL}/${fileName}`)
-  return `
-    <sitemap>
+  return `<sitemap>
       <loc>${url}</loc>
       <lastmod>${new Date().toISOString()}</lastmod>
     </sitemap>
