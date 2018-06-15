@@ -27,7 +27,7 @@
     "@google-cloud/pubsub": "^0.18.0",
     "@google-cloud/storage": "^1.6.0",
     "@pheasantplucker/failables": "^2.0.8",
-    "@pheasantplucker/gc-cloudstorage": "0.0.4",
+    "@pheasantplucker/gc-cloudstorage": "1.0.4",
     "@pheasantplucker/gc-datastore": "^1.0.3",
     "@pheasantplucker/gc-pubsub": "^3.0.0",
     "@pheasantplucker/http": "^1.0.2",

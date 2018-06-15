@@ -53,7 +53,8 @@ async function paginate(id, count, iteration = 0, sitemapPaths = [], cursor) {
   const sitemap = buildSitemap(jobs)
   const sitemapPath = `${SITEMAP_BUCKET}/test_sitemap_${iteration}.xml`
 
-  const r3 = await save(sitemapPath, sitemap)
+  const options = { predefinedAcl: 'publicRead' }
+  const r3 = await save(sitemapPath, sitemap, options)
   if (isFailure(r3)) {
     console.error(`${id} ${SERVICE_NAME} save ${payload(r3)}`)
     // considering returning `next` body here too. That allows for retries.

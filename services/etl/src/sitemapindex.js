@@ -33,7 +33,8 @@ async function buildSitemapIndex(target_bucket, sitemaps) {
     </sitemapindex>
   `
   const indexFilePath = `${target_bucket}/sitemapindex.xml`
-  const r2 = await save(indexFilePath, indexFile)
+  const options = { predefinedAcl: 'publicRead' }
+  const r2 = await save(indexFilePath, indexFile, options)
   if (isFailure(r2)) return r2
   return success(indexFilePath)
 }

@@ -1,19 +1,20 @@
+const uuid = require('uuid')
 const equal = require('assert').deepEqual
 const { assertSuccess, payload } = require('@pheasantplucker/failables')
 const { exists, deleteFile } = require('@pheasantplucker/gc-cloudstorage')
+
 const {
   sitemapindex,
   SITEMAP_BUCKET,
   buildSitemapIndex,
   formatUrl,
 } = require('./sitemapindex')
-const uuid = require('uuid')
+const BUCKET = `${SITEMAP_BUCKET}_test`
 
 describe(`sitemapindex.js`, () => {
   describe(`sitemapindex()`, () => {
     const id = uuid.v4()
-    const bucket = `${SITEMAP_BUCKET}_test`
-    const expectedPath = `${bucket}/sitemapindex.xml`
+    const expectedPath = `${BUCKET}/sitemapindex.xml`
     const paths = [`bleep/blop/bloop.xml`]
     let path
     it(`should create sitemapindex file`, async () => {
@@ -47,14 +48,14 @@ describe(`sitemapindex.js`, () => {
 
   describe(`buildSitemapIndex()`, () => {
     const sitemaps = [
-      'starspawn_jobs/sitemaps/test_sitemap_0.xml',
-      'starspawn_jobs/sitemaps/test_sitemap_1.xml',
+      `${BUCKET}/test_sitemap_0.xml`,
+      `${BUCKET}/test_sitemap_1.xml`,
     ]
     let indexFilePath
 
     it(`should build the sitemap index file`, async () => {
-      const result = await buildSitemapIndex(SITEMAP_BUCKET, sitemaps)
-      assertSuccess(result, `${SITEMAP_BUCKET}/sitemapindex.xml`)
+      const result = await buildSitemapIndex(BUCKET, sitemaps)
+      assertSuccess(result, `${BUCKET}/sitemapindex.xml`)
       indexFilePath = payload(result)
     })
 
