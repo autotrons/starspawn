@@ -47,10 +47,7 @@ describe(`sitemapindex.js`, () => {
   })
 
   describe(`buildSitemapIndex()`, () => {
-    const sitemaps = [
-      `test_sitemap_0.xml`,
-      `test_sitemap_1.xml`,
-    ]
+    const sitemaps = [`test_sitemap_0.xml`, `test_sitemap_1.xml`]
     let indexFilePath
 
     it(`should build the sitemap index file`, async () => {

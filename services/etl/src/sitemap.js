@@ -22,14 +22,22 @@ async function sitemap(id, data) {
       iteration,
       cursor,
       sitemapPaths,
+      destination = SITEMAP_BUCKET,
     } = data
-    return paginate(id, count, iteration, sitemapPaths, cursor)
+    return paginate(id, count, iteration, sitemapPaths, destination, cursor)
   } catch (e) {
     return failure(e.toString())
   }
 }
 
-async function paginate(id, count, iteration = 0, sitemapPaths = [], cursor) {
+async function paginate(
+  id,
+  count,
+  iteration = 0,
+  sitemapPaths = [],
+  destination,
+  cursor
+) {
   const r1 = await createQueryObj('job')
   if (isFailure(r1)) {
     console.error(`${id} ${SERVICE_NAME} createQueryObj ${payload(r1)}`)
@@ -52,7 +60,7 @@ async function paginate(id, count, iteration = 0, sitemapPaths = [], cursor) {
   const jobs = payload(r2)
   const sitemap = buildSitemap(jobs)
   const fileName = `sitemap_${iteration}.xml`
-  const sitemapPath = `${SITEMAP_BUCKET}/${fileName}`
+  const sitemapPath = `${destination}/${fileName}`
 
   const options = { predefinedAcl: 'publicRead' }
   const r3 = await save(sitemapPath, sitemap, options)

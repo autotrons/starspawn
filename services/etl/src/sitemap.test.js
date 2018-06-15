@@ -8,13 +8,14 @@ const {
   getJobs,
   extractCursor,
   moreDataLeft,
-  SITEMAP_BUCKET
+  SITEMAP_BUCKET,
 } = require('./sitemap')
 const equal = require('assert')
 const uuid = require('uuid')
 
 describe('sitemap.js', function() {
   this.timeout(540 * 1000)
+  const destination = `${SITEMAP_BUCKET}/test`
 
   describe(`sitemap()`, () => {
     const id = uuid.v4()
@@ -24,14 +25,14 @@ describe('sitemap.js', function() {
     let resultPaths
 
     it(`should build the sitemap`, async () => {
-      const data = { id, count, iteration, sitemapPaths }
+      const data = { id, count, iteration, sitemapPaths, destination }
       const result = await sitemap(id, data)
       assertSuccess(result)
       resultPaths = payload(result).sitemapPaths
     })
 
     it(`should have written the sitemap file`, async () => {
-      const r1 = await exists(resultPaths[0])
+      const r1 = await exists(`${destination}/${resultPaths[0]}`)
       assertSuccess(r1, true)
     })
   })
@@ -43,7 +44,7 @@ describe('sitemap.js', function() {
     let paths = []
     let p1
     it(`should do stuff`, async () => {
-      const result = await paginate(id, count, iteration, [])
+      const result = await paginate(id, count, iteration, [], destination)
       assertSuccess(result)
       p1 = payload(result)
       equal(p1.more_work, true)
@@ -56,15 +57,21 @@ describe('sitemap.js', function() {
         iteration: iteration2,
         sitemapPaths: sitemapPaths2,
       } = payload(result)
-      const r2 = await paginate(id2, count2, iteration2, sitemapPaths2)
+      const r2 = await paginate(
+        id2,
+        count2,
+        iteration2,
+        sitemapPaths2,
+        destination
+      )
       assertSuccess(r2)
       paths = payload(r2).sitemapPaths
     })
 
     it(`should have written that file bruh`, async () => {
-      const r1 = await exists(`${SITEMAP_BUCKET}/${paths[0]}`)
+      const r1 = await exists(`${destination}/${paths[0]}`)
       assertSuccess(r1, true)
-      const r2 = await exists(`${SITEMAP_BUCKET}/${paths[1]}`)
+      const r2 = await exists(`${destination}/${paths[1]}`)
       assertSuccess(r2, true)
     })
   })
