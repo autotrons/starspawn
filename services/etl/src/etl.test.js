@@ -286,38 +286,16 @@ describe('etl.js', function() {
     })
   })
 
-  describe('/sitemap_cron', () => {
+  // ==============================================
+  //
+  //   WARNING this will clobber the live sitemaps
+  //
+  // ==============================================
+  describe.skip('/sitemap_cron', () => {
     it('should return the id and sitemapPaths in a payload', async () => {
       const id = uuid.v4()
       const result = await sitemap_cron(id)
       assertSuccess(result)
     })
   })
-  // describe('/appcast_pipeline', () => {
-  //   it('start the appcast pipeline', async () => {
-  //     const r1 = await appcast_pipeline()
-  //     assertSuccess(r1)
-  //     //const id = payload(r1).id
-  //     // const r2 = await try_until(500, 2 * 1000, async () => {
-  //     //   try {
-  //     //     // see if the jobs are in the database
-  //     //   } catch (e) {
-  //     //     return false
-  //     //   }
-  //     // })
-  //   })
-  // })
 })
-
-// async function try_until(interval, timeout, condition) {
-//   let result = false
-//   let start_time = Date.now()
-//   while (result === false) {
-//     result = await condition()
-//     if (result) return true
-//     await sleep(interval)
-
-//     if (Date.now() - start_time > timeout) return false
-//   }
-//   return false
-// }

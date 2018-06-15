@@ -62,7 +62,8 @@ async function paginate(
   const fileName = `sitemap_${iteration}.xml`
   const sitemapPath = `${destination}/${fileName}`
 
-  const options = { predefinedAcl: 'publicRead' }
+  //const options = { predefinedAcl: 'publicRead' }
+  const options = {}
   const r3 = await save(sitemapPath, sitemap, options)
   if (isFailure(r3)) {
     console.error(`${id} ${SERVICE_NAME} save ${payload(r3)}`)
