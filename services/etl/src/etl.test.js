@@ -29,6 +29,20 @@ async function health_check(id) {
   return result
 }
 
+async function sitemap_cron(id) {
+  const options = {
+    uri: 'http://localhost:8080/sitemap_cron',
+    method: 'GET',
+    headers: {
+      'User-Agent': 'Request-Promise',
+    },
+    body: { message: { data: { id } } },
+    json: true, // Automatically stringifies the body to JSON
+  }
+  const result = await rp(options)
+  return result
+}
+
 // async function appcast_pipeline(id) {
 //   const options = {
 //     uri: 'http://localhost:8080/appcast_pipeline_test',
@@ -186,6 +200,14 @@ describe('etl.js', function() {
     it('should return the id in a payload', async () => {
       const id = uuid.v4()
       const result = await health_check(id)
+      assertSuccess(result)
+    })
+  })
+
+  describe('/sitemap_cron', () => {
+    it('should return the id and sitemapPaths in a payload', async () => {
+      const id = uuid.v4()
+      const result = await sitemap_cron(id)
       assertSuccess(result)
     })
   })

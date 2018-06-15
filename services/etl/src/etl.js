@@ -17,6 +17,7 @@ const { chunk } = require('./chunk')
 const { loader } = require('./loader')
 const { json2gsd } = require('./json2gsd')
 const { parse } = require('./parse')
+const { sitemap } = require('./sitemap')
 const { health_check } = require('./health_check')
 
 // ==========================================================
@@ -72,7 +73,13 @@ app.get('/:command', async (req, res) => {
     }
 
     if (command === 'sitemap_cron') {
-      // TODO put sitemap kick off code here
+      const count = 50
+      const iteration = 0
+      const sitemapPaths = []
+
+      const data = { id, count, iteration, sitemapPaths }
+      const result = await sitemap(id, data)
+      return respond(res, id, command, result)
     }
     return respond(res, id, command, failure('no path'))
   } catch (e) {
