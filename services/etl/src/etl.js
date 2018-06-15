@@ -60,7 +60,7 @@ app.get('/:command', async (req, res) => {
   let command = 'none'
   try {
     command = req.params.command
-
+    console.info(`${id} ${command}`)
     if (command === 'appcast_loader_cron') {
       const source_url =
         'https://exchangefeeds.s3.amazonaws.com/9d2dcb702d7d6b801f34227c04c8bb23/feed.xml.gz'
