@@ -48,7 +48,6 @@ describe('json2gsd.js', function() {
       const gsd = gsdPayload.rendered
       const checkKeysAgainstTemplate = compareGsdTemplate(gsd)
       assert(checkKeysAgainstTemplate)
-      assertSuccess(r1)
     })
   })
   describe('assemble()', function() {
@@ -56,7 +55,7 @@ describe('json2gsd.js', function() {
       const r1 = mergeMeta(jobJson)
       assertSuccess(r1)
       const r2 = assemble(tmpl, jobJson)
-      assert(typeof r2 === 'object')
+      assert(typeof payload(r2) === 'object')
       assertSuccess(r2)
     })
   })

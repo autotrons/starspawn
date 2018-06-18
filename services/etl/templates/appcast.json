@@ -30,12 +30,18 @@
     "jobLocation": {
       "ignoreEmpty": false,
       "as": {
-        "@type": "postalAddressType",
-        "streetAddress": null,
-        "addressLocality": "city",
-        "addressRegion": "state",
-        "postalCode": "zip",
-        "addressCountry": "country"
+        "@type": "jobLocationType",
+        "address": {
+          "ignoreEmpty": false,
+          "as": {
+            "@type": "postalAddressType",
+            "streetAddress": null,
+            "addressLocality": "city",
+            "addressRegion": "state",
+            "postalCode": "zip",
+            "addressCountry": "country"
+          }
+        }
       }
     },
     "baseSalary": {

@@ -32,6 +32,7 @@ function mergeMeta(jobJson) {
     identifierType: 'PropertyValue',
     hiringOrganizationType: 'Organization',
     postalAddressType: 'PostalAddress',
+    jobLocationType: 'Place',
     baseSalaryType: 'MonetaryAmount',
     valueType: 'QuantitativeValue',
     jobPostingContext: 'http://schema.org',

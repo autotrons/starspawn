@@ -29,7 +29,6 @@ async function do_file_things(id, data) {
   const r3 = await parseXmlToJson(xmlFile)
   if (isFailure(r3)) return r3
   const json = payload(r3)
-
   const r4 = await addGoogleStructuredData(json)
   if (isFailure(r4)) return r4
   const gsd = payload(r4)
