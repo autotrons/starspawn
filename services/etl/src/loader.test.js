@@ -18,7 +18,7 @@ const assert = require('assert')
 const uuid = require('uuid')
 
 const filename = `starspawn_tests/parsed_output.json`
-const fakeJobArray = require(`../../../samples/fakejobsarray.json`)
+const { forJobsToEntities } = require(`../../../samples/loaderJobs`)
 
 const thisId = uuid.v4()
 
@@ -52,7 +52,7 @@ describe('loader.js', function() {
 
   describe(`jobstoEntities()`, () => {
     it(`should take an array of jobs and return an array of entities`, () => {
-      const result = jobsToEntities(thisId, fakeJobArray)
+      const result = jobsToEntities(thisId, forJobsToEntities)
       assertSuccess(result)
       const p = payload(result)
       equal(p[0].key.kind, 'job')

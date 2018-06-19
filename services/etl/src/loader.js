@@ -11,6 +11,7 @@ const {
   lookup,
 } = require('@pheasantplucker/gc-datastore')
 const { getFile } = require('@pheasantplucker/gc-cloudstorage')
+const he = require('he')
 const md5 = require('md5')
 
 createDatastoreClient('starspawn-201921')
@@ -35,7 +36,6 @@ async function do_file_things(id, data) {
   if (isFailure(jobEntitiesResult)) return jobEntitiesResult
 
   const jobEntities = payload(jobEntitiesResult)
-
   const drain_result = await drain_write_entities(id, jobEntities)
   if (isFailure(drain_result)) return drain_result
 
@@ -95,9 +95,15 @@ function appcast_id(j) {
 }
 
 function appcast_datastore_job(j, is_test = false) {
+  console.log(`::::::::::::::j::::::::::::::`, j)
   const kind = 'job'
   const id = appcast_id(j)
   const key = payload(makeDatastoreKey(kind, id))
+  const sanitizedDescription = removeEscapeCharacters(j.gsd.description)
+  if (isFailure(sanitizedDescription)) return sanitizedDescription
+  const gsd = Object.assign({}, j.gsd, {
+    description: payload(sanitizedDescription),
+  })
   const data = {
     id: id,
     body: j.body,
@@ -118,7 +124,7 @@ function appcast_datastore_job(j, is_test = false) {
     title: j.title,
     url: j.url,
     zip: j.zip,
-    gsd: JSON.stringify(j.gsd),
+    gsd: JSON.stringify(gsd),
     hash: appcast_hash(j),
     source: 'appcast',
     is_test,
@@ -128,6 +134,15 @@ function appcast_datastore_job(j, is_test = false) {
     excludeFromIndexes: ['body', 'gsd'],
     method: 'insert',
     data,
+  }
+}
+
+const removeEscapeCharacters = html => {
+  try {
+    const decodedHtml = he.unescape(html)
+    return success(decodedHtml)
+  } catch (e) {
+    return failure(e.toString())
   }
 }
 
