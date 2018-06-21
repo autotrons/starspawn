@@ -113,27 +113,32 @@ function extractFields(data) {
   return {
     lastMod: posted_at,
     loc: buildUrl(id),
-    changefreq: 'daily',
+    changefreq: 'never',
     priority: 0.5, // 0.5 is the default value.
   }
 }
 
 function buildSitemap(jobs) {
   const urlBlocks = map(buildUrlBlock, jobs)
-  return `<?xml version="1.0" encoding="UTF-8"?>
-    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-      ${urlBlocks.join('\n')}
-    </urlset>`
+  const builtSitemap =
+`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urlBlocks.join('\n')}
+</urlset>`
+  return builtSitemap
 }
 
 function buildUrlBlock(job) {
   const { loc, lastMod, changefreq, priority } = job
-  return `<url>
-            <loc>${formatUrl(loc)}</loc>
-            <lastmod>${new Date(lastMod).toISOString()}</lastmod>
-            <changefreq>${changefreq}</changefreq>
-            <priority>${priority}</priority>
-          </url>`
+  const urlBlock =
+`\t<url>
+\t\t<loc>${formatUrl(loc)}</loc>
+\t\t<lastmod>${new Date(lastMod).toISOString()}</lastmod>
+\t\t<changefreq>${changefreq}</changefreq>
+\t\t<priority>${priority}</priority>
+\t</url>`
+  return urlBlock
+
 }
 
 const formatUrl = url => {
