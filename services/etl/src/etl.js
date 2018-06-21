@@ -77,7 +77,7 @@ app.get('/:command', async (req, res) => {
 
     if (command === 'sitemap_cron') {
       const destination = 'starspawn_jobs/sitemaps'
-      const count = 1000
+      const count = 50000 // Google wants you to max out each sitemap
       const iteration = 0
       const sitemapPaths = []
 
