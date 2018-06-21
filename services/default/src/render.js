@@ -19,19 +19,31 @@ const entityKeyKind = 'job'
 
 async function render(req, res) {
   const jobIdResult = getJobId(req)
-  if (isFailure(jobIdResult)) return jobIdResult
+  if (isFailure(jobIdResult)) {
+    res_err(res, `Couldn't find that job ID from req:${req}`)
+    return jobIdResult
+  }
   const jobId = payload(jobIdResult)
   const jobDataResult = await getDataFromDatastore(jobId)
-  if (isFailure(jobDataResult)) return jobDataResult
+  if (isFailure(jobDataResult)) {
+    res_err(res, `Couldn't find job ID [${jobId}] in DS`)
+    return jobDataResult
+  }
   const jobData = payload(jobDataResult)[jobId]
 
   const r1 = unsanitizeDescriptionHtml(jobData.body)
-  if (isFailure(r1)) return r1
+  if (isFailure(r1)) {
+    res_err(res, `Couldn't clean up that dirty, dirty job body.`)
+    return r1
+  }
   const cleanBody = payload(r1)
   const cleanBodyObj = { body: cleanBody }
 
   const r2 = timeAgo(jobData.posted_at)
-  if (isFailure(r2)) return r2
+  if (isFailure(r2)) {
+    res_err(res, `Couldn't figure out how long ago the job was posted.`)
+    return r2
+  }
   const cleanTimeAgo = payload(r2)
   const cleanTimeAgoObj = { timeAgo: cleanTimeAgo }
 
@@ -98,7 +110,7 @@ function res_ok(res, payload) {
 
 function res_err(res, payload) {
   console.error(payload)
-  res.status(404).send("<html><h1>404</h1></html>")
+  res.status(404).send("<html><h1>404</h1><br/>Sorry we couldn't find what you were looking four.</html>")
   return failure(payload)
 }
 

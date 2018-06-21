@@ -20,7 +20,7 @@ const realJob = require('./realJobSchemaed.json')
 const realJobKey = realJob.id
 const projectFullName = 'starspawn-201921'
 // this jobid will need to get updated as it may get deleted at some point
-const jobid = '0007683151aa07c18ef894e771254610'
+const jobid = '00338075635d99124ca27395b6cbe02b'
 
 let writtenEntities = []
 
@@ -48,7 +48,6 @@ describe('render.js ', function () {
     this.timeout(540 * 1000)
     it('Should get data from GCE Datastore', async () => {
       const result = await getDataFromDatastore(jobid)
-      console.log(result)
       assertSuccess(result)
       const data = payload(result)
       assert(typeof data === 'object')
