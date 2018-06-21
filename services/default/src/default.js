@@ -6,7 +6,7 @@ const express = require('express')
 const app = express()
 const SITEMAP_BUCKET = 'starspawn_jobs/sitemaps'
 
-const ROBOTS_TXT_STRING = 'User-agent: * \nDisallow: '
+const ROBOTS_TXT_STRING = 'User-agent: * \nDisallow: \nSitemap: https://joblog.app/sitemapindex.xml'
 
 app.get('/:jobId', async (req, res) => {
   if (req.params.jobId === 'robots.txt') {
