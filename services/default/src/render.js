@@ -98,7 +98,7 @@ function res_ok(res, payload) {
 
 function res_err(res, payload) {
   console.error(payload)
-  res.status(500).send(payload)
+  res.status(404).send("<html><h1>404</h1></html>")
   return failure(payload)
 }
 

@@ -130,7 +130,7 @@ function buildUrlBlock(job) {
   const { loc, lastMod, changefreq, priority } = job
   return `<url>
             <loc>${formatUrl(loc)}</loc>
-            <lastmod>${lastMod}</lastmod>
+            <lastmod>${new Date(lastMod).toISOString()}</lastmod>
             <changefreq>${changefreq}</changefreq>
             <priority>${priority}</priority>
           </url>`

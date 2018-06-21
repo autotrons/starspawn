@@ -22,6 +22,10 @@ app.get('/:jobId', async (req, res) => {
   }
 })
 
+app.get('/', (req, res) => {
+  res.status(200).send("A log for jobs")
+})
+
 // Start the server
 const PORT = process.env.PORT || 8080
 

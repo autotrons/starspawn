@@ -24,7 +24,8 @@ const jobid = '0007683151aa07c18ef894e771254610'
 
 let writtenEntities = []
 
-describe('render.js ', () => {
+describe('render.js ', function () {
+  this.timeout(10 * 1000)
   before(async () => {
     const r1 = await createDatastoreClient(projectFullName)
     assertSuccess(r1)
@@ -47,6 +48,7 @@ describe('render.js ', () => {
     this.timeout(540 * 1000)
     it('Should get data from GCE Datastore', async () => {
       const result = await getDataFromDatastore(jobid)
+      console.log(result)
       assertSuccess(result)
       const data = payload(result)
       assert(typeof data === 'object')
