@@ -6,7 +6,12 @@ const express = require('express')
 const app = express()
 const SITEMAP_BUCKET = 'starspawn_jobs/sitemaps'
 
+const ROBOTS_TXT_STRING = 'User-agent: * \nDisallow: '
+
 app.get('/:jobId', async (req, res) => {
+  if (req.params.jobId === 'robots.txt') {
+    res.status(200).send(ROBOTS_TXT_STRING)
+  }
   if (extension(req.params.jobId) === 'xml') {
     const r1 = await getFile(`${SITEMAP_BUCKET}/${req.params.jobId}`)
     if (isFailure(r1)) return r1
