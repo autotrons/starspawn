@@ -95,7 +95,6 @@ function appcast_id(j) {
 }
 
 function appcast_datastore_job(j, is_test = false) {
-  console.log(`::::::::::::::j::::::::::::::`, j)
   const kind = 'job'
   const id = appcast_id(j)
   const key = payload(makeDatastoreKey(kind, id))
