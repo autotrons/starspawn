@@ -10,6 +10,7 @@ const { json2gsd } = require('./json2gsd.js')
 const parser = new xml2js.Parser({ explicitArray: false, trim: true })
 const { getFile, save } = require('@pheasantplucker/gc-cloudstorage')
 const target_bucket = `datafeeds/parsed`
+const sanitizeHtml = require('sanitize-html')
 
 async function parse(id, data) {
   try {
@@ -29,16 +30,21 @@ async function do_file_things(id, data) {
   const r3 = await parseXmlToJson(xmlFile)
   if (isFailure(r3)) return r3
   const json = payload(r3)
-  const r4 = await addGoogleStructuredData(json)
+
+  const r4 = await cleanAllJobBodies(json)
   if (isFailure(r4)) return r4
-  const gsd = payload(r4)
+  const cleanJson = payload(r4)
+
+  const r5 = await addGoogleStructuredData(cleanJson)
+  if (isFailure(r5)) return r5
+  const gsd = payload(r5)
 
   const jsonJobs = { root: { job: gsd } }
 
   const subid = uuid.v4()
   const target_file = `${target_bucket}/${id}/${subid}.json`
-  const r5 = await save(target_file, JSON.stringify(jsonJobs))
-  if (isFailure(r5)) return r5
+  const r6 = await save(target_file, JSON.stringify(jsonJobs))
+  if (isFailure(r6)) return r6
 
   return success({ id, jsonJobs, target_file })
 }
@@ -52,6 +58,25 @@ async function addGoogleStructuredData(json) {
     return newJob
   })
   return success(gsd)
+}
+
+async function cleanAllJobBodies(json) {
+  const cleaned = await json.root.job.map(function(job) {
+    const r1 = cleanHtmlBody(job.body)
+    if (isFailure(r1)) return r1
+    const cleanBody = payload(r1)
+    const newJob = Object.assign({}, job, { body: cleanBody })
+    return newJob
+  })
+  return success({ root: { job: cleaned } })
+}
+
+function cleanHtmlBody(dirtyHtml) {
+  try {
+    return success(sanitizeHtml(dirtyHtml))
+  } catch (e) {
+    return failure(e.toString())
+  }
 }
 
 function parseXmlToJson(xml) {
@@ -69,4 +94,6 @@ function parseXmlToJson(xml) {
 module.exports = {
   parse,
   parseXmlToJson,
+  cleanHtmlBody,
+  cleanAllJobBodies,
 }
