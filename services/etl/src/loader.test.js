@@ -63,7 +63,8 @@ describe('loader.js', function() {
 
   describe('loader()', function() {
     it('should load a list of jobs into Datastore', async () => {
-      const result = await loader(thisId, { filename })
+      const isTest = true
+      const result = await loader(thisId, { filename, isTest })
       assertSuccess(result)
       const writtenJobs = payload(result)
       const job1Key = writtenJobs.jobEntities[0].key

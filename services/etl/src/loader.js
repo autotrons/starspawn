@@ -25,14 +25,14 @@ async function loader(id, data) {
 }
 
 async function do_file_things(id, data) {
-  const { filename } = data
+  let { filename, isTest } = data
 
   const r1 = await getFile(filename)
   if (isFailure(r1)) return r1
   const jobs = JSON.parse(payload(r1))
   const jobArray = jobs.root.job
 
-  const jobEntitiesResult = await jobsToEntities(id, jobArray)
+  const jobEntitiesResult = await jobsToEntities(id, jobArray, isTest)
   if (isFailure(jobEntitiesResult)) return jobEntitiesResult
 
   const jobEntities = payload(jobEntitiesResult)
@@ -42,11 +42,11 @@ async function do_file_things(id, data) {
   return success({ jobEntities })
 }
 
-const jobsToEntities = (id, jobs) => {
+const jobsToEntities = (id, jobs, isTest) => {
   try {
     const entities = []
     for (let i = 0; i < jobs.length; i++) {
-      const ent = appcast_datastore_job(jobs[i])
+      const ent = appcast_datastore_job(jobs[i], isTest)
       entities.push(ent)
     }
     return success(entities)
@@ -95,7 +95,9 @@ function appcast_id(j) {
 }
 
 function appcast_datastore_job(j, is_test = false) {
-  const kind = 'job'
+  let kind = 'job'
+  if (is_test) kind = 'testJob'
+
   const id = appcast_id(j)
   const key = payload(makeDatastoreKey(kind, id))
   const sanitizedDescription = removeEscapeCharacters(j.gsd.description)
