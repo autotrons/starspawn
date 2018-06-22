@@ -120,8 +120,7 @@ function extractFields(data) {
 
 function buildSitemap(jobs) {
   const urlBlocks = map(buildUrlBlock, jobs)
-  const builtSitemap =
-`<?xml version="1.0" encoding="UTF-8"?>
+  const builtSitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urlBlocks.join('\n')}
 </urlset>`
@@ -130,15 +129,13 @@ ${urlBlocks.join('\n')}
 
 function buildUrlBlock(job) {
   const { loc, lastMod, changefreq, priority } = job
-  const urlBlock =
-`\t<url>
+  const urlBlock = `\t<url>
 \t\t<loc>${formatUrl(loc)}</loc>
 \t\t<lastmod>${new Date(lastMod).toISOString()}</lastmod>
 \t\t<changefreq>${changefreq}</changefreq>
 \t\t<priority>${priority}</priority>
 \t</url>`
   return urlBlock
-
 }
 
 const formatUrl = url => {
