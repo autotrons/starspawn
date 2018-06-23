@@ -8,6 +8,12 @@ appcast etl:
 sitemap:
 `https://etl-dot-starspawn-201921.appspot.com/sitemap_cron`
 
+# Tools
+* GSD https://search.google.com/structured-data/testing-tool/u/0/
+* AMP https://search.google.com/test/amp
+* Webmater https://www.google.com/webmasters/tools/dashboard?hl=en&siteUrl=https://joblog.app/
+* GCP https://console.cloud.google.com/home/dashboard?project=starspawn-201921
+
 # Builds
 * Downloads https://console.cloud.google.com/gcr/builds?project=starspawn-201921&query=tags%20%3D%20%22download%22
 
