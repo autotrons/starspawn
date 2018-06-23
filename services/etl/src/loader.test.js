@@ -59,8 +59,6 @@ describe('loader.js', function() {
     })
   })
 
-  describe(`drain_write_entities()`, () => {})
-
   describe('loader()', function() {
     it('should load a list of jobs into Datastore', async () => {
       const isTest = true

@@ -65,7 +65,7 @@ app.get('/:command', async (req, res) => {
     command = req.params.command
     console.info(`${id} ${command}`)
     if (command === 'echo') {
-      return respond(res, id, command, success("echo"))
+      return respond(res, id, command, success('echo'))
     }
     if (command === 'appcast_loader_cron') {
       const source_url =
