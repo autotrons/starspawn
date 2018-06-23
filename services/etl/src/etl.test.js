@@ -135,7 +135,7 @@ describe('etl.js', function() {
       ]
       const cursor = 'asdf-adsf-adsf-asdf'
       const more_work = false
-
+      const notifyGoogle = true
       const data = {
         id,
         iteration,
@@ -150,7 +150,7 @@ describe('etl.js', function() {
       assertSuccess(result, [
         {
           next_command: 'sitemapindex',
-          next_args: { sitemapPaths },
+          next_args: { sitemapPaths, notifyGoogle },
         },
       ])
     })

@@ -21,6 +21,7 @@ describe(`sitemapindex.js`, () => {
       const result = await sitemapindex(id, {
         sitemapPaths: paths,
         target_bucket: `${BUCKET}`,
+        notifyGoogle: false,
       })
       assertSuccess(result, expectedPath)
       path = payload(result)
@@ -39,10 +40,6 @@ describe(`sitemapindex.js`, () => {
     it(`should have deleted test file`, async () => {
       const result = await exists(expectedPath)
       assertSuccess(result, false)
-    })
-
-    it.skip(`should tell Google!`, async () => {
-      assertSuccess(2)
     })
   })
 

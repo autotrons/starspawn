@@ -201,6 +201,7 @@ function sitemap_sitemap_sitemapindex(id, p) {
   }
   const c1 = make_next_command('sitemapindex', {
     sitemapPaths: p.sitemapPaths,
+    notifyGoogle: true
   })
   return success([c1])
 }
