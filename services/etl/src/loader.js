@@ -91,7 +91,13 @@ function appcast_hash(j) {
   return md5(JSON.stringify(copy))
 }
 function appcast_id(j) {
-  return md5(j.job_reference + j.posted_at)
+  const t0 = `${j.title}_${j.city}_${j.state}`
+  const t1 = t0.replace(/\s+/g,'_')
+  const t2 = t1.replace(/[^a-z0-9_+]+/gi, '');
+  const t3 = t2.replace(/_+/g, '_')
+  const t4 = t3.replace(/_+/g, '-')
+  const id = `${t4}-${md5(j.job_reference).slice(0,4)}`
+  return id
 }
 
 function appcast_datastore_job(j, is_test = false) {
