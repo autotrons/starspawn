@@ -91,7 +91,7 @@ function appcast_hash(j) {
   return md5(JSON.stringify(copy))
 }
 function appcast_id(j) {
-  const t0 = `${j.title}_${j.city}_${j.state}`
+  const t0 = `${j.title.slice(0,25)}_${j.city}_${j.state}`
   const t1 = t0.replace(/\s+/g,'_')
   const t2 = t1.replace(/[^a-z0-9_+]+/gi, '');
   const t3 = t2.replace(/_+/g, '_')
