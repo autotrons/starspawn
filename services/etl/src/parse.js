@@ -11,6 +11,7 @@ const parser = new xml2js.Parser({ explicitArray: false, trim: true })
 const { getFile, save } = require('@pheasantplucker/gc-cloudstorage')
 const target_bucket = `datafeeds/parsed`
 const sanitizeHtml = require('sanitize-html')
+const { map } = require('ramda')
 
 async function parse(id, data) {
   try {
@@ -49,14 +50,13 @@ async function do_file_things(id, data) {
   return success({ id, jsonJobs, target_file })
 }
 
-async function addGoogleStructuredData(json) {
-  const gsd = await json.root.job.map(function(job) {
-    const r1 = json2gsd(job)
+function addGoogleStructuredData(json) {
+  const gsd = map(j => {
+    const r1 = json2gsd(j)
     if (isFailure(r1)) return r1
     const gsdJob = payload(r1).rendered
-    const newJob = Object.assign({}, job, { gsd: gsdJob })
-    return newJob
-  })
+    return Object.assign({}, j, { gsd: gsdJob })
+  }, json.root.job)
   return success(gsd)
 }
 
