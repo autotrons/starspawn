@@ -11,7 +11,7 @@ const {
 } = require('@pheasantplucker/failables')
 const rp = require('request-promise')
 
-// const { download } = require('./download')
+const { download } = require('./download')
 // const { unzip } = require('./unzip')
 // const { chunk } = require('./chunk')
 // const { loader } = require('./loader')
@@ -33,17 +33,17 @@ let SERVER
 app.use(bodyParser.json())
 
 // function map
-// const FUNCTION_MAP = {
-//   chunk,
-//   download,
-//   health_check,
-//   loader,
-//   parse,
-//   json2gsd,
-//   unzip,
-//   sitemap,
-//   sitemapindex,
-// }
+const FUNCTION_MAP = {
+//  chunk,
+  download,
+  // health_check,
+  // loader,
+  // parse,
+  // json2gsd,
+  // unzip,
+  // sitemap,
+  // sitemapindex,
+}
 
 process.on('unhandledRejection', (reason, p) => {
   log(`Unhandled Rejection ${reason.stack}`)
