@@ -109,10 +109,10 @@ function buildUrl(job) {
 }
 
 function extractFields(data) {
-  const { posted_at, id } = data
+  const { posted_at, url } = data
   return {
     lastMod: posted_at,
-    loc: buildUrl(id),
+    loc: buildUrl(url),
     changefreq: 'never',
     priority: 0.5, // 0.5 is the default value.
   }

@@ -16,7 +16,6 @@ async function sitemapindex(id, data) {
   const bucket = whichBucket(data)
   const r1 = await buildSitemapIndex(bucket, sitemapPaths)
   if (isFailure(r1)) return failure(payload(r1), id)
-  console.log(`notifyGoogle:`, notifyGoogle)
   if (notifyGoogle == 'cheese') {
     const r2 = await tellGoogle()
     console.info(`${id} sitemapindex failed submitting to Google: ${payload(r2)}`)
