@@ -14,13 +14,14 @@ const {
   getDataFromDatastore,
   unsanitizeDescriptionHtml,
   timeAgo,
+  getByUrl
 } = require('./render')
 
 const realJob = require('./realJobSchemaed.json')
 const realJobKey = realJob.id
 const projectFullName = 'starspawn-201921'
 // this jobid will need to get updated as it may get deleted at some point
-const jobid = '00338075635d99124ca27395b6cbe02b'
+const jobid = '0043c6ceb907eaea2d639e0fcfa4ca8b'
 
 let writtenEntities = []
 
@@ -46,11 +47,19 @@ describe('render.js ', function () {
 
   describe('getDataFromDatastore()', function() {
     this.timeout(540 * 1000)
-    it('Should get data from GCE Datastore', async () => {
+    it('Should get a job by id / key', async () => {
       const result = await getDataFromDatastore(jobid)
       assertSuccess(result)
-      const data = payload(result)
-      assert(typeof data === 'object')
+      const job = payload(result)
+      equal(job.id, jobid)
+    })
+    it('Should get a job by url too', async () => {
+      // this may fail as we wipe the database
+      const url = "RN-in-St-Paul-Cottage-Grove-MN-0043"
+      const result = await getDataFromDatastore(url)
+      assertSuccess(result)
+      const job = payload(result)
+      equal(job.url, url)
     })
   })
 
@@ -76,7 +85,15 @@ describe('render.js ', function () {
       assert(parsed[0].tagName === '!doctype')
     })
   })
-
+  describe('getByUrl()', () => {
+    it('Should get a job by the url', async () => {
+      const url = "RN-in-St-Paul-Cottage-Grove-MN-0043"
+      const result = await getByUrl(url)
+      assertSuccess(result)
+      const job = payload(result)
+      equal(job.url, url)
+    })
+  })
   describe(`timeAgo()`, () => {
     it(`should return the english time ago equiv given a date`, () => {
       const result = timeAgo(new Date() - 1000)
