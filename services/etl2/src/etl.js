@@ -34,15 +34,15 @@ app.use(bodyParser.json())
 
 // function map
 const FUNCTION_MAP = {
-//  chunk,
+  chunk:()=>failure("noop"),
   download,
-  // health_check,
-  // loader,
-  // parse,
-  // json2gsd,
-  // unzip,
-  // sitemap,
-  // sitemapindex,
+  health_check:()=>failure("noop"),
+  loader:()=>failure("noop"),
+  parse:()=>failure("noop"),
+  json2gsd:()=>failure("noop"),
+  unzip:()=>failure("noop"),
+  sitemap:()=>failure("noop"),
+  sitemapindex:()=>failure("noop"),
 }
 
 process.on('unhandledRejection', (reason, p) => {
@@ -234,7 +234,7 @@ async function http_post(id, command, args) {
   const data = Object.assign({}, args, { id })
   try {
     const options = {
-      uri: `http://localhost:8080/${command}`,
+      uri: `https://etl2-dot-starspawn-201921.appspot.com/${command}`,
       method: 'POST',
       headers: {
         'User-Agent': 'Request-Promise',
