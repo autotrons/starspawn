@@ -13,7 +13,7 @@ const rp = require('request-promise')
 
 const { download } = require('./download')
 const { unzip } = require('./unzip')
-// const { chunk } = require('./chunk')
+const { chunk } = require('./chunk')
 // const { loader } = require('./loader')
 // const { json2gsd } = require('./json2gsd')
 // const { parse } = require('./parse')
@@ -34,7 +34,7 @@ app.use(bodyParser.json())
 
 // function map
 const FUNCTION_MAP = {
-  chunk:()=>failure("noop"),
+  chunk,
   download,
   health_check,
   loader:()=>failure("noop"),
