@@ -12,14 +12,14 @@ const {
 const rp = require('request-promise')
 
 const { download } = require('./download')
-// const { unzip } = require('./unzip')
+const { unzip } = require('./unzip')
 // const { chunk } = require('./chunk')
 // const { loader } = require('./loader')
 // const { json2gsd } = require('./json2gsd')
 // const { parse } = require('./parse')
 // const { sitemap } = require('./sitemap')
 // const { sitemapindex } = require('./sitemapindex')
-// const { health_check } = require('./health_check')
+const { health_check } = require('./health_check')
 
 // ==========================================================
 //
@@ -36,11 +36,11 @@ app.use(bodyParser.json())
 const FUNCTION_MAP = {
   chunk:()=>failure("noop"),
   download,
-  health_check:()=>failure("noop"),
+  health_check,
   loader:()=>failure("noop"),
   parse:()=>failure("noop"),
   json2gsd:()=>failure("noop"),
-  unzip:()=>failure("noop"),
+  unzip,
   sitemap:()=>failure("noop"),
   sitemapindex:()=>failure("noop"),
 }
@@ -302,4 +302,7 @@ function stop() {
 module.exports = {
   start,
   stop,
+  get_next_command,
+  extract_arguments,
+  post_command_handler
 }
