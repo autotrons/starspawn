@@ -1,5 +1,0 @@
-cron:
-- description: appcast loader
-  url: /appcast_loader_cron
-  schedule: every 23 hours
-  target: etl2

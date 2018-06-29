@@ -1,4 +1,9 @@
 cron:
+- description: appcast loader
+  url: /appcast_loader_cron
+  schedule: every 23 hours
+  target: etl2
+cron:
 - description: rebuild the sitemaps
   url: /sitemap_cron
   schedule: every 24 hours

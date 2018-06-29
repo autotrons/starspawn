@@ -8,8 +8,6 @@
     "test": "mocha ./src/*.test.js",
     "testwatch": "mocha --watch ./src/*.test.js",
     "lint": "esw .eslintrc.js src/ lib/ tests/ -w --fix --ignore-pattern !.eslintrc.js",
-    "lint-etl": "esw .eslintrc.js src/etl.js src/etl.test.js -w --fix --ignore-pattern !.eslintrc.js",
-    "lint-chunk": "esw .eslintrc.js src/chunk.js src/chunk.test.js -w --fix --ignore-pattern !.eslintrc.js",
     "deploy": "gcloud app deploy",
     "cron-deploy": "gcloud app deploy cron.yaml"
   },
