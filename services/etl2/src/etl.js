@@ -16,7 +16,7 @@ const { unzip } = require('./unzip')
 const { chunk } = require('./chunk')
 // const { loader } = require('./loader')
 // const { json2gsd } = require('./json2gsd')
-// const { parse } = require('./parse')
+const { parse } = require('./parse')
 // const { sitemap } = require('./sitemap')
 // const { sitemapindex } = require('./sitemapindex')
 const { health_check } = require('./health_check')
@@ -38,7 +38,7 @@ const FUNCTION_MAP = {
   download,
   health_check,
   loader:()=>failure("noop"),
-  parse:()=>failure("noop"),
+  parse,
   json2gsd:()=>failure("noop"),
   unzip,
   sitemap:()=>failure("noop"),
