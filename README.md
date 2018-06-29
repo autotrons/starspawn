@@ -3,10 +3,10 @@ Ingest all the things
 
 # Pipeline links
 appcast etl:
-`https://etl-dot-starspawn-201921.appspot.com/appcast_loader_cron`
+`https://etl2-dot-starspawn-201921.appspot.com/appcast_loader_cron`
 
 sitemap:
-`https://etl-dot-starspawn-201921.appspot.com/sitemap_cron`
+`https://sitemap-dot-starspawn-201921.appspot.com/sitemap_cron`
 
 # Tools
 * GSD https://search.google.com/structured-data/testing-tool/u/0/
