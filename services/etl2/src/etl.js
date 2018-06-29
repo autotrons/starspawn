@@ -17,6 +17,7 @@ const { chunk } = require('./chunk')
 const { loader } = require('./loader')
 const { parse } = require('./parse')
 const { health_check } = require('./health_check')
+const { set, createClient } = require('@pheasantplucker/redis')
 
 // ==========================================================
 //
@@ -69,6 +70,17 @@ app.get('/:command', async (req, res) => {
         source_url,
         target_file,
       })
+      return respond(res, id, command, result)
+    }
+    if (command === 'redis') {
+      const host = 'redis-13030.c1.us-central1-2.gce.cloud.redislabs.com'
+      const password = `jWFPlekdKFdSaJhl76luvClgsRmybNem`
+      const port = 13030
+      const opts = { host, port, password }
+      const r1 = await createClient(opts)
+      if (isFailure(r1)) return result
+
+      const result = await set('foo', Math.random())
       return respond(res, id, command, result)
     }
     return respond(res, id, command, failure('no path'))
