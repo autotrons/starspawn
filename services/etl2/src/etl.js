@@ -36,7 +36,7 @@ const FUNCTION_MAP = {
   health_check,
   loader,
   parse,
-  unzip
+  unzip,
 }
 
 process.on('unhandledRejection', (reason, p) => {
@@ -266,5 +266,5 @@ module.exports = {
   stop,
   get_next_command,
   extract_arguments,
-  post_command_handler
+  post_command_handler,
 }

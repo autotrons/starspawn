@@ -18,7 +18,9 @@ async function sitemapindex(id, data) {
   if (isFailure(r1)) return failure(payload(r1), id)
   if (notifyGoogle == 'cheese') {
     const r2 = await tellGoogle()
-    console.info(`${id} sitemapindex failed submitting to Google: ${payload(r2)}`)
+    console.info(
+      `${id} sitemapindex failed submitting to Google: ${payload(r2)}`
+    )
   }
   return r1
 }

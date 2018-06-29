@@ -29,20 +29,6 @@ async function health_check(id) {
   return result
 }
 
-async function sitemap_cron(id) {
-  const options = {
-    uri: 'http://localhost:8080/sitemap_cron',
-    method: 'GET',
-    headers: {
-      'User-Agent': 'Request-Promise',
-    },
-    body: { message: { data: { id } } },
-    json: true, // Automatically stringifies the body to JSON
-  }
-  const result = await rp(options)
-  return result
-}
-
 describe('etl.js', function() {
   this.timeout(540 * 1000)
   before(async () => {

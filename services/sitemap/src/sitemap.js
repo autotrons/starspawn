@@ -6,7 +6,11 @@ const {
   meta,
 } = require('@pheasantplucker/failables')
 const { map, values } = require('ramda')
-const { createQueryObj, runQuery, createDatastoreClient } = require('@pheasantplucker/gc-datastore')
+const {
+  createQueryObj,
+  runQuery,
+  createDatastoreClient,
+} = require('@pheasantplucker/gc-datastore')
 const { save } = require('@pheasantplucker/gc-cloudstorage')
 
 const SERVICE_NAME = `SITEMAP`

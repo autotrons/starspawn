@@ -226,5 +226,5 @@ module.exports = {
   stop,
   get_next_command,
   extract_arguments,
-  post_command_handler
+  post_command_handler,
 }
