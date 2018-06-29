@@ -16,8 +16,6 @@ const { unzip } = require('./unzip')
 const { chunk } = require('./chunk')
 const { loader } = require('./loader')
 const { parse } = require('./parse')
-// const { sitemap } = require('./sitemap')
-// const { sitemapindex } = require('./sitemapindex')
 const { health_check } = require('./health_check')
 
 // ==========================================================
@@ -38,9 +36,7 @@ const FUNCTION_MAP = {
   health_check,
   loader,
   parse,
-  unzip,
-  sitemap:()=>failure("noop"),
-  sitemapindex:()=>failure("noop"),
+  unzip
 }
 
 process.on('unhandledRejection', (reason, p) => {
@@ -73,17 +69,6 @@ app.get('/:command', async (req, res) => {
         source_url,
         target_file,
       })
-      return respond(res, id, command, result)
-    }
-
-    if (command === 'sitemap_cron') {
-      const destination = 'starspawn_jobs/sitemaps'
-      const count = 50000 // Google wants you to max out each sitemap
-      const iteration = 0
-      const sitemapPaths = []
-
-      const data = { count, iteration, sitemapPaths, destination }
-      const result = await http_post(id, 'sitemap', data)
       return respond(res, id, command, result)
     }
     return respond(res, id, command, failure('no path'))
@@ -143,13 +128,6 @@ function get_next_command(id, prev_command, prev_results) {
     const c1 = make_next_command('end', {})
     return success([c1])
   }
-  if (prev_command === 'sitemap') {
-    return sitemap_sitemap_sitemapindex(id, p)
-  }
-  if (prev_command === 'sitemapindex') {
-    const c1 = make_next_command('end', {})
-    return success([c1])
-  }
   if (prev_command === 'download') {
     return download_unzip(id, p)
   }
@@ -187,20 +165,6 @@ function unzip_chunk(id, p) {
     end_byte_offset: 0,
   }
   const c1 = make_next_command('chunk', next_args)
-  return success([c1])
-}
-
-function sitemap_sitemap_sitemapindex(id, p) {
-  if (p.more_work) {
-    delete p.more_work
-    delete p.id
-    const c1 = make_next_command('sitemap', p)
-    return success([c1])
-  }
-  const c1 = make_next_command('sitemapindex', {
-    sitemapPaths: p.sitemapPaths,
-    notifyGoogle: true,
-  })
   return success([c1])
 }
 
