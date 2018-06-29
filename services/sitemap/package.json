@@ -1,5 +1,5 @@
 {
-  "name": "etl",
+  "name": "sitemap",
   "version": "0.0.1",
   "description": "",
   "main": "./start.js",
@@ -8,8 +8,6 @@
     "test": "mocha ./src/*.test.js",
     "testwatch": "mocha --watch ./src/*.test.js",
     "lint": "esw .eslintrc.js src/ lib/ tests/ -w --fix --ignore-pattern !.eslintrc.js",
-    "lint-etl": "esw .eslintrc.js src/etl.js src/etl.test.js -w --fix --ignore-pattern !.eslintrc.js",
-    "lint-chunk": "esw .eslintrc.js src/chunk.js src/chunk.test.js -w --fix --ignore-pattern !.eslintrc.js",
     "deploy": "gcloud app deploy",
     "cron-deploy": "gcloud app deploy cron.yaml"
   },
@@ -24,29 +22,16 @@
   },
   "dependencies": {
     "@google-cloud/debug-agent": "^2.5.1",
-    "@google-cloud/pubsub": "^0.18.0",
-    "@google-cloud/storage": "^1.6.0",
     "@pheasantplucker/failables": "^2.0.8",
     "@pheasantplucker/gc-cloudstorage": "1.0.4",
     "@pheasantplucker/gc-datastore": "^1.0.6",
-    "@pheasantplucker/gc-pubsub": "^3.0.0",
     "@pheasantplucker/http": "^1.0.2",
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
-    "he": "^1.1.1",
-    "json2json": "^0.2.8",
-    "md5": "^2.2.1",
-    "mississippi": "^3.0.0",
+    "nanomatch": "^1.2.9",
     "ramda": "^0.25.0",
     "request": "^2.86.0",
     "request-promise": "^4.2.2",
-    "sanitize-html": "^1.18.2",
-    "simple-get": "^3.0.2",
-    "uuid": "^3.2.1",
-    "xml2js": "^0.4.19",
-    "zlib": "^1.0.5"
-  },
-  "engines": {
-    "node": "8.x"
+    "uuid": "^3.2.1"
   }
 }
