@@ -156,7 +156,7 @@ async function http_post(id, command, args) {
   const data = Object.assign({}, args, { id })
   try {
     const options = {
-      uri: `https://etl2-dot-starspawn-201921.appspot.com/${command}`,
+      uri: `https://sitemap-dot-starspawn-201921.appspot.com/${command}`,
       method: 'POST',
       headers: {
         'User-Agent': 'Request-Promise',
