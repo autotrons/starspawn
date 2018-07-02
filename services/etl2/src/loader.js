@@ -197,6 +197,16 @@ const makeArray = input => {
   return [input]
 }
 
+async function check_job_changes() {
+  return success({
+    old: ['63cad8c260faf7da8148bddc7857f05a'],
+    new: [
+      '73c9950112133be42bd41acc75e98e47',
+      '10921aa3c735209eecaa51806eb4b86f',
+    ],
+  })
+}
+
 module.exports = {
   loader,
   jobsToEntities,
@@ -204,4 +214,5 @@ module.exports = {
   appcast_datastore_job,
   drain_write_entities,
   findMissingEntities,
+  check_job_changes,
 }

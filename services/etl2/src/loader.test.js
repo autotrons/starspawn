@@ -3,6 +3,8 @@ const {
   createDatastoreClient,
   readEntities,
   makeEntityByName,
+  batch_delete,
+  batch_set,
 } = require('@pheasantplucker/gc-datastore')
 const { getFile } = require('@pheasantplucker/gc-cloudstorage')
 
@@ -12,6 +14,7 @@ const {
   make_batches,
   appcast_datastore_job,
   findMissingEntities,
+  check_job_changes,
 } = require('./loader')
 const equal = require('assert').deepEqual
 const assert = require('assert')
@@ -56,6 +59,42 @@ describe('loader.js', function() {
       assertSuccess(result)
       const p = payload(result)
       equal(p[0].key.kind, 'job')
+    })
+  })
+
+  //const log = console.log
+  describe(`check_job_changes()`, () => {
+    const namespace = 'loadertest'
+    const result = jobsToEntities(thisId, forJobsToEntities)
+    assertSuccess(result)
+    const jobs_to_check = payload(result).slice(0, 3)
+    const j1 = jobs_to_check[0]
+    const data1 = [['job', j1.data.id, j1.data]]
+    const meta1 = {
+      excludeFromIndexes: ['body', 'gsd'],
+      method: 'upsert',
+    }
+    //const ids = jobs_to_check.map(j => j.data.id)
+    //console.log(ids)
+    it('load one of the jobs', async () => {
+      const r1 = await batch_set(namespace, data1, meta1)
+      assertSuccess(r1)
+    })
+    it(`return new and updated ids`, async () => {
+      const r1 = await check_job_changes(jobs_to_check)
+      assertSuccess(r1)
+      const p = payload(r1)
+      equal(p, {
+        old: ['63cad8c260faf7da8148bddc7857f05a'],
+        new: [
+          '73c9950112133be42bd41acc75e98e47',
+          '10921aa3c735209eecaa51806eb4b86f',
+        ],
+      })
+    })
+    it(`should clean up`, async () => {
+      const r1 = await batch_delete(namespace, data1)
+      assertSuccess(r1)
     })
   })
 
