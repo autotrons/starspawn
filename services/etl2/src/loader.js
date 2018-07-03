@@ -102,7 +102,7 @@ function appcast_datastore_job(j, is_test = false) {
     created_at: new Date(Date.now()),
     state: j.state,
     title: j.title,
-    url: j.url,
+    apply_url: j.url,
     zip: j.zip,
     gsd: JSON.stringify(gsd),
     hash: appcast_hash(j),
@@ -123,6 +123,8 @@ const removeEscapeCharacters = html => {
 
 async function check_job_changes(namespace, jobs) {
   const jobs_set = to_map(jobs, 'id')
+  // check the cache
+
   // convert jobs to batch format
   const batch = jobs.map(j => ['job', j.id])
   // pull all the jobs by id
