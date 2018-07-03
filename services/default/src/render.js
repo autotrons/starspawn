@@ -8,14 +8,14 @@ const {
   isFailure,
   payload,
   isSuccess,
-  isEmpty
+  isEmpty,
 } = require('@pheasantplucker/failables')
 const {
   createDatastoreClient,
   makeDatastoreKey,
   readEntities,
   createQueryObj,
-  runQuery
+  runQuery,
 } = require('@pheasantplucker/gc-datastore')
 
 const projectFullName = 'starspawn-201921'
@@ -27,6 +27,7 @@ async function render(req, res) {
     res_err(res, `Couldn't find that job ID from req:${req}`)
     return jobIdResult
   }
+
   const jobId = payload(jobIdResult)
   const jobDataResult = await getDataFromDatastore(jobId)
   if (isFailure(jobDataResult)) {
@@ -76,8 +77,9 @@ async function getDataFromDatastore(keyName) {
   createDatastoreClient(projectFullName)
   // try by url first
   const result_by_url = await getByUrl(keyName)
-  console.log(result_by_url)
-  if(isSuccess(result_by_url) && isEmpty(result_by_url) === false) return result_by_url
+
+  if (isSuccess(result_by_url) && isEmpty(result_by_url) === false)
+    return result_by_url
 
   // now try the id if the url failed
   const entityKeyResult = makeDatastoreKey(entityKeyKind, keyName)
@@ -89,11 +91,11 @@ async function getDataFromDatastore(keyName) {
   return success(jobData)
 }
 
-async function getByUrl (url) {
-  const query = payload(createQueryObj("job"))
-  query.filter("url","=",url)
+async function getByUrl(url) {
+  const query = payload(createQueryObj('job'))
+  query.filter('url', '=', url)
   const result = await runQuery(query)
-  if(isFailure(result)) return result
+  if (isFailure(result)) return result
   const responses = payload(result)
   return success(Object.values(responses)[0])
 }
@@ -129,7 +131,11 @@ function res_ok(res, payload) {
 
 function res_err(res, payload) {
   console.error(payload)
-  res.status(404).send("<html><h1>404</h1><br/>Sorry we couldn't find what you were looking four.</html>")
+  res
+    .status(404)
+    .send(
+      "<html><h1>404</h1><br/>Sorry we couldn't find what you were looking four.</html>"
+    )
   return failure(payload)
 }
 
@@ -138,5 +144,5 @@ module.exports = {
   getDataFromDatastore,
   unsanitizeDescriptionHtml,
   timeAgo,
-  getByUrl
+  getByUrl,
 }

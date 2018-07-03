@@ -37,6 +37,7 @@
     "express": "^4.16.3",
     "file-extension": "^4.0.5",
     "he": "^1.1.1",
+    "serve-favicon": "^2.5.0",
     "time-ago": "^0.2.1",
     "uuid": "3.2.1"
   },

@@ -14,7 +14,7 @@ const {
   getDataFromDatastore,
   unsanitizeDescriptionHtml,
   timeAgo,
-  getByUrl
+  getByUrl,
 } = require('./render')
 
 const realJob = require('./realJobSchemaed.json')
@@ -25,7 +25,7 @@ const jobid = '0043c6ceb907eaea2d639e0fcfa4ca8b'
 
 let writtenEntities = []
 
-describe('render.js ', function () {
+describe('render.js ', function() {
   this.timeout(10 * 1000)
   before(async () => {
     const r1 = await createDatastoreClient(projectFullName)
@@ -55,7 +55,7 @@ describe('render.js ', function () {
     })
     it('Should get a job by url too', async () => {
       // this may fail as we wipe the database
-      const url = "RN-in-St-Paul-Cottage-Grove-MN-0043"
+      const url = 'RN-in-St-Paul-Cottage-Grove-MN-0043'
       const result = await getDataFromDatastore(url)
       assertSuccess(result)
       const job = payload(result)
@@ -87,7 +87,7 @@ describe('render.js ', function () {
   })
   describe('getByUrl()', () => {
     it('Should get a job by the url', async () => {
-      const url = "RN-in-St-Paul-Cottage-Grove-MN-0043"
+      const url = 'RN-in-St-Paul-Cottage-Grove-MN-0043'
       const result = await getByUrl(url)
       assertSuccess(result)
       const job = payload(result)

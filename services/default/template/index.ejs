@@ -4,8 +4,14 @@
     <meta charset="utf-8">
     <title><%- title %> <%- city %> <%- state %></title>
 
-    <!-- We need to change the href to point to the page!! -->
-    <link rel="canonical" href="https://joblog.app/<%- id %>">
+    <link rel="canonical" href="https://joblog.app/<%- url %>">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
 
     <meta name="Description" content="Employer: <%- company %>, City: <%- city %>, State: <%- state %>">
     <meta name="robots" content="nofollow" />
@@ -26,10 +32,10 @@
       webkit-border-radius: 4px;
       height: 40px;
       width: 130px;
-      background-color: #10abe0;
+      background-color: #007dad;
       -moz-box-shadow:    inset 0 0 -6px #000000;
       -webkit-box-shadow: inset 0 0 -6px #000000;
-      box-shadow: 0px 2px 0px 0px  #0d89b3;
+      box-shadow: 0px 2px 0px 0px  #0d5993;
       vertical-align: middle;
       text-align: center;
       align-items: center;
@@ -123,31 +129,33 @@
   <body>
     <div class="centerContent">
       <div class="topSpacer"></div>
-      <div class="jobTitle"><%- title %></div>
-      <div class="topLocation"><%- city %>, <%- state %></div>
-      <div class="thinLine"></div>
-      <div class="flexRow">
-        <div class="posted topMarginIndent">Posted:</div>
-        <div class="daysAgo topMargin"><%- timeAgo %></div>
+      <main>
+        <div class="jobTitle"><%- title %></div>
+        <div class="topLocation"><%- city %>, <%- state %></div>
+        <div class="thinLine"></div>
+        <div class="flexRow">
+          <div class="posted topMarginIndent">Posted:</div>
+          <div class="daysAgo topMargin"><%- timeAgo %></div>
+          <div class="apply button topMargin">
+            <a href="<%- url %>" >
+              Apply
+            </a>
+          </div>
+
+          <div class ="rightLine"></div>
+        </div>
+
+        <div class="jobBody topMarginIndent">
+          <%- body %>
+        </div>
+
         <div class="apply button topMargin">
           <a href="<%- url %>" >
             Apply
           </a>
         </div>
-
-        <div class ="rightLine"></div>
-      </div>
-
-      <div class="jobBody topMarginIndent">
-        <%- body %>
-      </div>
-
-      <div class="apply button topMargin">
-        <a href="<%- url %>" >
-          Apply
-        </a>
-      </div>
-      <br/><br/><br/><br/>
+        <br/><br/><br/><br/>
+      </main>
     </div>
   </body>
 </html>
