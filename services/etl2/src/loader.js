@@ -18,30 +18,41 @@ createDatastoreClient('starspawn-201921')
 
 async function loader(id, data) {
   try {
+    let namespace = "prod"
     let { filename, isTest } = data
-    const set_meta = {
-      excludeFromIndexes: ['body', 'gsd'],
-      method: 'upsert',
-    }
-
+    if(isTest) namespace = "test"
     const r1 = await getFile(filename)
     if (isFailure(r1)) return r1
-    const jobs = JSON.parse(payload(r1))
-    const jobArray = jobs.root.job
-
-    const preped_jobs = jobArray.map(j => appcast_datastore_job(j))
-    const changes_result = await check_job_changes(preped_jobs)
+    const jobs_json = JSON.parse(payload(r1))
+    const jobs = jobs_json.root.job
+    const preped_jobs = jobs.map(j => appcast_datastore_job(j))
+    const checked_ids = preped_jobs.map(j => j.id)
+    const changes_result = await check_job_changes(namespace, preped_jobs)
     if (isFailure(changes_result)) return changes_result
     const changes = payload(changes_result)
-    console.log(changes.add)
-    // const add = filter_records(preped_jobs, changes.add, 'id')
-    // const changed = filter_records(preped_jobs, changes.changed, 'id')
-    // const batch_add = add.map(j => ['job', j.id, j])
-    // const batch_changed = changed.map(j => ['job', j.id, j])
-    // return batch_set('loadertest', [...batch_add, ...batch_changed], set_meta)
-    return success()
+    const ids_to_insert = [...changes.add,...changes.changed]
+    const updates = filter_records(preped_jobs, ids_to_insert, 'id')
+    const batch_updates = updates.map(j => ['job', j.id, j])
+    const r2 = await batch_set(namespace, batch_updates, get_datastore_meta())
+    if(isFailure(r2)) return r2
+    log_results(id, changes)
+    return success({checked:checked_ids, written:ids_to_insert})
   } catch (e) {
     return failure(e.toString())
+  }
+}
+
+function log_results(id, changes) {
+  const existed = changes.exist.length
+  const added = changes.add.length
+  const changed = changes.changed.length
+  console.info({id, existed, changed, added})
+}
+
+function get_datastore_meta() {
+  return  {
+    excludeFromIndexes: ['body', 'gsd'],
+    method: 'upsert',
   }
 }
 
@@ -50,8 +61,7 @@ function filter_records(records, record_ids, field) {
 }
 
 function appcast_hash(j) {
-  const copy = Object.assign({}, j, { gsd: '' })
-  return md5(JSON.stringify(copy))
+  return md5(j.body)
 }
 function appcast_id(j) {
   return md5(j.job_reference)
@@ -111,9 +121,8 @@ const removeEscapeCharacters = html => {
   }
 }
 
-async function check_job_changes(jobs) {
+async function check_job_changes(namespace, jobs) {
   const jobs_set = to_map(jobs, 'id')
-  const namespace = 'loadertest'
   // convert jobs to batch format
   const batch = jobs.map(j => ['job', j.id])
   // pull all the jobs by id
