@@ -18,9 +18,9 @@ createDatastoreClient('starspawn-201921')
 
 async function loader(id, data) {
   try {
-    let namespace = "prod"
+    let namespace = 'prod'
     let { filename, isTest } = data
-    if(isTest) namespace = "test"
+    if (isTest) namespace = 'test'
     const r1 = await getFile(filename)
     if (isFailure(r1)) return r1
     const jobs_json = JSON.parse(payload(r1))
@@ -30,13 +30,13 @@ async function loader(id, data) {
     const changes_result = await check_job_changes(namespace, preped_jobs)
     if (isFailure(changes_result)) return changes_result
     const changes = payload(changes_result)
-    const ids_to_insert = [...changes.add,...changes.changed]
+    const ids_to_insert = [...changes.add, ...changes.changed]
     const updates = filter_records(preped_jobs, ids_to_insert, 'id')
     const batch_updates = updates.map(j => ['job', j.id, j])
     const r2 = await batch_set(namespace, batch_updates, get_datastore_meta())
-    if(isFailure(r2)) return r2
+    if (isFailure(r2)) return r2
     log_results(id, changes)
-    return success({checked:checked_ids, written:ids_to_insert})
+    return success({ checked: checked_ids, written: ids_to_insert })
   } catch (e) {
     return failure(e.toString())
   }
@@ -46,11 +46,11 @@ function log_results(id, changes) {
   const existed = changes.exist.length
   const added = changes.add.length
   const changed = changes.changed.length
-  console.info({id, existed, changed, added})
+  console.info({ id, existed, changed, added })
 }
 
 function get_datastore_meta() {
-  return  {
+  return {
     excludeFromIndexes: ['body', 'gsd'],
     method: 'upsert',
   }
