@@ -46,7 +46,7 @@ function log_results(id, changes) {
   const existed = changes.exist.length
   const added = changes.add.length
   const changed = changes.changed.length
-  console.info({ id, existed, changed, added })
+  console.info(JSON.stringify({ id, existed, changed, added }))
 }
 
 function get_datastore_meta() {
