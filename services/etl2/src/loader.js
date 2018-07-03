@@ -5,85 +5,48 @@ const {
   payload,
 } = require('@pheasantplucker/failables')
 const {
-  makeDatastoreKey,
-  writeEntity,
   createDatastoreClient,
-  lookup,
+  batch_get,
+  batch_set,
 } = require('@pheasantplucker/gc-datastore')
 const { getFile } = require('@pheasantplucker/gc-cloudstorage')
 const he = require('he')
 const md5 = require('md5')
+const R = require('ramda')
 
 createDatastoreClient('starspawn-201921')
 
 async function loader(id, data) {
   try {
-    return do_file_things(id, data)
-  } catch (e) {
-    return failure(e.toString())
-  }
-}
-
-async function do_file_things(id, data) {
-  let { filename, isTest } = data
-
-  const r1 = await getFile(filename)
-  if (isFailure(r1)) return r1
-  const jobs = JSON.parse(payload(r1))
-  const jobArray = jobs.root.job
-
-  const jobEntitiesResult = await jobsToEntities(id, jobArray, isTest)
-  if (isFailure(jobEntitiesResult)) return jobEntitiesResult
-
-  const jobEntities = payload(jobEntitiesResult)
-  const drain_result = await drain_write_entities(id, jobEntities)
-  if (isFailure(drain_result)) return drain_result
-
-  return success({ jobEntities })
-}
-
-const jobsToEntities = (id, jobs, isTest) => {
-  try {
-    const entities = []
-    for (let i = 0; i < jobs.length; i++) {
-      const ent = appcast_datastore_job(jobs[i], isTest)
-      entities.push(ent)
+    let { filename, isTest } = data
+    const set_meta = {
+      excludeFromIndexes: ['body', 'gsd'],
+      method: 'upsert',
     }
-    return success(entities)
-  } catch (e) {
-    return failure(e.toString())
-  }
-}
 
-async function drain_write_entities(id, ents) {
-  const batches = make_batches(ents, 500)
-  let write_results = []
-  for (let i = 0; i < batches.length; i++) {
-    const r1 = await findMissingEntities(batches[i])
-
+    const r1 = await getFile(filename)
     if (isFailure(r1)) return r1
-    const missingEntities = payload(r1)
-    console.info(
-      `${id} loader drain_write_entities writing ${missingEntities.length} jobs`
-    )
-    const r2 = await writeEntity(missingEntities)
-    if (isFailure(r2)) {
-      console.log(r2)
-      return r2
-    }
-    write_results = [...write_results, payload(r2)]
+    const jobs = JSON.parse(payload(r1))
+    const jobArray = jobs.root.job
+
+    const preped_jobs = jobArray.map(j => appcast_datastore_job(j))
+    const changes_result = await check_job_changes(preped_jobs)
+    if (isFailure(changes_result)) return changes_result
+    const changes = payload(changes_result)
+    console.log(changes.add)
+    // const add = filter_records(preped_jobs, changes.add, 'id')
+    // const changed = filter_records(preped_jobs, changes.changed, 'id')
+    // const batch_add = add.map(j => ['job', j.id, j])
+    // const batch_changed = changed.map(j => ['job', j.id, j])
+    // return batch_set('loadertest', [...batch_add, ...batch_changed], set_meta)
+    return success()
+  } catch (e) {
+    return failure(e.toString())
   }
-  return success(write_results)
 }
 
-function make_batches(items, batch_size) {
-  let batches = []
-  let i, j, temp
-  for (i = 0, j = items.length; i < j; i += batch_size) {
-    temp = items.slice(i, i + batch_size)
-    batches.push(temp)
-  }
-  return batches
+function filter_records(records, record_ids, field) {
+  return R.innerJoin((record, id) => record[field] === id, records, record_ids)
 }
 
 function appcast_hash(j) {
@@ -105,17 +68,13 @@ function appcast_to_url(j) {
 }
 
 function appcast_datastore_job(j, is_test = false) {
-  let kind = 'job'
-  if (is_test) kind = 'testJob'
-
   const id = appcast_id(j)
-  const key = payload(makeDatastoreKey(kind, id))
   const sanitizedDescription = removeEscapeCharacters(j.gsd.description)
   if (isFailure(sanitizedDescription)) return sanitizedDescription
   const gsd = Object.assign({}, j.gsd, {
     description: payload(sanitizedDescription),
   })
-  const data = {
+  return {
     id: id,
     body: j.body,
     category: j.category,
@@ -141,12 +100,6 @@ function appcast_datastore_job(j, is_test = false) {
     url: appcast_to_url(j),
     is_test,
   }
-  return {
-    key,
-    excludeFromIndexes: ['body', 'gsd'],
-    method: 'insert',
-    data,
-  }
 }
 
 const removeEscapeCharacters = html => {
@@ -158,61 +111,43 @@ const removeEscapeCharacters = html => {
   }
 }
 
-async function findMissingEntities(ents) {
-  const entityKeys = await ents.map(e => {
-    return e.key
-  })
-  const lookupResp = await lookup(entityKeys)
-  if (isFailure(lookupResp)) return lookupResp
-  const lookupObj = payload(lookupResp)
-  const missing = lookupObj.missing
-  const missingArray = makeArray(missing)
+async function check_job_changes(jobs) {
+  const jobs_set = to_map(jobs, 'id')
+  const namespace = 'loadertest'
+  // convert jobs to batch format
+  const batch = jobs.map(j => ['job', j.id])
+  // pull all the jobs by id
+  const r1 = await batch_get(namespace, batch)
+  if (isFailure(r1)) return r1
+  const main_db = payload(r1)
+  const db_add = main_db.missing
+  // check the hashes of all that are in the db
+  // any hashes that do not match need to be updated
+  const db_changed = main_db.found.filter(
+    id => main_db.items[id].hash !== jobs_set[id].hash
+  )
 
-  const makePath = (kind, name) => {
-    return kind + '/' + name
-  }
-
-  const missingPaths = await missingArray.map(ent => {
-    const kind = ent.entity.key.path[0].kind
-    const name = ent.entity.key.path[0].name
-    return makePath(kind, name)
-  })
-
-  const cleanMissing = [].concat.apply([], missingPaths)
-
-  const missingEntities = await ents.filter(e => {
-    if (e === undefined) return false
-    const kind = e.key.kind
-    const name = e.key.name
-    const thisPath = makePath(kind, name)
-    if (cleanMissing.indexOf(thisPath) > -1) return true
-    return false
-  })
-
-  return success(missingEntities)
-}
-
-const makeArray = input => {
-  if (Array.isArray(input)) return input
-  return [input]
-}
-
-async function check_job_changes() {
+  const db_exist = main_db.found.filter(
+    id => main_db.items[id].hash === jobs_set[id].hash
+  )
   return success({
-    old: ['63cad8c260faf7da8148bddc7857f05a'],
-    new: [
-      '73c9950112133be42bd41acc75e98e47',
-      '10921aa3c735209eecaa51806eb4b86f',
-    ],
+    exist: db_exist,
+    add: db_add,
+    changed: db_changed,
   })
+}
+
+function to_map(list, key) {
+  const the_map = {}
+  for (let i = 0; i < list.length; i++) {
+    const element = list[i]
+    the_map[element[key]] = element
+  }
+  return the_map
 }
 
 module.exports = {
   loader,
-  jobsToEntities,
-  make_batches,
   appcast_datastore_job,
-  drain_write_entities,
-  findMissingEntities,
   check_job_changes,
 }
