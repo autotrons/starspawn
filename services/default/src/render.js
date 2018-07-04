@@ -12,14 +12,15 @@ const {
 } = require('@pheasantplucker/failables')
 const {
   createDatastoreClient,
-  makeDatastoreKey,
-  readEntities,
   createQueryObj,
   runQuery,
+  batch_get,
 } = require('@pheasantplucker/gc-datastore')
 
 const projectFullName = 'starspawn-201921'
-const entityKeyKind = 'job'
+const JOB_KIND = 'job'
+const NAMESPACE = 'prod'
+createDatastoreClient(projectFullName)
 
 async function render(req, res) {
   const jobIdResult = getJobId(req)
@@ -74,30 +75,29 @@ function timeAgo(datePosted) {
 }
 
 async function getDataFromDatastore(keyName) {
-  createDatastoreClient(projectFullName)
   // try by url first
   const result_by_url = await getByUrl(keyName)
 
   if (isSuccess(result_by_url) && isEmpty(result_by_url) === false)
     return result_by_url
 
-  // now try the id if the url failed
-  const entityKeyResult = makeDatastoreKey(entityKeyKind, keyName)
-  if (isFailure(entityKeyResult)) return entityKeyResult
-  const entityKey = payload(entityKeyResult)
-  const entity = await readEntities([entityKey])
-  if (isFailure(entity)) return entity
-  const jobData = Object.values(payload(entity))[0]
+  const batch = [[JOB_KIND, keyName]]
+  const r1 = await batch_get(NAMESPACE, batch)
+  if (isFailure(r1)) return r1
+  const main_db = payload(r1)
+
+  const jobData = Object.values(main_db.items)[0]
   return success(jobData)
 }
 
 async function getByUrl(url) {
-  const query = payload(createQueryObj('job'))
+  const query = payload(createQueryObj(JOB_KIND, [NAMESPACE]))
   query.filter('url', '=', url)
   const result = await runQuery(query)
   if (isFailure(result)) return result
   const responses = payload(result)
-  return success(Object.values(responses)[0])
+  const job_data = Object.values(responses)[0]
+  return success(job_data)
 }
 
 const unsanitizeDescriptionHtml = sanHtml => {
