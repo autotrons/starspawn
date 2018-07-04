@@ -86,6 +86,7 @@ function appcast_datastore_job(j, is_test = false) {
   })
   return {
     id: id,
+    version: 1,
     body: j.body,
     category: j.category,
     city: j.city,
