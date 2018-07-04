@@ -23,7 +23,7 @@
   "dependencies": {
     "@google-cloud/debug-agent": "^2.5.1",
     "@pheasantplucker/failables": "^2.0.8",
-    "@pheasantplucker/gc-cloudstorage": "1.0.4",
+    "@pheasantplucker/gc-cloudstorage": "^1.0.4",
     "@pheasantplucker/gc-datastore": "^1.0.6",
     "@pheasantplucker/http": "^1.0.2",
     "body-parser": "^1.18.3",

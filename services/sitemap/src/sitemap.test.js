@@ -96,9 +96,11 @@ describe('sitemap.js', function() {
       let cursor
 
       while (true) {
-        const r1 = await createQueryObj('job')
+        const r1 = await createQueryObj('job', ['prod'])
         assertSuccess(r1)
-        let query = payload(r1).limit(10000)
+        let query = payload(r1)
+          .select('__key__')
+          .limit(10000)
         if (cursor) {
           query = query.start(cursor)
         }

@@ -17,6 +17,7 @@ const SERVICE_NAME = `SITEMAP`
 const SITEMAP_URL_COUNT = 100 // pass this in when calling sitemap()?
 const SITEMAP_BUCKET = 'starspawn_jobs/sitemaps'
 const BASE_URL = `https://joblog.app`
+const NAMESPACE = 'prod'
 
 createDatastoreClient('starspawn-201921')
 
@@ -44,7 +45,7 @@ async function paginate(
   destination,
   cursor
 ) {
-  const r1 = await createQueryObj('job')
+  const r1 = await createQueryObj('job', [NAMESPACE])
   if (isFailure(r1)) {
     console.error(`${id} ${SERVICE_NAME} createQueryObj ${payload(r1)}`)
     return failure(payload(r1), id)
