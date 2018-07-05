@@ -6,7 +6,15 @@ const {
 } = require('@pheasantplucker/gc-datastore')
 const { getFile } = require('@pheasantplucker/gc-cloudstorage')
 
-const { loader, appcast_datastore_job, check_job_changes } = require('./loader')
+const {
+  loader,
+  appcast_datastore_job,
+  check_job_changes,
+  add_jobs_to_cache,
+  delete_jobs_from_cache,
+  diff_for_cache,
+  delete_jobs_from_cache_by_id,
+} = require('./loader')
 const equal = require('assert').deepEqual
 const uuid = require('uuid')
 
@@ -36,11 +44,16 @@ describe('loader.js', function() {
     })
   })
 
-  describe(`check_job_changes()`, () => {
-    const jobs_to_check = APPCAST_JOBS.slice(0, 3)
-    const j1 = jobs_to_check[0]
-    const j2 = jobs_to_check[1]
-    const data1 = [['job', j1.id, j1], ['job', j2.id, j2]]
+  describe(`check_job_changes()`, async () => {
+    const jobs_to_check = APPCAST_JOBS.slice(0, 4)
+    const exist_job = jobs_to_check[0]
+    const changed_job = jobs_to_check[1]
+    const job_to_add = jobs_to_check[2]
+    const cached_job = jobs_to_check[3]
+    const data1 = [
+      ['job', exist_job.id, exist_job],
+      ['job', changed_job.id, changed_job],
+    ]
     const meta1 = {
       excludeFromIndexes: ['body', 'gsd'],
       method: 'upsert',
@@ -48,6 +61,8 @@ describe('loader.js', function() {
     it('load one of the jobs', async () => {
       const r1 = await batch_set(NAMESPACE, data1, meta1)
       assertSuccess(r1)
+      const r2 = await add_jobs_to_cache([cached_job])
+      assertSuccess(r2)
     })
     it(`return new and updated ids`, async () => {
       // change the hash so we get a changed job
@@ -56,18 +71,36 @@ describe('loader.js', function() {
       assertSuccess(r1)
       const p = payload(r1)
       equal(p, {
-        exist: ['e56bb6a26601368047248800dad8a656'],
-        add: ['9b70cbd30e85bcf58c8b6d72647cda48'],
-        changed: ['4e92e055181b53c84ed6bba99b66aff0'],
+        cached: [cached_job.id],
+        exist: [exist_job.id],
+        add: [job_to_add.id],
+        changed: [changed_job.id],
       })
     })
     it(`should clean up`, async () => {
       const r1 = await batch_delete(NAMESPACE, data1)
       assertSuccess(r1)
+      const r2 = await delete_jobs_from_cache([cached_job])
+      assertSuccess(r2)
     })
   })
 
-  describe('loader()', function() {
+  describe('diff_for_cache()', function() {
+    it('turn check_job_changes into a list of ids for caching', async () => {
+      const jobs = [{ id: 'a' }, { id: 'b' }, { id: 'c' }, { id: 'd' }]
+      const diff = [{ id: 'a' }, { id: 'b' }, { id: 'd' }]
+      const check_job_changes_output = {
+        cached: ['c'],
+        exist: ['a'],
+        add: ['b'],
+        changed: ['d'],
+      }
+      const r1 = diff_for_cache(jobs, check_job_changes_output)
+      equal(r1, diff)
+    })
+  })
+
+  describe.only('loader()', function() {
     it('should load a list of jobs into Datastore', async () => {
       const isTest = true
       const r1 = await loader(thisId, { filename, isTest })
@@ -75,9 +108,13 @@ describe('loader.js', function() {
       // If this fails it may be because the jobs
       // are already in the loadertest namespace in datastore
       // remove them via the UI or by running the rest again
+      // also the cache needs to be cleared of the ids
       const batch = payload(r1).checked.map(id => ['job', id])
       const r2 = await batch_delete(NAMESPACE, batch)
       assertSuccess(r2)
+      const p = payload(r1)
+      const r3 = await delete_jobs_from_cache_by_id(p.checked)
+      assertSuccess(r3)
       equal(payload(r1).written.length, 100)
       equal(payload(r1).checked.length, 100)
     })
