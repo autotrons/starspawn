@@ -2,6 +2,7 @@ const {
   success,
   failure,
   isFailure,
+  isSuccess,
   payload,
 } = require('@pheasantplucker/failables')
 const {
@@ -66,11 +67,12 @@ async function loader(id, data) {
 
     // update the cache
     // TODO
-    let cache_write_success = true
+    let cache_diff_ids = []
     const cache_diff_jobs = diff_for_cache(preped_jobs, changes)
     const r3 = await add_jobs_to_cache(cache_diff_jobs)
-    if (isFailure(r3)) cache_write_success = false
-    const cache_diff_ids = cache_diff_jobs.map(j => j.id)
+    if (isSuccess(r3)) {
+      cache_diff_ids = cache_diff_jobs.map(j => j.id)
+    }
     // return
     log_results(id, changes, cache_diff_ids)
     return success({
@@ -209,21 +211,29 @@ async function check_job_changes(namespace, jobs) {
 }
 
 async function add_jobs_to_cache(jobs) {
-  await setup_redis()
-  const commands = jobs.map(j => [
-    'set',
-    j.id,
-    j.hash,
-    'EX',
-    SECONDS_IN_60_DAYS,
-  ])
-  return redis.pipeline(commands)
+  try {
+    await setup_redis()
+    const commands = jobs.map(j => [
+      'set',
+      j.id,
+      j.hash,
+      'EX',
+      SECONDS_IN_60_DAYS,
+    ])
+    return redis.pipeline(commands)
+  } catch (error) {
+    return failure(error.toString())
+  }
 }
 
 async function delete_jobs_from_cache(jobs) {
-  await setup_redis()
-  const commands = jobs.map(j => ['del', j.id])
-  return redis.pipeline(commands)
+  try {
+    await setup_redis()
+    const commands = jobs.map(j => ['del', j.id])
+    return redis.pipeline(commands)
+  } catch (error) {
+    return failure(error.toString())
+  }
 }
 
 function to_map(list, key) {
@@ -236,9 +246,13 @@ function to_map(list, key) {
 }
 
 async function delete_jobs_from_cache_by_id(job_ids) {
-  await setup_redis()
-  const commands = job_ids.map(id => ['del', id])
-  return redis.pipeline(commands)
+  try {
+    await setup_redis()
+    const commands = job_ids.map(id => ['del', id])
+    return redis.pipeline(commands)
+  } catch (error) {
+    return failure(error.toString())
+  }
 }
 
 function to_map(list, key) {
