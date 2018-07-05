@@ -100,7 +100,7 @@ describe('loader.js', function() {
     })
   })
 
-  describe.only('loader()', function() {
+  describe('loader()', function() {
     it('should load a list of jobs into Datastore', async () => {
       const isTest = true
       const r1 = await loader(thisId, { filename, isTest })

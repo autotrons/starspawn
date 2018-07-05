@@ -18,10 +18,10 @@ const SECONDS_IN_60_DAYS = 60 * 60 * 24 * 60
 let REDIS_CONNECTED = false
 async function setup_redis() {
   if (REDIS_CONNECTED) return success()
-  const redis_host = 'redis-13030.c1.us-central1-2.gce.cloud.redislabs.com'
-  const redis_password = `jWFPlekdKFdSaJhl76luvClgsRmybNem`
-  const redis_port = 13030
-  const redis_opts = { redis_host, redis_port, redis_password }
+  const host = 'redis-13030.c1.us-central1-2.gce.cloud.redislabs.com'
+  const password = `jWFPlekdKFdSaJhl76luvClgsRmybNem`
+  const port = 13030
+  const redis_opts = { host, port, password }
   REDIS_CONNECTED = true
   return redis.createClient(redis_opts)
 }
