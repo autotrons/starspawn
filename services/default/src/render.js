@@ -32,7 +32,7 @@ async function render(req, res) {
 
     const jobId = payload(jobIdResult)
     const jobDataResult = await getDataFromDatastore(jobId)
-    if (isFailure(jobDataResult)) {
+    if (isFailure(jobDataResult) || isEmpty(jobDataResult)) {
       res_err(res, `Couldn't find job ID [${jobId}] in DS`)
       return jobDataResult
     }

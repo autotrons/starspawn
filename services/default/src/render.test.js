@@ -2,6 +2,7 @@ const {
   assertSuccess,
   payload,
   assertEmpty,
+  assertFailure,
 } = require('@pheasantplucker/failables')
 const assert = require('assert')
 const equal = assert.deepEqual
@@ -85,13 +86,19 @@ describe('render.js ', function() {
 
   describe('render()', () => {
     it('Should render an AMP page from a query string', async () => {
-      const { req, res } = make_req_res()
+      const { req, res } = make_req_res(jobid)
       const result = await render(req, res)
       assertSuccess(result)
       const renderedAmp = payload(result)
       const parsed = parse(renderedAmp)
       assert(typeof renderedAmp === 'string')
       assert(parsed[0].tagName === '!doctype')
+    })
+    it('Should return a 404', async () => {
+      const bad_jobid = 'badid1234'
+      const { req, res } = make_req_res(bad_jobid)
+      const result = await render(req, res)
+      assertEmpty(result)
     })
   })
   describe('getByUrl()', () => {
@@ -114,10 +121,10 @@ describe('render.js ', function() {
   })
 })
 
-function make_req_res() {
+function make_req_res(id) {
   const req = {
     params: {
-      jobId: jobid,
+      jobId: id,
     },
   }
   const res = {
