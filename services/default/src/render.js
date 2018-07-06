@@ -139,7 +139,7 @@ function res_err(res, payload) {
   res
     .status(404)
     .send(
-      "<html><h1>404</h1><br/>Sorry we couldn't find what you were looking four.</html>"
+      "<html><h1>404</h1><br/>Sorry we couldn't find what you were looking four oh four :( </html>"
     )
   return failure(payload)
 }
