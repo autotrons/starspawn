@@ -51,18 +51,11 @@ async function loader(id, data) {
     if (isFailure(changes_result)) return changes_result
     const changes = payload(changes_result)
     const ids_to_insert = [...changes.add, ...changes.changed]
-    if (ids_to_insert.length === 0) {
-      return success({
-        checked: checked_ids,
-        written: [],
-        cached: [],
-      })
-    }
-    const updates = filter_records(preped_jobs, ids_to_insert, 'id')
-    const batch_updates = updates.map(j => ['job', j.id, j])
+    if (ids_to_insert.length === 0) loader_results(id, checked_ids, [], [], [])
 
     // update the main database (datastore)
-    const r2 = await batch_set(namespace, batch_updates, get_datastore_meta())
+    const updates = filter_records(preped_jobs, ids_to_insert, 'id')
+    const r2 = await add_jobs_to_db(namespace, updates)
     if (isFailure(r2)) return r2
 
     // update the cache
@@ -74,23 +67,35 @@ async function loader(id, data) {
       cache_diff_ids = cache_diff_jobs.map(j => j.id)
     }
     // return
-    log_results(id, changes, cache_diff_ids)
-    return success({
-      checked: checked_ids,
-      written: ids_to_insert,
-      cached: cache_diff_ids,
-    })
+
+    return loader_results(
+      id,
+      checked_ids,
+      changes.add,
+      changes.changed,
+      cache_diff_ids
+    )
   } catch (e) {
     return failure(e.toString())
   }
 }
 
-function log_results(id, changes, cached_ids) {
-  const existed = changes.exist.length
-  const added = changes.add.length
-  const changed = changes.changed.length
+function loader_results(id, checked_ids, added_ids, changed_ids, cached_ids) {
+  log_results(id, checked_ids, added_ids, changed_ids, cached_ids)
+  return success({
+    checked: checked_ids,
+    added: added_ids,
+    changed: changed_ids,
+    cached: cached_ids,
+  })
+}
+
+function log_results(id, checked_ids, added_ids, changed_ids, cached_ids) {
+  const checked = checked_ids.length
+  const added = added_ids.length
+  const changed = changed_ids.length
   const cached = cached_ids.length
-  console.info(JSON.stringify({ id, existed, changed, added, cached }))
+  console.info(JSON.stringify({ id, checked, changed, added, cached }))
 }
 
 function get_datastore_meta() {
@@ -208,6 +213,15 @@ async function check_job_changes(namespace, jobs) {
     changed: db_changed,
     cached: in_cache,
   })
+}
+
+async function add_jobs_to_db(namespace, jobs) {
+  try {
+    const batch = jobs.map(j => ['job', j.id, j])
+    return batch_set(namespace, batch, get_datastore_meta())
+  } catch (error) {
+    return failure(error.toString())
+  }
 }
 
 async function add_jobs_to_cache(jobs) {
