@@ -1,4 +1,8 @@
-const { assertSuccess, payload } = require('@pheasantplucker/failables')
+const {
+  assertSuccess,
+  payload,
+  assertEmpty,
+} = require('@pheasantplucker/failables')
 const assert = require('assert')
 const equal = assert.deepEqual
 const { parse } = require('himalaya')
@@ -60,6 +64,11 @@ describe('render.js ', function() {
       assertSuccess(result)
       const job = payload(result)
       equal(job.url, url)
+    })
+    it('Should return quickly from a bad id', async () => {
+      const bad_jobid = 'badid1234'
+      const result = await getDataFromDatastore(bad_jobid)
+      assertEmpty(result)
     })
   })
 

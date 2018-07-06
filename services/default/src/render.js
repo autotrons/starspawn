@@ -23,39 +23,44 @@ const NAMESPACE = 'prod'
 createDatastoreClient(projectFullName)
 
 async function render(req, res) {
-  const jobIdResult = getJobId(req)
-  if (isFailure(jobIdResult)) {
-    res_err(res, `Couldn't find that job ID from req:${req}`)
-    return jobIdResult
-  }
-
-  const jobId = payload(jobIdResult)
-  const jobDataResult = await getDataFromDatastore(jobId)
-  if (isFailure(jobDataResult)) {
-    res_err(res, `Couldn't find job ID [${jobId}] in DS`)
-    return jobDataResult
-  }
-  const jobData = payload(jobDataResult)
-
-  const r1 = unsanitizeDescriptionHtml(jobData.body)
-  if (isFailure(r1)) {
-    res_err(res, `Couldn't clean up that dirty, dirty job body.`)
-    return r1
-  }
-  const cleanBody = payload(r1)
-  const cleanBodyObj = { body: cleanBody }
-
-  const r2 = timeAgo(jobData.posted_at)
-  if (isFailure(r2)) {
-    res_err(res, `Couldn't figure out how long ago the job was posted.`)
-    return r2
-  }
-  const cleanTimeAgo = payload(r2)
-  const cleanTimeAgoObj = { timeAgo: cleanTimeAgo }
-
-  const cleanJobData = Object.assign({}, jobData, cleanBodyObj, cleanTimeAgoObj)
-
   try {
+    const jobIdResult = getJobId(req)
+    if (isFailure(jobIdResult)) {
+      res_err(res, `Couldn't find that job ID from req:${req}`)
+      return jobIdResult
+    }
+
+    const jobId = payload(jobIdResult)
+    const jobDataResult = await getDataFromDatastore(jobId)
+    if (isFailure(jobDataResult)) {
+      res_err(res, `Couldn't find job ID [${jobId}] in DS`)
+      return jobDataResult
+    }
+    const jobData = payload(jobDataResult)
+
+    const r1 = unsanitizeDescriptionHtml(jobData.body)
+    if (isFailure(r1)) {
+      res_err(res, `Couldn't clean up that dirty, dirty job body.`)
+      return r1
+    }
+    const cleanBody = payload(r1)
+    const cleanBodyObj = { body: cleanBody }
+
+    const r2 = timeAgo(jobData.posted_at)
+    if (isFailure(r2)) {
+      res_err(res, `Couldn't figure out how long ago the job was posted.`)
+      return r2
+    }
+    const cleanTimeAgo = payload(r2)
+    const cleanTimeAgoObj = { timeAgo: cleanTimeAgo }
+
+    const cleanJobData = Object.assign(
+      {},
+      jobData,
+      cleanBodyObj,
+      cleanTimeAgoObj
+    )
+
     const filePath = path.join(__dirname, '../template/index.ejs')
     const html = await cons.ejs(filePath, cleanJobData)
     return res_ok(res, html)
