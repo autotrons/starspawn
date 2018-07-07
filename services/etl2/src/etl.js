@@ -113,6 +113,7 @@ async function post_command_handler(id, command, args) {
     if (isFailure(r2)) return r2
     const next_commands = payload(r2)
     for (let i = 0; i < next_commands.length; i++) {
+      await sleep(1 * 1000)
       const { next_command, next_args } = next_commands[i]
       if (next_command !== 'end') http_post(id, next_command, next_args)
     }
@@ -239,6 +240,14 @@ function respond(res, id, command, failable) {
   } else {
     res.status(500).send(failure('did not return a failable', m))
   }
+}
+
+function sleep(ms) {
+  return new Promise(res => {
+    setTimeout(() => {
+      res()
+    }, ms)
+  })
 }
 
 // ==========================================================

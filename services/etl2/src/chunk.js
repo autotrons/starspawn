@@ -11,8 +11,8 @@ const { stats } = require('@pheasantplucker/gc-cloudstorage')
 
 const COMPLETE = 'complete'
 const NAME = 'chunk'
-const BLOCK_LIMIT = 250
-const CHUNK_TIMEOUT_MS = 500 * 1000
+const BLOCK_LIMIT = 100
+const CHUNK_TIMEOUT_MS = 30 * 1000
 
 async function chunk(id, data) {
   try {
@@ -33,9 +33,9 @@ async function chunk(id, data) {
       end_byte_offset = payload(stat_result).size
     }
 
-    console.info(
-      `${id} ${NAME} starting on ${filename} at ${start_byte_offset} to ${end_byte_offset}`
-    )
+    // console.info(
+    //   `${id} ${NAME} starting on ${filename} at ${start_byte_offset} to ${end_byte_offset}`
+    // )
 
     const { bucketpart, filepart } = split_filename(filename)
     const myBucket = storage.bucket(bucketpart)
@@ -138,10 +138,10 @@ function find_blocks(rs, start_text, end_text, cursor = 0) {
 async function write_blocks(id, filename, blocks) {
   try {
     if (blocks.length <= 0) {
-      console.info(`${id} had 0 blocks`)
+      //console.info(`${id} had 0 blocks`)
       return success(blocks.length)
     }
-    console.info(`${id} try to write ${blocks.length} blocks to ${filename}`)
+    //console.info(`${id} try to write ${blocks.length} blocks to ${filename}`)
     const file = getFileHandle(filename)
     const preblob = `<?xml version="1.0" encoding="UTF-8"?>\n<root>\n`
     const postblob = `\n</root>`
@@ -178,7 +178,7 @@ function continue_work(
     target_file,
   }
   if (streamed_to >= end_byte_offset) {
-    console.info(`${id} ${NAME} end of section reached`)
+    //console.info(`${id} ${NAME} end of section reached`)
     return success({ more_work: false, args })
   }
 

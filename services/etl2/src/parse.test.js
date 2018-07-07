@@ -69,17 +69,14 @@ describe('parse.js', function() {
       const data = { filePath: testFileCloud }
       const result = await parse(thisId, data)
       assertSuccess(result)
-      const parseRet = payload(result)
-      assert(parseRet.jsonJobs)
-      assert(parseRet.jsonJobs.root.job[0].city)
+      const p = payload(result)
+      assert(typeof p.target_file === 'string', true)
     })
 
     it(`should return google structured data`, async () => {
       const data = { filePath: testFileCloud }
       const result = await parse(thisId, data)
       assertSuccess(result)
-      const parseRet = payload(result)
-      assert(parseRet.jsonJobs.root.job[0].gsd)
     })
 
     it(`should write a file`, async () => {})

@@ -47,7 +47,7 @@ async function do_file_things(id, data) {
   const r6 = await save(target_file, JSON.stringify(jsonJobs))
   if (isFailure(r6)) return r6
 
-  return success({ id, jsonJobs, target_file })
+  return success({ id, target_file })
 }
 
 function addGoogleStructuredData(json) {
