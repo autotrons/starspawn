@@ -59,7 +59,7 @@ app.get('/:command', async (req, res) => {
       const destination = 'starspawn_jobs/sitemaps'
       const job_size = 300 // bytes for safeness
       const max_file_size = 1e7
-      const count = Math.floor(max_file_size / job_size) // 10 MB max
+      const count = 10000 // 10 MB max
       const iteration = 0
       const sitemapPaths = []
 
