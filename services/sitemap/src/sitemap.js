@@ -120,7 +120,7 @@ function extractFields(data) {
   return {
     lastMod: posted_at,
     loc: buildUrl(url),
-    changefreq: 'never',
+    changefreq: 'weekly',
     priority: 0.5, // 0.5 is the default value.
   }
 }
