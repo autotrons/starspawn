@@ -14,3 +14,4 @@
 # [START app_yaml]
 runtime: nodejs8
 service: default
+instance_class: F4
