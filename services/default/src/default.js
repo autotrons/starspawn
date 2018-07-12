@@ -23,10 +23,15 @@ app.use(favicon(path.join(__dirname, '../favicon.ico')))
 
 app.get('/:jobId', async (req, res) => {
   if (req.params.jobId === 'robots.txt') {
-    res.status(200).send(ROBOTS_TXT_STRING)
+    res
+      .set('Content-Type', 'text/plain')
+      .status(200)
+      .send(ROBOTS_TXT_STRING)
+    return
   }
   if (req.params.jobId === 'favicon.ico') {
     res.status(200).send('')
+    return
   }
   if (extension(req.params.jobId) === 'xml') {
     const r1 = await getFile(`${SITEMAP_BUCKET}/${req.params.jobId}`)

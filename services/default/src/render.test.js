@@ -2,7 +2,6 @@ const {
   assertSuccess,
   payload,
   assertEmpty,
-  assertFailure,
 } = require('@pheasantplucker/failables')
 const assert = require('assert')
 const equal = assert.deepEqual

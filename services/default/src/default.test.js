@@ -13,6 +13,11 @@ describe(`default.js`, () => {
       const result = await get(`http://localhost:${PORT}/${id}`)
       assertSuccess(result)
     })
+    it(`should get the robots.txt`, async () => {
+      const id = 'robots.txt'
+      const result = await get(`http://localhost:${PORT}/${id}`)
+      assertSuccess(result)
+    })
     it(`should stop`, async () => {
       await stop()
     })
