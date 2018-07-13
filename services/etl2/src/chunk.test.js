@@ -1,13 +1,9 @@
 const equal = require('assert').deepEqual
 const uuid = require(`uuid`)
-const {
-  assertSuccess,
-  success,
-  payload,
-} = require('@pheasantplucker/failables')
+const { assertSuccess, payload } = require('@pheasantplucker/failables')
 const { chunk, find_blocks, write_blocks, continue_work } = require('./chunk')
 const fs = require('fs')
-const storage = require('@google-cloud/storage')()
+const { exists } = require('@pheasantplucker/gc-cloudstorage')
 
 const TOPIC = `test-${uuid.v4()}`
 
@@ -20,7 +16,7 @@ describe('chunk.js', function() {
       const filename = `datafeeds/chunks/${id}/1.xml`
       const r1 = await write_blocks(id, filename, blocks, TOPIC)
       assertSuccess(r1, 2)
-      const r2 = await exists('datafeeds', `chunks/${id}/1.xml`)
+      const r2 = await exists(filename)
       assertSuccess(r2, true)
     })
     it('does nothing if no blocks', async () => {
@@ -144,11 +140,3 @@ describe('chunk.js', function() {
     })
   })
 })
-
-async function exists(bucket, filename) {
-  const result = await storage
-    .bucket(bucket)
-    .file(filename)
-    .exists()
-  return success(result[0])
-}
