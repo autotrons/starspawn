@@ -22,9 +22,8 @@
   },
   "dependencies": {
     "@google-cloud/debug-agent": "^2.5.1",
-    "@google-cloud/storage": "^1.7.0",
     "@pheasantplucker/failables": "^2.0.8",
-    "@pheasantplucker/gc-cloudstorage": "1.0.4",
+    "@pheasantplucker/gc-cloudstorage": "^1.0.6",
     "@pheasantplucker/gc-datastore": "^1.0.8",
     "@pheasantplucker/http": "^1.0.2",
     "@pheasantplucker/redis": "0.0.6",

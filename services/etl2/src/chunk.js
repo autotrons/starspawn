@@ -6,8 +6,11 @@ const {
   payload,
 } = require('@pheasantplucker/failables')
 const miss = require('mississippi')
-const storage = require('@google-cloud/storage')()
-const { stats } = require('@pheasantplucker/gc-cloudstorage')
+const {
+  stats,
+  getReadStream,
+  save,
+} = require('@pheasantplucker/gc-cloudstorage')
 
 const COMPLETE = 'complete'
 const NAME = 'chunk'
@@ -33,17 +36,16 @@ async function chunk(id, data) {
       end_byte_offset = payload(stat_result).size
     }
 
-    // console.info(
-    //   `${id} ${NAME} starting on ${filename} at ${start_byte_offset} to ${end_byte_offset}`
-    // )
-
-    const { bucketpart, filepart } = split_filename(filename)
-    const myBucket = storage.bucket(bucketpart)
-    const readFileHandle = myBucket.file(filepart)
-    const rStream = readFileHandle.createReadStream({
+    const opts = {
       start: start_byte_offset,
       end: end_byte_offset,
-    })
+    }
+    const r0 = await getReadStream(filename, opts)
+    if (isFailure(r0)) {
+      console.error(`${id} ${NAME} find_blocks getReadStream ${payload(r0)}`)
+      return r0
+    }
+    const rStream = payload(r0)
 
     const r1 = await find_blocks(
       rStream,
@@ -142,13 +144,12 @@ async function write_blocks(id, filename, blocks) {
       return success(blocks.length)
     }
     //console.info(`${id} try to write ${blocks.length} blocks to ${filename}`)
-    const file = getFileHandle(filename)
     const preblob = `<?xml version="1.0" encoding="UTF-8"?>\n<root>\n`
     const postblob = `\n</root>`
     const blob = blocks.join('\n')
-    const r1 = await file.save(preblob + blob + postblob)
+    const r1 = await save(filename, preblob + blob + postblob)
     if (isFailure(r1)) {
-      console.error(`${id} ${NAME} write_blocks await file.save ${payload(r1)}`)
+      console.error(`${id} ${NAME} write_blocks await file save ${payload(r1)}`)
       return r1
     }
     return success(blocks.length)
@@ -187,19 +188,6 @@ function continue_work(
 
 function chop(str, idx) {
   return str.slice(idx)
-}
-
-function split_filename(n) {
-  const [bucketpart, ...filepartarray] = n.split('/')
-  const filepart = filepartarray.join('/')
-  return { bucketpart, filepart }
-}
-
-function getFileHandle(filepath) {
-  const { bucketpart, filepart } = split_filename(filepath)
-  const bucket = storage.bucket(bucketpart)
-  const file = bucket.file(filepart)
-  return file
 }
 
 module.exports = {
