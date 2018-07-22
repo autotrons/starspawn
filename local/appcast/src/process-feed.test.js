@@ -26,4 +26,10 @@ describe('process-feed.js', () => {
     const result = await doesFileExist(unzip_output_file)
     assertSuccess(result, true)
   })
+
+  it(`should have parsed the file`, async () => {
+    const parsed_output_file = processStepResults[2]
+    const result = await doesFileExist(parsed_output_file)
+    assertSuccess(result, true)
+  })
 })

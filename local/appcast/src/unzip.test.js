@@ -4,7 +4,7 @@ const { unzip } = require('./unzip')
 describe('unzip.js', function() {
   let outputFile
   describe('unzip()', () => {
-    const source_file = './cache/test_feed.xml.gz'
+    const source_file = './samples/test_feed.xml.gz'
     it('split up a file', async () => {
       const result = await unzip(source_file)
       assertSuccess(result)

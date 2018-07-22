@@ -2,13 +2,16 @@ const { assertSuccess, payload } = require('@pheasantplucker/failables')
 const equal = require('assert').deepEqual
 const assert = require('assert')
 
-const { parse, cleanHtmlBody, cleanJobBody } = require('./parse')
-
+const {
+  parse,
+  cleanHtmlBody,
+  cleanJobBody,
+  appcast_datastore_job,
+} = require('./parse')
+const parsedJsonOutput = require('../samples/parsed_output.json')
 const fileName = 'test_feed.xml'
-const testFileRelative = `./cache/${fileName}`
-
+const testFileRelative = `./samples/${fileName}`
 const dirtyHtml = `With locations across 47 states, we are certain to have a rehab job for you.</p></p><p style="MARGIN-BOTTOM\: 0px; MARGIN-TOP\: 0px"><span style="BACKGROUND\: white"><p></p></span><o></o></p>`
-
 const cleanHtml = `With locations across 47 states, we are certain to have a rehab job for you.<p></p><p></p><p><p></p></p>`
 
 describe('parse.js', function() {
@@ -50,6 +53,17 @@ describe('parse.js', function() {
       assertSuccess(result)
       const returnedHtml = payload(result)
       equal(returnedHtml, cleanHtml)
+    })
+  })
+  describe(`appcast_datastore_job()`, () => {
+    it(`create a job with datastore schema`, async () => {
+      const job = parsedJsonOutput.root.job[0]
+      const transformed_job = appcast_datastore_job(job)
+      const data = transformed_job
+      equal(typeof data.body, 'string')
+      equal(data.body.length > 100, true)
+      equal(typeof data.gsd, 'string')
+      equal(data.gsd.length > 100, true)
     })
   })
 })
