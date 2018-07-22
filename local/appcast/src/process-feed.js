@@ -1,6 +1,7 @@
 const { success, isFailure, payload } = require('@pheasantplucker/failables')
 const { download } = require('./download')
 const { unzip } = require('./unzip')
+const { parse } = require('./parse')
 
 // ADD check of the appcast apply url is the same maybe hash it
 // ADD skills tags ???
@@ -19,6 +20,10 @@ async function processFeed(source_url) {
   if (isFailure(unzipResult)) return unzipResult
   const unzipped = payload(unzipResult).output_file
   steps.push(unzipped)
+
+  const parseResult = await parse(unzipped)
+  const parsed = payload(parseResult).output_file
+  steps.push(parsed)
   return success(steps)
 }
 

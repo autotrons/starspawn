@@ -1,6 +1,5 @@
 const { assertSuccess, payload } = require('@pheasantplucker/failables')
-const { doesFileExist, deleteFile } = require('./fs-failable')
-const uuid = require('uuid')
+const { doesFileExist } = require('./fs-failable')
 const { unzip } = require('./unzip')
 describe('unzip.js', function() {
   let outputFile
@@ -18,8 +17,8 @@ describe('unzip.js', function() {
     })
   })
 
-  after(async () => {
-    const r1 = await deleteFile(outputFile)
-    assertSuccess(r1)
-  })
+  // after(async () => {
+  //   const r1 = await deleteFile(outputFile)
+  //   assertSuccess(r1)
+  // })
 })
