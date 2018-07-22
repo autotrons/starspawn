@@ -1,1 +1,0 @@
-const {} = require('./main.js')

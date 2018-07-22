@@ -20,8 +20,12 @@
     "prettier": "^1.13.5"
   },
   "dependencies": {
+    "@pheasantplucker/failables": "^2.0.14",
     "@pheasantplucker/gc-cloudstorage": "^1.0.6",
+    "await-fs": "^1.0.0",
     "compromise": "^11.11.0",
+    "he": "^1.1.1",
+    "md5": "^2.2.1",
     "sanitize-html": "^1.18.2",
     "simple-get": "^3.0.2",
     "uuid": "^3.3.2",
