@@ -1,2 +1,5 @@
 node_modules/
 src/*.json
+cache/*
+!cache/.gitkeep
+!cache/test_feed.xml.gz
