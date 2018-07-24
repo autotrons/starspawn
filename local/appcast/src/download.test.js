@@ -11,7 +11,6 @@ describe(`download.js`, function() {
       // THIS IS SPECIFIC TO THE ABOVE FILE
       const output_file = `./cache/5269_1532295509000.gz`
       const result = await download(source_url)
-      console.log(`result:`, result)
       assertSuccess(result, { output_file })
       const r2 = await doesFileExist(output_file)
       assertSuccess(r2, true)

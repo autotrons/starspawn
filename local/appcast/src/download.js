@@ -24,7 +24,7 @@ async function download(source_url) {
   const output_file = `./cache/${cached_file_name}`
 
   const r2 = await doesFileExist(output_file)
-  if (isFailure(r1)) return r1
+  if (isFailure(r2)) return r2
   const is_file_cached = payload(r2)
 
   if (is_file_cached) {
@@ -39,8 +39,8 @@ async function download(source_url) {
 
   const write_stream = fs.createWriteStream(output_file)
 
-  //  const r4 = await download_file(source_url, write_stream)
-  //  if (isFailure(r4)) return r4
+  const r4 = await download_file(source_url, write_stream)
+  if (isFailure(r4)) return r4
   return success({ output_file })
 }
 
