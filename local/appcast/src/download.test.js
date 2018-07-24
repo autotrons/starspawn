@@ -8,9 +8,10 @@ describe(`download.js`, function() {
     it('download a file', async () => {
       const source_url =
         'https://storage.googleapis.com/starspawn_tests/test_feed.xml.gz'
-      const end_of_url = source_url.substr(source_url.lastIndexOf('/') + 1)
-      const output_file = `./cache/${end_of_url}`
+      // THIS IS SPECIFIC TO THE ABOVE FILE
+      const output_file = `./cache/5269_1532295509000.gz`
       const result = await download(source_url)
+      console.log(`result:`, result)
       assertSuccess(result, { output_file })
       const r2 = await doesFileExist(output_file)
       assertSuccess(r2, true)
