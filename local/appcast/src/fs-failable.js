@@ -11,6 +11,15 @@ async function doesFileExist(path) {
   })
 }
 
+async function fileStat(path) {
+  return new Promise(resolve => {
+    fs.stat(path, (err, stats) => {
+      if (err) resolve(success(false))
+      resolve(success(stats))
+    })
+  })
+}
+
 async function deleteFile(path) {
   return new Promise(resolve => {
     fs.unlink(path, err => {
@@ -23,4 +32,5 @@ async function deleteFile(path) {
 module.exports = {
   doesFileExist,
   deleteFile,
+  fileStat,
 }
