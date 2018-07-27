@@ -2,7 +2,7 @@ FROM python:3
 
 EXPOSE 5000
 
-ADD server.py /
+ADD . /
 
 RUN pip install flask
 RUN pip install gensim
