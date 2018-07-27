@@ -1,3 +1,4 @@
 node_modules/
-.vscode/settings.json
 .vs/
+.vscode/
+__pycache__/
