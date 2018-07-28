@@ -11,31 +11,40 @@ const fs = require('fs')
 const he = require('he')
 const md5 = require('md5')
 
+const JOBS_PER_FILE = 50000
+
 async function parse(filePath) {
   return new Promise(resolve => {
     const readStream = fs.createReadStream(filePath)
+    const file_name = filePath.substr(filePath.lastIndexOf('/') + 1)
     let output_file
     const flowStream = flow(readStream)
     let counter = 0
+    let file_number = 0
+    let files = []
     flowStream.on('tag:job', (job, encoding, cb) => {
-      const file_number = Math.floor(counter / 50000)
-      output_file = `./cache/${file_number}.json`
+      file_number = Math.floor(counter / JOBS_PER_FILE)
+      output_file = `./cache/${file_name}_${file_number}.json`
+      if (counter % JOBS_PER_FILE === 0) files.push(output_file)
+
       const cleanJobResult = process_job(job)
       if (isFailure(cleanJobResult)) {
         ///log or some shit
       }
       const jsonData = payload(cleanJobResult)
       // if (counter > 100) return
+
       fs.appendFile(output_file, JSON.stringify(jsonData) + '\n', err => {
         if (err) throw err
       })
+
       counter += 1
     })
-    flowStream.on('end', () => {
-      resolve(success({ output_file }))
+    flowStream.on('end', async () => {
+      resolve(success({ files }))
     })
     flowStream.on('error', () => {
-      resolve(failure({ output_file }))
+      resolve(failure({ files }))
     })
   })
 }
