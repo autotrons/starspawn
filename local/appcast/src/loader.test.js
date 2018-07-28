@@ -19,7 +19,6 @@ const { appcast_datastore_job } = require('./parse')
 const equal = require('assert').deepEqual
 const uuid = require('uuid')
 
-const filename = `starspawn_tests/parsed_output.json`
 const files = ['./samples/parsed_output.json']
 const { forJobsToEntities } = require(`../../../samples/loaderJobs`)
 
@@ -28,7 +27,6 @@ const IS_TEST = true
 const APPCAST_JOBS = forJobsToEntities.map(j =>
   appcast_datastore_job(j, IS_TEST)
 )
-const thisId = uuid.v4()
 
 createDatastoreClient('starspawn-201921')
 
@@ -90,6 +88,7 @@ describe('loader.js', function() {
   })
 
   describe('loader()', function() {
+    this.timeout(540 * 1000)
     it('should load a list of jobs into Datastore', async () => {
       const r1 = await loader(files, IS_TEST)
       assertSuccess(r1)

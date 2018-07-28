@@ -10,7 +10,6 @@ const {
   batch_get,
   batch_set,
 } = require('@pheasantplucker/gc-datastore')
-const fs = require('fs')
 const { read_file_to_array } = require('./fs-failable')
 const R = require('ramda')
 const redis = require('@pheasantplucker/redis')
@@ -26,14 +25,12 @@ async function setup_redis() {
   return redis.createClient(redis_opts)
 }
 
-const JOBS_BATCH_SIZE = 500
-
 createDatastoreClient('starspawn-201921')
 
 async function loader(files, isTest = false) {
   try {
     const files_len = files.length
-    let file_counter = 0
+    let last_return
     for (var i = 0; i < files_len; i++) {
       // pull the jobs out of the data pipeline file
       const r1 = await read_file_to_array(files[i])
@@ -43,12 +40,12 @@ async function loader(files, isTest = false) {
       const job_batch = jobs_and_empty_batch.filter(Boolean)
       const r2 = await process_jobs_batch(job_batch, isTest)
       if (isFailure(r2)) return r2
-      file_counter++
+      last_return = payload(r2)
     }
 
-    return success(file_counter)
+    return success(last_return)
   } catch (e) {
-    return failure(e.toString())
+    return failure('loader fail- ' + e.toString())
   }
 }
 
@@ -64,7 +61,7 @@ async function process_jobs_batch(jobs, isTest) {
     if (isFailure(changes_result)) return changes_result
     const changes = payload(changes_result)
     const ids_to_insert = [...changes.add, ...changes.changed]
-    if (ids_to_insert.length === 0) loader_results(id, checked_ids, [], [], [])
+    if (ids_to_insert.length === 0) loader_results(checked_ids, [], [], [])
 
     // update the main database (datastore)
     const updates = filter_records(jobs, ids_to_insert, 'id')
@@ -82,19 +79,18 @@ async function process_jobs_batch(jobs, isTest) {
     // return
 
     return loader_results(
-      id,
       checked_ids,
       changes.add,
       changes.changed,
       cache_diff_ids
     )
   } catch (e) {
-    return failure(e.toString())
+    return failure('process_jobs_batch fail ' + e.toString())
   }
 }
 
-function loader_results(id, checked_ids, added_ids, changed_ids, cached_ids) {
-  log_results(id, checked_ids, added_ids, changed_ids, cached_ids)
+function loader_results(checked_ids, added_ids, changed_ids, cached_ids) {
+  log_results(checked_ids, added_ids, changed_ids, cached_ids)
   return success({
     checked: checked_ids,
     added: added_ids,
@@ -103,12 +99,12 @@ function loader_results(id, checked_ids, added_ids, changed_ids, cached_ids) {
   })
 }
 
-function log_results(id, checked_ids, added_ids, changed_ids, cached_ids) {
+function log_results(checked_ids, added_ids, changed_ids, cached_ids) {
   const checked = checked_ids.length
   const added = added_ids.length
   const changed = changed_ids.length
   const cached = cached_ids.length
-  console.info(JSON.stringify({ id, checked, changed, added, cached }))
+  console.info(JSON.stringify({ checked, changed, added, cached }))
 }
 
 function get_datastore_meta() {
@@ -216,7 +212,7 @@ async function delete_jobs_from_cache_by_id(job_ids) {
     const commands = job_ids.map(id => ['del', id])
     return redis.pipeline(commands)
   } catch (error) {
-    return failure(error.toString())
+    return failure('delete_jobs_from_cache_by_id ' + error.toString())
   }
 }
 

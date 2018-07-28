@@ -37,9 +37,9 @@ async function processFeed(source_url, is_test = false) {
   steps.push(files)
 
   const loaderResult = await loader(files, is_test)
-  console.log(`loaderResult:`, hydrate(loaderResult))
-  const something = payload(loaderResult)
-  steps.push(something)
+  // console.log(`loaderResult:`, hydrate(loaderResult))
+  const last_payload = payload(loaderResult)
+  steps.push(last_payload)
   return success(steps)
 }
 
