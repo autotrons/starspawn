@@ -28,8 +28,15 @@ describe('process-feed.js', () => {
   })
 
   it(`should have parsed the file`, async () => {
-    const parsed_output_file = processStepResults[2]
+    const parsed_steps_data = processStepResults[2]
+    const parsed_output_file = parsed_steps_data[0]
     const result = await doesFileExist(parsed_output_file)
+    assertSuccess(result, true)
+  })
+
+  it(`should have loaded the file`, async () => {
+    const loaded_steps_data = processStepResults[3]
+    //const result = await doesFileExist(loaded_output_file)
     assertSuccess(result, true)
   })
 })

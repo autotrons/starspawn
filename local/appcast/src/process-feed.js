@@ -7,6 +7,7 @@ const {
 const { download } = require('./download')
 const { unzip } = require('./unzip')
 const { parse } = require('./parse')
+const { loader } = require('./loader')
 
 // ADD check of the appcast apply url is the same maybe hash it
 // ADD skills tags ???
@@ -17,11 +18,13 @@ const { parse } = require('./parse')
 // node src/start.js https://exchangefeeds.s3.amazonaws.com/9d2dcb702d7d6b801f34227c04c8bb23/feed.xml.gz
 async function processFeed(source_url) {
   const steps = []
+
   const downloadResult = await download(source_url)
   console.log(`downloadResult:`, hydrate(downloadResult))
   if (isFailure(downloadResult)) return downloadResult
   const downloaded = payload(downloadResult).output_file
   steps.push(downloaded)
+
   const unzipResult = await unzip(downloaded)
   console.log(`unzipResult:`, hydrate(unzipResult))
   if (isFailure(unzipResult)) return unzipResult
@@ -30,8 +33,13 @@ async function processFeed(source_url) {
 
   const parseResult = await parse(unzipped)
   console.log(`parseResult:`, hydrate(parseResult))
-  const parsed = payload(parseResult).output_file
-  steps.push(parsed)
+  const { files } = payload(parseResult)
+  steps.push(files)
+
+  const loaderResult = await loader(files)
+  console.log(`loaderResult:`, hydrate(loaderResult))
+  const something = payload(loaderResult)
+  steps.push(something)
   return success(steps)
 }
 
