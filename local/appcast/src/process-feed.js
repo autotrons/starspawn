@@ -16,7 +16,7 @@ const { loader } = require('./loader')
 // LOADER diffs from bigquery and loads the difference and deletes
 
 // node src/start.js https://exchangefeeds.s3.amazonaws.com/9d2dcb702d7d6b801f34227c04c8bb23/feed.xml.gz
-async function processFeed(source_url) {
+async function processFeed(source_url, is_test = false) {
   const steps = []
 
   const downloadResult = await download(source_url)
@@ -36,7 +36,7 @@ async function processFeed(source_url) {
   const { files } = payload(parseResult)
   steps.push(files)
 
-  const loaderResult = await loader(files)
+  const loaderResult = await loader(files, is_test)
   console.log(`loaderResult:`, hydrate(loaderResult))
   const something = payload(loaderResult)
   steps.push(something)
