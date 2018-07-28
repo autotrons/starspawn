@@ -20,8 +20,8 @@ async function download(source_url) {
   const content_len = parseInt(headers['content-length'])
   const epoch_date = new Date(messy_date).getTime()
   const etag_with_quotes = headers.etag
-  const etag = etag_with_quotes.replace(/"/g,"");
-  const cached_file_name = epoch_date + "_" + etag + '.' + end_of_file
+  const etag = etag_with_quotes.replace(/"/g, '')
+  const cached_file_name = epoch_date + '_' + etag + '.' + end_of_file
 
   const output_file = `./cache/${cached_file_name}`
 

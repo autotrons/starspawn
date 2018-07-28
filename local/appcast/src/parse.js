@@ -7,7 +7,6 @@ const {
 const { json2gsd } = require('./json2gsd.js')
 const flow = require('xml-flow')
 const sanitizeHtml = require('sanitize-html')
-const { deleteFile } = require('./fs-failable')
 const fs = require('fs')
 const he = require('he')
 const md5 = require('md5')

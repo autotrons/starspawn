@@ -39,24 +39,23 @@ async function readFile(path, encoding) {
   })
 }
 
-
 async function read_file_to_array(path) {
   return new Promise(resolve => {
     try {
       const read_line_stream = readline.createInterface({
-          input: fs.createReadStream(path),
-          crlfDelay: Infinity,
-        })
+        input: fs.createReadStream(path),
+        crlfDelay: Infinity,
+      })
 
-        let lines = []
+      let lines = []
 
-        read_line_stream.on('line', line => {
-          lines.push(line)
-        })
+      read_line_stream.on('line', line => {
+        lines.push(line)
+      })
 
-        read_line_stream.on('close', () => {
-          resolve(success(lines))
-        })
+      read_line_stream.on('close', () => {
+        resolve(success(lines))
+      })
     } catch (e) {
       resolve(failure(e))
     }
@@ -68,5 +67,5 @@ module.exports = {
   deleteFile,
   fileStat,
   readFile,
-  read_file_to_array
+  read_file_to_array,
 }
