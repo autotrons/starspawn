@@ -11,7 +11,6 @@ function main() {
 
     xmlStream = xmlFlow(httpStream)
     xmlStream.on('tag:sitemap', processSitemap)
-    xmlStream.on('end', updateOutput)
   })
 }
 
@@ -22,6 +21,7 @@ function processSitemap(sitemap) {
 
     xmlStream = xmlFlow(httpStream)
     xmlStream.on('tag:url', processJobUrl)
+    xmlStream.on('end', updateOutput)
   })
 }
 
