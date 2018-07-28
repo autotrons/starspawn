@@ -91,8 +91,7 @@ describe('loader.js', function() {
 
   describe('loader()', function() {
     it('should load a list of jobs into Datastore', async () => {
-      const isTest = true
-      const r1 = await loader(files, isTest)
+      const r1 = await loader(files, IS_TEST)
       assertSuccess(r1)
       // If this fails it may be because the jobs
       // are already in the loadertest namespace in datastore

@@ -10,8 +10,8 @@ const {
   batch_get,
   batch_set,
 } = require('@pheasantplucker/gc-datastore')
-const readline = require('readline')
 const fs = require('fs')
+const { read_file_to_array } = require('./fs-failable')
 const R = require('ramda')
 const redis = require('@pheasantplucker/redis')
 const SECONDS_IN_60_DAYS = 60 * 60 * 24 * 60
@@ -32,33 +32,17 @@ createDatastoreClient('starspawn-201921')
 
 async function loader(files, isTest = false) {
   try {
-    // setup
-    await setup_redis()
-    let namespace = 'prod'
-    if (isTest) namespace = 'test'
     const files_len = files.length
     let file_counter = 0
     for (var i = 0; i < files_len; i++) {
       // pull the jobs out of the data pipeline file
-      const read_line_stream = readline.createInterface({
-        input: fs.createReadStream(files[i]),
-        crlfDelay: Infinity,
-      })
-
-      let jobs = []
-      let counter = 0
-      read_line_stream.on('line', line => {
-        jobs.push(line)
-        if (counter > 0 && counter % JOBS_BATCH_SIZE === 0) {
-          read_line_stream.pause()
-          console.log(`triggered pause with count:`, counter, jobs.length)
-        }
-        counter++
-      })
-
-      read_line_stream.on('close', () => {
-        console.log('read stream closed with count:', counter, jobs.length)
-      })
+      const r1 = await read_file_to_array(files[i])
+      if (isFailure(r1)) return r1
+      const read_batch = payload(r1)
+      const jobs_and_empty_batch = read_batch.map(line => JSON.parse(line))
+      const job_batch = jobs_and_empty_batch.filter(Boolean)
+      const r2 = await process_jobs_batch(job_batch, isTest)
+      if (isFailure(r2)) return r2
       file_counter++
     }
 
@@ -68,8 +52,12 @@ async function loader(files, isTest = false) {
   }
 }
 
-async function process_jobs_batch(jobs) {
+async function process_jobs_batch(jobs, isTest) {
   try {
+    // setup
+    await setup_redis()
+    let namespace = 'prod'
+    if (isTest) namespace = 'test'
     const checked_ids = jobs.map(j => j.id)
     // Figure out which jobs have changed or are new
     const changes_result = await check_job_changes(namespace, jobs)
