@@ -16,10 +16,12 @@ async function download(source_url) {
   const r1 = await get_headers(source_url)
   if (isFailure(r1)) return r1
   const headers = payload(r1)
-  const content_len = parseInt(headers['content-length'])
   const messy_date = headers['last-modified']
+  const content_len = parseInt(headers['content-length'])
   const epoch_date = new Date(messy_date).getTime()
-  const cached_file_name = content_len + '_' + epoch_date + '.' + end_of_file
+  const etag_with_quotes = headers.etag
+  const etag = etag_with_quotes.replace(/"/g,"");
+  const cached_file_name = epoch_date + "_" + etag + '.' + end_of_file
 
   const output_file = `./cache/${cached_file_name}`
 
