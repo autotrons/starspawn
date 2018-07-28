@@ -5,7 +5,7 @@ let count = 0
 let matchFilter = 0
 
 function main() {
-  get('https://joblog.app/sitemapindex.xml', function (error, httpStream) {
+  get('https://joblog.app/sitemapindex.xml', (error, httpStream) => {
     if (error) throw error
     if (httpStream.statusCode != 200) throw new Error(`Unexpected status code while downloading sitemap index: ${httpStream.statusCode}`)
 
@@ -15,7 +15,7 @@ function main() {
 }
 
 function processSitemap(sitemap) {
-  get(sitemap.loc, function (error, httpStream) {
+  get(sitemap.loc, (error, httpStream) => {
     if (error) throw error
     if (httpStream.statusCode != 200) throw new Error(`Unexpected status code while downloading sitemap: ${httpStream.statusCode}`)
 
@@ -29,7 +29,7 @@ const processJobUrl = function (jobUrl) {
   count++
   if (jobUrl.loc.indexOf('-') === -1) matchFilter++
 
-  if(count % 10000 === 0) updateOutput()
+  if (count % 10000 === 0) updateOutput()
 }
 
 function updateOutput() {
