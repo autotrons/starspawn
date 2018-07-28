@@ -7,11 +7,12 @@ const {
 const { json2gsd } = require('./json2gsd.js')
 const flow = require('xml-flow')
 const sanitizeHtml = require('sanitize-html')
+const { deleteFile } = require('./fs-failable')
 const fs = require('fs')
 const he = require('he')
 const md5 = require('md5')
 
-const JOBS_PER_FILE = 50000
+const JOBS_PER_FILE = 500
 
 async function parse(filePath) {
   return new Promise(resolve => {
@@ -22,10 +23,16 @@ async function parse(filePath) {
     let counter = 0
     let file_number = 0
     let files = []
-    flowStream.on('tag:job', (job, encoding, cb) => {
+    flowStream.on('tag:job', async (job, encoding, cb) => {
       file_number = Math.floor(counter / JOBS_PER_FILE)
       output_file = `./cache/${file_name}_${file_number}.json`
-      if (counter % JOBS_PER_FILE === 0) files.push(output_file)
+
+      if (counter % JOBS_PER_FILE === 0) {
+        fs.unlink(output_file, err => {
+          if (err) console.log(err)
+        })
+        files.push(output_file)
+      }
 
       const cleanJobResult = process_job(job)
       if (isFailure(cleanJobResult)) {
