@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node src/main.js",
+    "start": "node src/start.js",
     "test": "mocha ./src/*.test.js",
     "testwatch": "mocha --watch ./src/*.test.js",
     "lint": "eslint src/ lib/ tests/ --fix --ignore-pattern !.eslintrc.js",
