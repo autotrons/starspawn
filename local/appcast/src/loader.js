@@ -32,17 +32,28 @@ async function loader(files, isTest = false) {
     const files_len = files.length
     let last_return
     for (var i = 0; i < files_len; i++) {
+      const start = process.hrtime()
       // pull the jobs out of the data pipeline file
       const r1 = await read_file_to_array(files[i])
+      const readFileElapsed = process.hrtime(start)
       if (isFailure(r1)) return r1
       const read_batch = payload(r1)
       const jobs_and_empty_batch = read_batch.map(line => JSON.parse(line))
+      const parseLinesElapsed = process.hrtime(readFileElapsed)
       const job_batch = jobs_and_empty_batch.filter(Boolean)
+      const filterEmptiesElapsed = process.hrtime(parseLinesElapsed)
       const r2 = await process_jobs_batch(job_batch, isTest)
+      const processBatchElapsed = process.hrtime(filterEmptiesElapsed)
       if (isFailure(r2)) return r2
       last_return = payload(r2)
+      console.log(`Time benchmarking (in seconds):`)
+      console.log(`readFileElapsed:`, readFileElapsed [0])
+      console.log(`parseLinesElapsed:`, parseLinesElapsed[0])
+      console.log(`filterEmptiesElapsed:`, filterEmptiesElapsed[0])
+      console.log(`processBatchElapsed:`, processBatchElapsed[0])
     }
-
+    // last_return would just be the process result from the last batch it updated
+    // is that desired? 
     return success(last_return)
   } catch (e) {
     return failure('loader fail- ' + e.toString())
