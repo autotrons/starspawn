@@ -1,5 +1,5 @@
 const { success, failure } = require('@pheasantplucker/failables')
-const fs = require('fs')
+const fs = require('fs-extra')
 const readline = require('readline')
 const { constants: fsConstants } = fs
 
@@ -30,11 +30,21 @@ async function deleteFile(path) {
   })
 }
 
+
 async function readFile(path, encoding) {
   return new Promise(resolve => {
     fs.readFile(path, encoding, (err, data) => {
       if (err) resolve(success(false))
       resolve(success(data))
+    })
+  })
+}
+
+async function mkdir(path) {
+  return new Promise(resolve => {
+    fs.mkdir(path, (err) => {
+      if (err) resolve(success(err))
+      resolve(success(true))
     })
   })
 }
@@ -68,4 +78,5 @@ module.exports = {
   fileStat,
   readFile,
   read_file_to_array,
+  mkdir,
 }

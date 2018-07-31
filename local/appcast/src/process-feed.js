@@ -20,24 +20,24 @@ async function processFeed(source_url, is_test = false) {
   const steps = []
 
   const downloadResult = await download(source_url)
-  console.log(`downloadResult:`, hydrate(downloadResult))
+  console.log(`${Date.now()} downloadResult:`, hydrate(downloadResult))
   if (isFailure(downloadResult)) return downloadResult
   const downloaded = payload(downloadResult).output_file
   steps.push(downloaded)
 
   const unzipResult = await unzip(downloaded)
-  console.log(`unzipResult:`, hydrate(unzipResult))
+  console.log(`${Date.now()} unzipResult:`, hydrate(unzipResult))
   if (isFailure(unzipResult)) return unzipResult
   const unzipped = payload(unzipResult).output_file
   steps.push(unzipped)
 
   const parseResult = await parse(unzipped)
-  console.log(`parseResult:`, hydrate(parseResult))
+  console.log(`${Date.now()} parseResult:`, hydrate(parseResult))
   const { files } = payload(parseResult)
   steps.push(files)
 
   const loaderResult = await loader(files, is_test)
-  // console.log(`loaderResult:`, hydrate(loaderResult))
+  console.log(`${Date.now()} loaderResult`)
   const last_payload = payload(loaderResult)
   steps.push(last_payload)
   return success(steps)

@@ -26,6 +26,7 @@
     "@pheasantplucker/redis": "0.0.6",
     "await-fs": "^1.0.0",
     "compromise": "^11.11.0",
+    "fs-extra": "^7.0.0",
     "he": "^1.1.1",
     "json2json": "^0.2.8",
     "md5": "^2.2.1",
