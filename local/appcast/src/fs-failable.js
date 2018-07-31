@@ -30,7 +30,6 @@ async function deleteFile(path) {
   })
 }
 
-
 async function readFile(path, encoding) {
   return new Promise(resolve => {
     fs.readFile(path, encoding, (err, data) => {
@@ -42,7 +41,7 @@ async function readFile(path, encoding) {
 
 async function mkdir(path) {
   return new Promise(resolve => {
-    fs.mkdir(path, (err) => {
+    fs.mkdir(path, err => {
       if (err) resolve(success(err))
       resolve(success(true))
     })

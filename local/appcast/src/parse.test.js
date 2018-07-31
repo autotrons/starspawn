@@ -14,7 +14,7 @@ const testFileRelative = `./samples/${fileName}`
 const dirtyHtml = `With locations across 47 states, we are certain to have a rehab job for you.</p></p><p style="MARGIN-BOTTOM\: 0px; MARGIN-TOP\: 0px"><span style="BACKGROUND\: white"><p></p></span><o></o></p>`
 const cleanHtml = `With locations across 47 states, we are certain to have a rehab job for you.<p></p><p></p><p><p></p></p>`
 
-describe.only('parse.js', function() {
+describe('parse.js', function() {
   describe(`parse()`, () => {
     it('should convert the XML from the file into JSON', async () => {
       const result = await parse(testFileRelative)
