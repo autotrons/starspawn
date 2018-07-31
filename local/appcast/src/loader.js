@@ -31,29 +31,32 @@ async function loader(files, isTest = false) {
   try {
     const files_len = files.length
     let last_return
-    for (var i = 0; i < files_len; i++) {
-      const start = process.hrtime()
-      // pull the jobs out of the data pipeline file
-      const r1 = await read_file_to_array(files[i])
-      const readFileElapsed = process.hrtime(start)
-      if (isFailure(r1)) return r1
-      const read_batch = payload(r1)
-      const jobs_and_empty_batch = read_batch.map(line => JSON.parse(line))
-      const parseLinesElapsed = process.hrtime(readFileElapsed)
-      const job_batch = jobs_and_empty_batch.filter(Boolean)
-      const filterEmptiesElapsed = process.hrtime(parseLinesElapsed)
-      const r2 = await process_jobs_batch(job_batch, isTest)
-      const processBatchElapsed = process.hrtime(filterEmptiesElapsed)
-      if (isFailure(r2)) return r2
-      last_return = payload(r2)
-      console.log(`Time benchmarking (in seconds):`)
-      console.log(`readFileElapsed:`, readFileElapsed [0])
-      console.log(`parseLinesElapsed:`, parseLinesElapsed[0])
-      console.log(`filterEmptiesElapsed:`, filterEmptiesElapsed[0])
-      console.log(`processBatchElapsed:`, processBatchElapsed[0])
+    const concurrent_files = 4
+    let failures = []
+    for (var i = 0; i < files_len; i += concurrent_files) {
+      console.time('ENTIRE_LOADER')
+
+      let these_files = files.slice(i, i + concurrent_files)
+
+      await Promise.all(
+        these_files.map(async file => {
+          // console.log(`file:`, file)
+          const r1 = await read_file_to_array(file)
+          if (isFailure(r1)) failures.push(r1)
+          const read_batch = payload(r1)
+          const jobs_and_empty_batch = read_batch.map(line => JSON.parse(line))
+          const job_batch = jobs_and_empty_batch.filter(Boolean)
+          const r2 = await process_jobs_batch(job_batch, isTest)
+          if (isFailure(r2)) failures.push(r2)
+          last_return = payload(r2)
+          return payload(r2)
+        })
+      )
+
+      console.timeEnd('ENTIRE_LOADER')
     }
     // last_return would just be the process result from the last batch it updated
-    // is that desired? 
+    // is that desired?
     return success(last_return)
   } catch (e) {
     return failure('loader fail- ' + e.toString())
@@ -84,6 +87,7 @@ async function process_jobs_batch(jobs, isTest) {
     let cache_diff_ids = []
     const cache_diff_jobs = diff_for_cache(jobs, changes)
     const r3 = await add_jobs_to_cache(cache_diff_jobs)
+
     if (isSuccess(r3)) {
       cache_diff_ids = cache_diff_jobs.map(j => j.id)
     }

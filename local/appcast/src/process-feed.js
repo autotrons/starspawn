@@ -1,9 +1,4 @@
-const {
-  success,
-  isFailure,
-  payload,
-  hydrate,
-} = require('@pheasantplucker/failables')
+const { success, isFailure, payload } = require('@pheasantplucker/failables')
 const { download } = require('./download')
 const { unzip } = require('./unzip')
 const { parse } = require('./parse')
@@ -19,25 +14,30 @@ const { loader } = require('./loader')
 async function processFeed(source_url, is_test = false) {
   const steps = []
 
+  console.time('download')
   const downloadResult = await download(source_url)
-  console.log(`${Date.now()} downloadResult:`, hydrate(downloadResult))
+  console.timeEnd('download')
+
   if (isFailure(downloadResult)) return downloadResult
   const downloaded = payload(downloadResult).output_file
   steps.push(downloaded)
 
+  console.time('unzip')
   const unzipResult = await unzip(downloaded)
-  console.log(`${Date.now()} unzipResult:`, hydrate(unzipResult))
+  console.timeEnd('unzip')
   if (isFailure(unzipResult)) return unzipResult
   const unzipped = payload(unzipResult).output_file
   steps.push(unzipped)
 
+  console.time('parse')
   const parseResult = await parse(unzipped)
-  console.log(`${Date.now()} parseResult:`, hydrate(parseResult))
+  console.timeEnd('parse')
   const { files } = payload(parseResult)
   steps.push(files)
 
+  console.time('loader')
   const loaderResult = await loader(files, is_test)
-  console.log(`${Date.now()} loaderResult`)
+  console.timeEnd('loader')
   const last_payload = payload(loaderResult)
   steps.push(last_payload)
   return success(steps)
