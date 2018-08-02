@@ -5,6 +5,9 @@ warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
 
 import spacy
 
+# 'en' is alias for 'en_core_web_sm'
+# ls -l /usr/local/lib/python3.7/site-packages/spacy/data/en
+print('loading spacy en model')
 nlp = spacy.load('en')
 
 train_data = [
@@ -33,16 +36,35 @@ Lead the development team in the deployment/implementation of software solutions
 As an Unit Manager - RN, you will oversee the care management of a population of patients within an assigned area, unit or clinical function. The position conducts the nursing process, assessment, planning, implementation, and evaluation under the scope of the State's Nurse Practice Act of Registered Nurse licensure. The Unit Manager - RN coordinates resource utilization, timely and appropriate care interventions, and interdisciplinary communication to enhance patient and family satisfaction, adherence to center's clinical systems and regulatory compliance.''', {"cats": {"SOFTWARE": 0}}),
 ]
 
-
+print('create textcategorizer')
+# 'textcat' is the TextCategorizer pipeline component - https://spacy.io/api/language#create_pipe
+# it doesn't seem like create_pipe creates a new pipeline, but rather just a component for the pipe
 textcat = nlp.create_pipe('textcat')
+
+print('add textcat to pipeline')
+#add component to the pipeline - https://spacy.io/api/language#add_pipe
 nlp.add_pipe(textcat, last=True)
+
+print('add label')
 textcat.add_label('SOFTWARE')
+
+print('about to begin training')
+
 optimizer = nlp.begin_training(use_gpu = True)
+
+print('training complete, begin iterations')
+
 for itn in range(100):
     for doc, gold in train_data:
         nlp.update([doc], [gold], sgd=optimizer)
 
+print('iterations complete, saving model to disk')
+
+nlp.to_disk('./models')
+
+print('model saved, executing test run')
+
 doc = nlp(u'''This role is in the Enterprise Platforms – AID (Automation, Integration & Development) team, which is responsible for supporting integration needs for various Enterprise platforms. The role enables integration of enterprise systems and business processes using open source frameworks and COTS products.
 
 The Senior Associate Software Engineer plays an integral role in building a holistic view and roadmap of the company’s information technology strategy and processes. The Senior Associate Software Engineer partners with both business and technology groups to ensure that the proposed technical solutions align with the company’s overall objectives, and that both groups enable and drive each other to meet the company’s mission and vision.''')
-print(doc.cats)
+print(doc.cats) 
