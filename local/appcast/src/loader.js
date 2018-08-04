@@ -31,13 +31,13 @@ async function loader(files, isTest = false) {
   try {
     const files_len = files.length
     let last_return
-    const concurrent_files = 4
-    let failures = []
+    const concurrent_files = 2
     for (var i = 0; i < files_len; i += concurrent_files) {
       console.time('ENTIRE_LOADER')
 
       let these_files = files.slice(i, i + concurrent_files)
 
+      let failures = []
       await Promise.all(
         these_files.map(async file => {
           // console.log(`file:`, file)
@@ -52,7 +52,7 @@ async function loader(files, isTest = false) {
           return payload(r2)
         })
       )
-
+      console.log(`failures:`, failures)
       console.timeEnd('ENTIRE_LOADER')
     }
     // last_return would just be the process result from the last batch it updated
@@ -79,14 +79,18 @@ async function process_jobs_batch(jobs, isTest) {
 
     // update the main database (datastore)
     const updates = filter_records(jobs, ids_to_insert, 'id')
+    console.time('add_jobs_to_db')
     const r2 = await add_jobs_to_db(namespace, updates)
+    console.timeEnd('add_jobs_to_db')
     if (isFailure(r2)) return r2
 
     // update the cache
     // TODO
     let cache_diff_ids = []
+    console.time('add_jobs_to_cache')
     const cache_diff_jobs = diff_for_cache(jobs, changes)
     const r3 = await add_jobs_to_cache(cache_diff_jobs)
+    console.timeEnd('add_jobs_to_cache')
 
     if (isSuccess(r3)) {
       cache_diff_ids = cache_diff_jobs.map(j => j.id)
@@ -140,6 +144,7 @@ async function check_job_changes(namespace, jobs) {
   const redis_keys = jobs.map(j => j.id)
   const cache_result = await redis.batch_get(redis_keys)
   if (isFailure(cache_result)) {
+    console.log(`cache_result:`, cache_result)
   } // do nothing and use the DB
   const cached_jobs = payload(cache_result)
   const need_db_check = jobs.filter(j => j.hash !== cached_jobs[j.id])
