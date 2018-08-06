@@ -7,35 +7,50 @@ const {
 const { json2gsd } = require('./json2gsd.js')
 const flow = require('xml-flow')
 const sanitizeHtml = require('sanitize-html')
-const fs = require('fs')
+const fs = require('fs-extra')
 const he = require('he')
 const md5 = require('md5')
 
+const JOBS_PER_FILE = 500
+
 async function parse(filePath) {
+  const file_name = filePath.substr(filePath.lastIndexOf('/') + 1)
+  const temp_dir = `./cache/parse_${file_name}/`
+  await fs.emptyDir(temp_dir)
+
   return new Promise(resolve => {
     const readStream = fs.createReadStream(filePath)
     let output_file
     const flowStream = flow(readStream)
     let counter = 0
-    flowStream.on('tag:job', (job, encoding, cb) => {
-      const file_number = Math.floor(counter / 50000)
-      output_file = `./cache/${file_number}.json`
+    let file_number = 0
+    let files = []
+    flowStream.on('tag:job', async (job, encoding, cb) => {
+      file_number = Math.floor(counter / JOBS_PER_FILE)
+      output_file = `${temp_dir}/${file_name}_${file_number}.json`
+
+      if (counter % JOBS_PER_FILE === 0) {
+        files.push(output_file)
+      }
+
       const cleanJobResult = process_job(job)
       if (isFailure(cleanJobResult)) {
         ///log or some shit
       }
       const jsonData = payload(cleanJobResult)
       // if (counter > 100) return
+
       fs.appendFile(output_file, JSON.stringify(jsonData) + '\n', err => {
         if (err) throw err
       })
+
       counter += 1
     })
     flowStream.on('end', () => {
-      resolve(success({ output_file }))
+      resolve(success({ files }))
     })
     flowStream.on('error', () => {
-      resolve(failure({ output_file }))
+      resolve(failure({ files }))
     })
   })
 }

@@ -8,7 +8,7 @@ const {
   cleanJobBody,
   appcast_datastore_job,
 } = require('./parse')
-const parsedJsonOutput = require('../samples/parsed_output.json')
+const parsedJsonOutput = require('../samples/pre_parse.json')
 const fileName = 'test_feed.xml'
 const testFileRelative = `./samples/${fileName}`
 const dirtyHtml = `With locations across 47 states, we are certain to have a rehab job for you.</p></p><p style="MARGIN-BOTTOM\: 0px; MARGIN-TOP\: 0px"><span style="BACKGROUND\: white"><p></p></span><o></o></p>`
@@ -20,7 +20,7 @@ describe('parse.js', function() {
       const result = await parse(testFileRelative)
       assertSuccess(result)
       const p = payload(result)
-      assert(typeof p.output_file === 'string', true)
+      assert(typeof p.files[0] === 'string', true)
     })
 
     it(`should return google structured data`, async () => {
@@ -57,8 +57,7 @@ describe('parse.js', function() {
   })
   describe(`appcast_datastore_job()`, () => {
     it(`create a job with datastore schema`, async () => {
-      const job = parsedJsonOutput.root.job[0]
-      const transformed_job = appcast_datastore_job(job)
+      const transformed_job = appcast_datastore_job(parsedJsonOutput)
       const data = transformed_job
       equal(typeof data.body, 'string')
       equal(data.body.length > 100, true)
