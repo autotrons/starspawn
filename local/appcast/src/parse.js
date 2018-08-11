@@ -15,7 +15,7 @@ const JOBS_PER_FILE = 500
 
 async function parse(filePath) {
   const file_name = filePath.substr(filePath.lastIndexOf('/') + 1)
-  const temp_dir = `./cache/parse_${file_name}/`
+  const temp_dir = `./cache/parse_${file_name}`
   await fs.emptyDir(temp_dir)
 
   return new Promise(resolve => {
@@ -24,33 +24,45 @@ async function parse(filePath) {
     const flowStream = flow(readStream)
     let counter = 0
     let file_number = 0
-    let files = []
+    let jobFiles = []
+    let cityFiles = {}
     flowStream.on('tag:job', async (job, encoding, cb) => {
       file_number = Math.floor(counter / JOBS_PER_FILE)
-      output_file = `${temp_dir}/${file_name}_${file_number}.json`
-
+      job_output_file = `${temp_dir}/${file_name}_${file_number}.json`
+      
       if (counter % JOBS_PER_FILE === 0) {
-        files.push(output_file)
+        jobFiles.push(job_output_file)
       }
-
+      
       const cleanJobResult = process_job(job)
       if (isFailure(cleanJobResult)) {
         ///log or some shit
       }
       const jsonData = payload(cleanJobResult)
       // if (counter > 100) return
+      
+      const city = jsonData.city
+      const clean_city = city.replace(' ', '_')
+      const state = jsonData.state
+    
+      const city_key = `${state}_${clean_city}`
+      city_output_file = `${temp_dir}/${file_name}_${state}_${clean_city}.json`
+      cityFiles[city_key] = city_output_file
+      fs.appendFile(job_output_file, JSON.stringify(jsonData) + '\n', err => {
+        if (err) throw err
+      })      
 
-      fs.appendFile(output_file, JSON.stringify(jsonData) + '\n', err => {
+      fs.appendFile(city_output_file, JSON.stringify(jsonData) + '\n', err => {
         if (err) throw err
       })
 
       counter += 1
     })
     flowStream.on('end', () => {
-      resolve(success({ files }))
+      resolve(success({ jobFiles, cityFiles }))
     })
     flowStream.on('error', () => {
-      resolve(failure({ files }))
+      resolve(failure({ jobFiles, cityFiles }))
     })
   })
 }

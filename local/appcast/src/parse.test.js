@@ -1,6 +1,7 @@
 const { assertSuccess, payload } = require('@pheasantplucker/failables')
 const equal = require('assert').deepEqual
 const assert = require('assert')
+const { doesFileExist } = require('./fs-failable')
 
 const {
   parse,
@@ -20,7 +21,7 @@ describe('parse.js', function() {
       const result = await parse(testFileRelative)
       assertSuccess(result)
       const p = payload(result)
-      assert(typeof p.files[0] === 'string', true)
+      assert(typeof p.jobFiles[0] === 'string', true)
     })
 
     it(`should return google structured data`, async () => {
@@ -28,7 +29,24 @@ describe('parse.js', function() {
       assertSuccess(result)
     })
 
-    it(`should write a file`, async () => {})
+    it(`should write a job file`, async () => {
+      const result = await parse(testFileRelative)
+      assertSuccess(result)
+      const files = payload(result).jobFiles
+      const fileWritten = await doesFileExist(files[0])
+      assertSuccess(fileWritten, true)
+    })
+
+    it(`should write a city file`, async () => {
+      const result = await parse(testFileRelative)
+      assertSuccess(result)
+      const files = payload(result).cityFiles
+      const keys = Object.keys(files)
+      keys.forEach(async k => {
+        const fileWritten = await doesFileExist(files[k])
+        assertSuccess(fileWritten, true)
+      })
+    })
   })
 
   describe(`cleanJobBody()`, () => {

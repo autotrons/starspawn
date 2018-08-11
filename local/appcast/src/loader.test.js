@@ -19,7 +19,8 @@ const { appcast_datastore_job } = require('./parse')
 const equal = require('assert').deepEqual
 const uuid = require('uuid')
 
-const files = ['./samples/parsed_output.json']
+const job_files = ['./samples/parsed_output.json']
+const city_files = ['./samples/test_feed.xml_CA_San_Jose.json']
 const { forJobsToEntities } = require(`../../../samples/loaderJobs`)
 
 const NAMESPACE = 'test'
@@ -87,25 +88,47 @@ describe('loader.js', function() {
     })
   })
 
-  describe('loader()', function() {
+  describe.only('loader()', function() {
     this.timeout(540 * 1000)
+    let jobData
+    let jobData
     it('should load a list of jobs into Datastore', async () => {
-      const r1 = await loader(files, IS_TEST)
+      const r1 = await loader(job_files, city_files, IS_TEST)
       assertSuccess(r1)
       // If this fails it may be because the jobs
       // are already in the loadertest namespace in datastore
       // remove them via the UI or by running the test again
       // also the cache needs to be cleared of the ids
-      const batch = payload(r1).checked.map(id => ['job', id])
+      data = payload(r1)
+    })
+    
+    it(`should have loaded jobs`, async () => {
+      equal(jobData.added.length, 100)
+      equal(jobData.checked.length, 100)
+      equal(jobData.cached.length, 100)
+    })
+    
+    it(`clean up the jobs`, async () => {
+      const batch = data.checked.map(id => ['job', id])
       const r2 = await batch_delete(NAMESPACE, batch)
       assertSuccess(r2)
-      const p = payload(r1)
-      const r3 = await delete_jobs_from_cache_by_id(p.checked)
+    })
+
+    it(`should have loaded cities`, async () => {
+      equal(data.added.length, 100)
+      equal(data.checked.length, 100)
+      equal(data.cached.length, 100)
+    })
+    
+    it(`clean up the cities`, async () => {
+      const batch = data.checked.map(id => ['job', id])
+      const r2 = await batch_delete(NAMESPACE, batch)
+      assertSuccess(r2)
+    })
+    
+    it(`should clear from cache`, async () => {
+      const r3 = await delete_jobs_from_cache_by_id(data.checked)
       assertSuccess(r3)
-      const p2 = payload(r1)
-      equal(p2.added.length, 100)
-      equal(p2.checked.length, 100)
-      equal(p2.cached.length, 100)
     })
   })
 })

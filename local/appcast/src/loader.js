@@ -4,6 +4,7 @@ const {
   isFailure,
   isSuccess,
   payload,
+  anyFailed,
 } = require('@pheasantplucker/failables')
 const {
   createDatastoreClient,
@@ -25,34 +26,59 @@ async function setup_redis() {
   return redis.createClient(redis_opts)
 }
 
+// facet page
+//
+// STATE - CITY - (keyword)
+// Wichita, Kansas Jobs
+// - Nurse job
+// - Truck job
+// - Yelp job
+// paginate?
+// short descrip -> job apply
+// short desc -> our job page -> job apply
+
+
+// Job Title - <location>
+// Summary...
+// Learn More <h4> // Apply <h3>
+
+///////
+// DONE parse => outputs a city file (all jobs in that city) ... sandiego.ca.json
+    // when a new city is identified, create file
+    // otherwise append job to city file
+// loader => kind: 'city' key: sandiego.ca.1
+    // { page: 1
+    //   totalPages: 6
+    //   jobs: [job1, job2, job3]    
+    // }
+  // writes to datastore['city'] w/ 
+
+//////
+// render => get joblog.app/ca/sandiego/1/
+
+
 createDatastoreClient('starspawn-201921')
 
-async function loader(files, isTest = false) {
+async function loader(jobsFiles, cityFiles, isTest = false) {
   try {
-    const files_len = files.length
+    const files_len = jobsFiles.length
     let last_return
     const concurrent_files = 2
     for (var i = 0; i < files_len; i += concurrent_files) {
       console.time('ENTIRE_LOADER')
 
-      let these_files = files.slice(i, i + concurrent_files)
+      let end_index = i + concurrent_files
+      if (end_index - 1 > files_len) end_index = files_len - 1
+      let these_files = jobsFiles.slice(i, end_index)
 
       let failures = []
-      await Promise.all(
-        these_files.map(async file => {
-          // console.log(`file:`, file)
-          const r1 = await read_file_to_array(file)
-          if (isFailure(r1)) failures.push(r1)
-          const read_batch = payload(r1)
-          const jobs_and_empty_batch = read_batch.map(line => JSON.parse(line))
-          const job_batch = jobs_and_empty_batch.filter(Boolean)
-          const r2 = await process_jobs_batch(job_batch, isTest)
-          if (isFailure(r2)) failures.push(r2)
-          last_return = payload(r2)
-          return payload(r2)
-        })
-      )
-      console.log(`failures:`, failures)
+      // const cityResult = await loadCities(cityFiles)
+      // if (isFailure(cityResult)) return cityResult
+      const jobsResult = await loadJobs(these_files, isTest)  
+      last_return = payload(jobsResult)
+      if (isFailure(jobsResult)) return jobsResultr
+
+      if (failures.length > 0)  console.log(`failures:`, failures)
       console.timeEnd('ENTIRE_LOADER')
     }
     // last_return would just be the process result from the last batch it updated
@@ -61,6 +87,25 @@ async function loader(files, isTest = false) {
   } catch (e) {
     return failure('loader fail- ' + e.toString())
   }
+}
+
+async function loadJobs(these_files, isTest) {
+  let last_return
+  const promises = these_files.map(async file => {
+    // console.log(`file:`, file)
+    const r1 = await read_file_to_array(file)
+    if (isFailure(r1)) return r1
+    const read_batch = payload(r1)
+    const jobs_and_empty_batch = read_batch.map(line => JSON.parse(line))
+    const job_batch = jobs_and_empty_batch.filter(Boolean)
+    const r2 = await process_jobs_batch(job_batch, isTest)
+    if (isFailure(r2)) return r2
+    last_return = payload(r2)
+    return payload(r2)
+  })
+  const results = await Promise.all(promises)
+  if(anyFailed(results)) return results.filter(f => isFailure(f))
+  return success(last_return)
 }
 
 async function process_jobs_batch(jobs, isTest) {
